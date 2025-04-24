@@ -5,10 +5,17 @@ services:
     image: postgres:16
     container_name: my-postgres-db
     restart: always
+
+    # importa tutte le variabili da .env
+    env_file:
+      - .env
+
+    # le mette anche come environment nel container
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: database
+      POSTGRES_USER: user_root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: e_artisan
+
     ports:
       - "5432:5432"
     volumes:
