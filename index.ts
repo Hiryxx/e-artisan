@@ -1,23 +1,5 @@
-import express from "express";
-import dotenv from "dotenv";
+import Server from "./lib/server/server";
 
-import authRouter from "./routers/auth";
+const server = new Server()
 
-// configures dotenv to work in your application
-dotenv.config();
-const app = express();
-
-const PORT = process.env.PORT;
-
-app.use('/auth', authRouter);
-
-app.get("/", (request, response) => { 
-  response.status(200).send("Hello World");
-}); 
-
-app.listen(PORT, () => { 
-  console.log("Server running at PORT: ", PORT); 
-}).on("error", (error) => {
-  // gracefully handle error
-  throw new Error(error.message);
-})
+server.startServer().then()
