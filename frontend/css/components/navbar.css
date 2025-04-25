@@ -10,12 +10,11 @@
 #nav-options{
     display: flex;
     flex-direction: row;
-    height: 50px;
     justify-content: space-between;
     width: 20%;
 }
 
-#nav-options > p{
+#nav-options > a{
     cursor: pointer;
     color: gray;
 }
