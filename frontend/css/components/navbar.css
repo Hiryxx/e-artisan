@@ -1,0 +1,21 @@
+#nav{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+}
+
+#nav-options{
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    justify-content: space-between;
+    width: 20%;
+}
+
+#nav-options > p{
+    cursor: pointer;
+    color: gray;
+}

@@ -1,6 +1,6 @@
-package-lock.json
+backend/package-lock.json
 node_modules
 .idea
-.env
+backend/.env
 
-.dist/
+backend/dist/
