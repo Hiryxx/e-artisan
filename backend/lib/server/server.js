@@ -1,25 +1,25 @@
-import Database from "../db/database";
-import express, {Express} from "express";
+import Database from "../db/database.js";
+import express from "express";
 import dotenv from "dotenv";
-import apiRouter from "../../routers";
+import apiRouter from "../../routers/index.js";
 
 
 
 class Server {
-    app: Express
+    app
 
     constructor() {
         this.app = express();
         dotenv.config();
     }
 
-    public async bootstrap(){
+    async bootstrap(){
         let db = new Database()
 
         await db.bootstrap()
     }
 
-    public loadServer(){
+    loadServer(){
         // configures dotenv to work in your application
         this.app.use(apiRouter) // This has all routers
 
@@ -28,7 +28,7 @@ class Server {
         });
     }
 
-    public async startServer(){
+    async startServer(){
         await this.bootstrap()
         this.loadServer()
 

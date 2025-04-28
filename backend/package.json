@@ -2,24 +2,18 @@
   "name": "e-artisan",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx tsc && node dist/index.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@types/pg": "^8.11.14",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "pg": "^8.15.5"
-  },
-  "devDependencies": {
-    "@types/dotenv": "^6.1.1",
-    "@types/express": "^5.0.1",
-    "@types/node": "^22.14.1",
-    "typescript": "^5.8.3"
   }
 }
