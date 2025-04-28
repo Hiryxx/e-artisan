@@ -18,3 +18,10 @@
     cursor: pointer;
     color: gray;
 }
+
+#shopping-cart{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+}
