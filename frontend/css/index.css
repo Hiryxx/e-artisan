@@ -2,9 +2,31 @@ html,
 body{
     height: 100%;
 }
+
+/*
+For more control:
+#logo-container {
+    display: inline-block;
+}
+
+#logo {
+    width: 12rem;
+    height: auto;
+    max-height: 5rem;
+    object-fit: contain;
+}
+<a href="index.html" id="logo-container">
+    <img id="logo" src="images/e-artisan-logo.png" alt="E-ARTISAN Logo">
+</a>
+ */
+
 #logo{
-    width:1px;
-    height:1px;
+    width: 15rem;
+    height: 6.7rem;
+    background-image: url("../images/e-artisan-logo.png");
+    background-position: center left;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 #page-body{
     display: flex;
@@ -14,8 +36,57 @@ body{
 }
 
 #product-section{
-    width: 80%;
+    width: 78%;
     height: 100%;
-    background-color: red;
-    margin-left: 5rem;
+    /*background-color: red;*/
+    margin-left: 10rem;
+
+}
+#products {
+    display: flex;
+    align-items: start;
+    flex-wrap: wrap;
+    height: 47%;
+}
+
+#products > .product{
+    width: 22rem;
+    height: 25rem;
+    margin-right: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.product > .product-img {
+    width: 100%;
+    height: 19.3rem;
+    /*background-color: green;*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.product-img > img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    width: auto;
+    height: auto;
+}
+
+.product > .product-info{
+    /*TODO fix to fit behaviour*/
+    height: 5.7rem;
+    /*background-color: blueviolet;*/
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+
+}
+.product-info > .product-info-text{
+    font-size: 1rem;
+    padding-left: 0.5rem;
 }
