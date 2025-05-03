@@ -1,5 +1,5 @@
+const navbarId = 'navbar-placeholder'
 document.addEventListener('DOMContentLoaded', function () {
-    const navbarId = 'navbar-placeholder'
     extractHtml("components/navbar.html", navbarId)
     loadComponents()
 });
@@ -103,5 +103,13 @@ const loadComponents = () => {
         </div>
         `
     }
-
+}
+// todo switch to class
+/**
+ * Switch page
+ * @param page Page name without url (e.g. "home" for "/pages/home.html")
+ */
+const switchPage = (page) => {
+    window.location.href = page === "home" ? `../frontend/index.html` : `../frontend/pages/${page}.html`
+    extractHtml("components/navbar.html", navbarId)
 }

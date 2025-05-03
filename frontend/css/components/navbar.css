@@ -14,7 +14,7 @@
     width: 20%;
 }
 
-#nav-options > a{
+#nav-options > p{
     cursor: pointer;
     color: gray;
 }
