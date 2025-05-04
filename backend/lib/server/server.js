@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import apiRouter from "../../routers/index.js";
 import jwt from "jsonwebtoken";
 
+export const db = new Database()
 
 function unless(path, middleware) {
     // do this but with more than one path
@@ -18,7 +19,7 @@ function unless(path, middleware) {
     }
 }
 
-class Server {
+export class Server {
     app
 
     constructor() {
@@ -27,8 +28,6 @@ class Server {
     }
 
     async bootstrap() {
-        let db = new Database()
-
         await db.bootstrap()
     }
 
@@ -74,5 +73,3 @@ class Server {
 
 }
 
-
-export default Server;

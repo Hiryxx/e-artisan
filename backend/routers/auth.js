@@ -1,19 +1,42 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import Database from "../lib/db/database.js";
 import uuid4 from "uuid4";
+import {db} from "../lib/server/server.js";
 
 const router = express.Router()
-const db = new Database()
 
-// JWT Token
+// JWT Token generator
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
 router.get("/login", async (req, res) => {
-    res.status(200).send("Logged in")
+    const { email, password } = req.body;
+
+    try {
+        const result = await db.dbConnection.pool.query(
+            'SELECT * FROM users WHERE email = $1',
+            [email]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        const user = result.rows[0];
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        const token = generateToken(user.user_uuid);
+        res.json({ token, user });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Server error" });
+    }
 })
 
 router.get("/register", async (req, res) => {
@@ -22,8 +45,7 @@ router.get("/register", async (req, res) => {
     const uuid = uuid4();
 
     try {
-        const result = await db.dbConnection.pool.query(
-            //calcolare uuid,email,password,nome,cognome, ruolo
+        await db.dbConnection.pool.query(
             'INSERT INTO users (user_uuid, password, email, name, lastname, role_id) VALUES ($1, $2, $3, $4, $5, $6)',
             [uuid, hashedPassword, email, name, lastname, role_id]
         );
