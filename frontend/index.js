@@ -40,7 +40,7 @@ const router = new Router("home", "pages/") // todo ok here or in the event list
 
 // todo remove event listener
 document.addEventListener('DOMContentLoaded', function () {
-    extractHtml(router.getCurrentPagePath(), pageId, loadComponents)
+    extractHtml(router.getCurrentPagePath(), pageId, getPageFunction('home'))
 });
 
 // TODO CHANGE NAME
