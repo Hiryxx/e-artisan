@@ -7,23 +7,33 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="./css/components/navbar.css">
     <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/pages/about.css">
     <title>E artisan</title>
 </head>
 <body>
-<div id="navbar-placeholder"></div>
-<!-- Full body -->
-<section id="page-body">
-    <!-- Products section -->
-    <section id="product-section">
-        <h2>
-            All Products
-        </h2>
-        <!-- Products -->
-        <section id="products">
-
-        </section>
-
+<nav id="nav">
+    <div id="logo">
+    </div>
+    <section id="nav-options">
+        <p onclick="switchPage('home')">
+            Home
+        </p>
+        <p onclick="switchPage('about')">
+            About
+        </p>
+        <p onclick="switchPage('account')">
+            Account
+        </p>
+        <p onclick="switchPage('shopping_cart')">
+            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
+            </svg>
+        </p>
     </section>
+</nav>
+<!-- Pages will be loaded here -->
+<section id="current-page">
+
 </section>
 
 <script src="index.js"></script>

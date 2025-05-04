@@ -1,16 +1,55 @@
-const navbarId = 'navbar-placeholder'
+
+//todo find a way move this to router.js
+class Router {
+    currentPage = null
+    pagesPath = null
+
+    constructor(page, pagesPath){
+        this.currentPage = page
+        this.pagesPath = pagesPath
+    }
+
+    changePage(newPage){
+        this.currentPage = newPage
+    }
+
+    getCurrentPagePath() {
+        return this.currentPage ? this.pagesPath + this.currentPage + ".html": null
+    }
+
+}
+
+/**
+ * Get the function to call after loading the page
+ * @param page
+ * @returns {(function(): void)|*|loadComponents}
+ */
+const getPageFunction = (page) => {
+    switch (page) {
+        case "home":
+            return loadComponents
+        case "about":
+            return () => {
+                console.log("About page loaded")
+            }
+    }
+}
+
+const pageId = "current-page"
+const router = new Router("home", "pages/") // todo ok here or in the event listener?
+
+// todo remove event listener
 document.addEventListener('DOMContentLoaded', function () {
-    extractHtml("components/navbar.html", navbarId)
-    loadComponents()
+    extractHtml(router.getCurrentPagePath(), pageId, getPageFunction('home'))
 });
 
 // TODO CHANGE NAME
-const extractHtml = (htmlUrl, elementId) => {
+const extractHtml = (htmlUrl, elementId, callAfter) => {
     fetch(htmlUrl)
         .then(response => response.text())
         .then(data => {
-            console.log(data)
             document.getElementById(elementId).innerHTML = data;
+            callAfter()
         })
         .catch(error => {
             console.error('Error loading navbar:', error);
@@ -110,6 +149,7 @@ const loadComponents = () => {
  * @param page Page name without url (e.g. "home" for "/pages/home.html")
  */
 const switchPage = (page) => {
-    window.location.href = page === "home" ? `../frontend/index.html` : `../frontend/pages/${page}.html`
-    extractHtml("components/navbar.html", navbarId)
+    router.changePage(page)
+    extractHtml(router.getCurrentPagePath(), pageId, getPageFunction(page))
+
 }
