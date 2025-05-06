@@ -41,6 +41,55 @@ const router = new Router("home", "pages/") // todo ok here or in the event list
 // todo remove event listener
 document.addEventListener('DOMContentLoaded', function () {
     extractHtml(router.getCurrentPagePath(), pageId, getPageFunction('home'))
+    const token = localStorage.getItem("token")
+
+    if(token){
+        document.getElementById("nav").innerHTML +=  `<div id="logo">
+    </div>
+    <section id="nav-options">
+        <p onclick="switchPage('home')">
+            Home
+        </p>
+        <p onclick="switchPage('about')">
+            About
+        </p>
+        <p onclick="switchPage('account')">
+            Account
+        </p>
+        <p onclick="switchPage('shopping_cart')">
+            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
+            </svg>
+        </p>
+    </section>`
+
+
+
+    }else{
+        document.getElementById("nav").innerHTML +=  ` <div id="logo">
+    </div>
+    <section id="nav-options">
+        <p onclick="switchPage('home')">
+            Home
+        </p>
+        <p onclick="switchPage('about')">
+            About
+        </p>
+        <p onclick="switchPage('login')">
+            Login
+        </p>
+        <p onclick="switchPage('register')">
+            Register
+        </p>
+        <p onclick="switchPage('shopping_cart')">
+            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
+            </svg>
+        </p>
+    </section>`
+    }
+
+
 });
 
 // TODO CHANGE NAME
@@ -252,6 +301,8 @@ const login = () => {
                 localStorage.setItem("token", token);
                 localStorage.setItem("user", JSON.stringify(user));
                 switchPage("home");
+                //todo reload page per aggiornare nav bar da aggiustare!
+                location.reload();
             } else {
                 alert("Login failed: Missing token");
             }
