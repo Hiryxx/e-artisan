@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import apiRouter from "../../routers/index.js";
 import jwt from "jsonwebtoken";
 
+dotenv.config();
 export const db = new Database()
 
 function unless(path, middleware) {
@@ -24,7 +25,6 @@ export class Server {
 
     constructor() {
         this.app = express();
-        dotenv.config();
     }
 
     async bootstrap() {
@@ -34,8 +34,8 @@ export class Server {
     loadServer() {
         // configures dotenv to work in your application
         this.app.use(unless(["/auth/login", "/auth/register"], this.middleware))
-        this.app.use(apiRouter) // This has all routers
         this.app.use(express.json())
+        this.app.use(apiRouter) // This has all routers
         this.app.get("/", (request, response) => {
             response.status(200).send("Hello World");
         });

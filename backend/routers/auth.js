@@ -39,10 +39,15 @@ router.get("/login", async (req, res) => {
     }
 })
 
-router.get("/register", async (req, res) => {
+router.post("/register", async (req, res) => {
     const { name, lastname, email, password, role_id } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const uuid = uuid4();
+
+    console.log("Registering user with UUID:", uuid);
+    console.log("leng:", uuid.length);
+
+    console.log(req.body)
 
     try {
         await db.dbConnection.pool.query(

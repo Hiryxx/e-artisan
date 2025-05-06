@@ -49,7 +49,8 @@ const extractHtml = (htmlUrl, elementId, callAfter) => {
         .then(response => response.text())
         .then(data => {
             document.getElementById(elementId).innerHTML = data;
-            callAfter()
+            if (callAfter)
+                callAfter()
         })
         .catch(error => {
             console.error('Error loading navbar:', error);
@@ -151,5 +152,64 @@ const loadComponents = () => {
 const switchPage = (page) => {
     router.changePage(page)
     extractHtml(router.getCurrentPagePath(), pageId, getPageFunction(page))
-
 }
+
+const register = () => {
+    // Get form values
+    const fname = document.getElementById("fname").value;
+    const lname = document.getElementById("lname").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const user_role = document.getElementById("user-role").checked; // Assuming it's a checkbox
+    const artisan_role = document.getElementById("artisan-role").checked; // Assuming it's a checkbox
+
+    // Basic validation
+    if (!fname || !lname || !email || !password || (!user_role && !artisan_role)) {
+        alert("Please fill all required fields");
+        return;
+    }
+
+
+    const user = {
+        name: fname,
+        lastname: lname,
+        email: email,
+        password: password,
+        role_id: user_role ? 2 : 3
+    };
+
+    console.log(JSON.stringify(user))
+
+    fetch("http://localhost:900/auth/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+
+        },
+        body: JSON.stringify(user)
+    })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log("Registration successful:", data);
+            const token = data.token;
+            const user = data.user;
+
+            if (token) {
+                localStorage.setItem("token", token);
+                localStorage.setItem("user", JSON.stringify(user));
+                switchPage("home");
+            } else {
+                alert("Registration failed: Missing token");
+            }
+        })
+        .catch(err => {
+            console.error("Registration error:", err.message);
+            alert(`Registration failed: ${err.message}`);
+        });
+};

@@ -6,7 +6,7 @@ class Database {
 
     createShipmentInfos = `CREATE TABLE IF NOT EXISTS shipment_infos (info_id INT PRIMARY KEY,street VARCHAR(100) NOT NULL,number VARCHAR(10) NOT NULL,zipcode VARCHAR(10) NOT NULL,state VARCHAR(50) NOT NULL,city VARCHAR(50) NOT NULL);`
 
-    createUsers = `CREATE TABLE IF NOT EXISTS users (user_uuid CHAR(32) PRIMARY KEY,password VARCHAR(255) NOT NULL,email VARCHAR(100) UNIQUE NOT NULL,name VARCHAR(50) NOT NULL,lastname VARCHAR(50) NOT NULL,role_id INT NOT NULL,info_id INT,FOREIGN KEY (role_id) REFERENCES user_roles(role_id),FOREIGN KEY (info_id) REFERENCES shipment_infos(info_id));`
+    createUsers = `CREATE TABLE IF NOT EXISTS users (user_uuid CHAR(36) PRIMARY KEY,password VARCHAR(255) NOT NULL,email VARCHAR(100) UNIQUE NOT NULL,name VARCHAR(50) NOT NULL,lastname VARCHAR(50) NOT NULL,role_id INT NOT NULL,info_id INT,FOREIGN KEY (role_id) REFERENCES user_roles(role_id),FOREIGN KEY (info_id) REFERENCES shipment_infos(info_id));`
 
     createPaymentInfos = `CREATE TABLE IF NOT EXISTS payment_infos (payment_id INT PRIMARY KEY,payment_method VARCHAR(50) NOT NULL);`
 
@@ -36,7 +36,10 @@ class Database {
             await client.query(this.createCategories);
             await client.query(this.createProducts);
             await client.query(this.createOrders);
-            await client.query(this.insertRoles);
+            const role = await client.query("SELECT role_id FROM user_roles");
+            if (role.rows.length === 0) {//create roles if not exists
+                await client.query(this.insertRoles);
+            }
 
             client.release()
             console.log("Database tables created successfully");
@@ -52,6 +55,7 @@ class DbConnection {
     _pool
 
     constructor() {
+        console.log("Connecting to database...");
         this._pool = new Pool({
             host: 'localhost',
             port: +process.env.DB_PORT,
