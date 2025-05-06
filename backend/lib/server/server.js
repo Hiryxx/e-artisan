@@ -3,6 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import apiRouter from "../../routers/index.js";
 import jwt from "jsonwebtoken";
+import  cors from "cors";
 
 dotenv.config();
 export const db = new Database()
@@ -32,6 +33,7 @@ export class Server {
     }
 
     loadServer() {
+        this.app.use(cors())
         // configures dotenv to work in your application
         this.app.use(unless(["/auth/login", "/auth/register"], this.middleware))
         this.app.use(express.json())

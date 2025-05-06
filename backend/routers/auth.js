@@ -11,9 +11,8 @@ const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
-router.get("/login", async (req, res) => {
+router.post("/login", async (req, res) => {
     const { email, password } = req.body;
-
     try {
         const result = await db.dbConnection.pool.query(
             'SELECT * FROM users WHERE email = $1',

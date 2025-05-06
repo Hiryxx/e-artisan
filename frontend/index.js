@@ -213,3 +213,51 @@ const register = () => {
             alert(`Registration failed: ${err.message}`);
         });
 };
+
+const login = () => {
+    // Get form values
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    // Basic validation
+    if (!email || !password) {
+        alert("Please fill all required fields");
+        return;
+    }
+
+
+    fetch( `http://localhost:900/auth/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({
+            email: email,
+            password: password
+        })
+    })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log("Login successful:", data);
+            const token = data.token;
+            const user = data.user;
+
+            if (token) {
+                localStorage.setItem("token", token);
+                localStorage.setItem("user", JSON.stringify(user));
+                switchPage("home");
+            } else {
+                alert("Login failed: Missing token");
+            }
+        })
+        .catch(err => {
+            console.error("Login error:", err.message);
+            alert(`Login failed: ${err.message}`);
+        });
+}
