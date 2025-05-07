@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import uuid4 from "uuid4";
 import {db} from "../lib/server/server.js";
+import User from "../lib/models/User.js";
 
 const router = express.Router()
 
@@ -14,18 +15,13 @@ const generateToken = (id) => {
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
     try {
-        const result = await db.dbConnection.pool.query(
-            'SELECT * FROM users WHERE email = $1',
-            [email]
-        );
+        const user = await User.getUserByEmail(email)
 
-        if (result.rows.length === 0) {
+        if (user === null) {
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        const user = result.rows[0];
-
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = User.checkPassword(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: "Invalid credentials" });
         }
@@ -40,26 +36,39 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
     const { name, lastname, email, password, role_id } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const uuid = uuid4();
+    const hashedPassword = User.hashPassword(password)
+
 
     try {
-        await db.dbConnection.pool.query(
-            'INSERT INTO users (user_uuid, password, email, name, lastname, role_id) VALUES ($1, $2, $3, $4, $5, $6)',
-            [uuid, hashedPassword, email, name, lastname, role_id]
-        );
-        const newUser = {
-            uuid,
+        const user = {
             name,
             lastname,
             email,
+            hashedPassword,
             role_id
-        };
-        res.json({ token: generateToken(newUser.uuid), user: newUser });
+        }
+        const userUUid = await User.newUser(user)
+        res.json({ token: generateToken(userUUid), user: user });
     } catch (error) {
         console.log(error);
         res.status(400).json({ message: "User already exists" });
     }
+})
+
+router.get("/token/validate", (req, res) => {
+    const token = req.headers.authorization;
+    if (!token || !token.startsWith("Bearer ")) {
+        //return res.status(401).send("Unauthorized");
+        res.json({ valid: false });
+    }
+
+    jwt.verify(token.split(" ")[1], process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            //return res.status(403).send("Forbidden");
+            res.json({ valid: true });
+        }
+        res.json({ valid: true });
+    });
 })
 
 
