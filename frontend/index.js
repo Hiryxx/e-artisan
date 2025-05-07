@@ -16,6 +16,8 @@ const getPageFunction = (page) => {
 
 const pageChangeEvent = new CustomEvent('pageChanged');
 
+
+
 const pageId = "current-page"
 const router = new Router("home", "pages/")
 
@@ -27,9 +29,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 document.addEventListener('pageChanged', function (e) {
+    const page = e.detail.page;
+    if (!page) {
+        console.error("No page found")
+        return
+    }
+    switchPage(page);
     loadNavbarAuth()
-    loadComponents()
 });
+
+const createPageChangeEvent = (page) => new CustomEvent('pageChanged', { detail: { page } });
 
 
 const extractHtml = (htmlUrl, elementId, callAfter) => {
@@ -240,8 +249,8 @@ const register = () => {
             if (token) {
                 localStorage.setItem("token", token);
                 localStorage.setItem("user", JSON.stringify(user));
-                switchPage("home");
-                document.dispatchEvent(pageChangeEvent);
+
+                document.dispatchEvent(createPageChangeEvent("home"));
             } else {
                 alert("Registration failed: Missing token");
             }
@@ -289,8 +298,7 @@ const login = () => {
             if (token) {
                 localStorage.setItem("token", token);
                 localStorage.setItem("user", JSON.stringify(user));
-                switchPage("home");
-                document.dispatchEvent(pageChangeEvent);
+                document.dispatchEvent(createPageChangeEvent("home"));
                 //location.reload();
             } else {
                 alert("Login failed: Missing token");
@@ -306,7 +314,7 @@ const login = () => {
 const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    document.dispatchEvent(pageChangeEvent);
+    document.dispatchEvent(createPageChangeEvent("home"));
 }
 
 // needed since now index.js is a module

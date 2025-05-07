@@ -35,7 +35,7 @@ export class Server {
     loadServer() {
         this.app.use(cors())
         // configures dotenv to work in your application
-        this.app.use(unless(["/auth/login", "/auth/register"], this.middleware))
+        this.app.use(unless(["/" ,"/auth/login", "/auth/register"], this.middleware))
         this.app.use(express.json())
         this.app.use(apiRouter) // This has all routers
         this.app.get("/", (request, response) => {

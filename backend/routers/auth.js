@@ -43,11 +43,6 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const uuid = uuid4();
 
-    console.log("Registering user with UUID:", uuid);
-    console.log("leng:", uuid.length);
-
-    console.log(req.body)
-
     try {
         await db.dbConnection.pool.query(
             'INSERT INTO users (user_uuid, password, email, name, lastname, role_id) VALUES ($1, $2, $3, $4, $5, $6)',
