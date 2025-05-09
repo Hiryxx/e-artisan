@@ -59,89 +59,40 @@ const loadComponents = () => {
     if (!productsDiv) {
         console.error("No products div found")
     }
-    // todo this is fetch
-    const products = [
-        {
-            id: "1",
-            name: "prova1",
-            price: 50,
-            img: "./images/products/prod1.webp"
+    // todo save after fetch and check whether to fetch again or not
+    fetch("http://localhost:900/product", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
         },
-        {
-            id: "2",
-            name: "prova2",
-            price: 100,
-            img: "./images/products/prod2.jpg"
-        },
-        {
-            id: "3",
-            name: "prova3",
-            price: 150,
-            img: "./images/products/prod3.jpg"
-        },
-        {
-            id: "4",
-            name: "prova4",
-            price: 200,
-            img: "./images/products/prod4.png"
-        },
-        {
-            id: "5",
-            name: "prova5",
-            price: 250,
-            img: "./images/products/prod5.jpg"
-        },
-        {
-            id: "6",
-            name: "prova6",
-            price: 300,
-            img: ""
-        },
-        {
-            id: "7",
-            name: "prova7",
-            price: 350,
-            img: ""
-        },
-        {
-            id: "8",
-            name: "prova8",
-            price: 400,
-            img: ""
-        },
-        {
-            id: "9",
-            name: "prova9",
-            price: 450,
-            img: ""
-        },
-        {
-            id: "10",
-            name: "prova10",
-            price: 500,
-            img: ""
-        },
-    ]
-    // TODO SEE IF OK
-    productsDiv.innerText = ""
+    }).then(res => {
+        if (!res.ok) {
+            throw new Error(`Server responded with status: ${res.status}`);
+        }
+        return res.json();
+    }).then(products =>{
+        productsDiv.innerText = ""
 
-    for (let prod of products) {
-        productsDiv.innerHTML += `
-        <div class="product">
-            <div class="product-img">
-                <img src=${prod.img} alt="prod-img">
+        for (let prod of products) {
+            productsDiv.innerHTML += `
+            <div class="product">
+                <div class="product-img">
+                    <img src="http://localhost:900/images?product_id=${prod.product_id}" alt="prod-img">
+                </div>
+                <div class="product-info">
+                    <p class="product-info-text">
+                        ${prod.productname}
+                    </p>
+                     <p class="product-info-text">
+                        $${prod.price}
+                    </p>
+                </div>
             </div>
-            <div class="product-info">
-                <p class="product-info-text">
-                    ${prod.name}
-                </p>
-                 <p class="product-info-text">
-                    $${prod.price}
-                </p>
-            </div>
-        </div>
         `
-    }
+        }
+    })
+
 }
 
 

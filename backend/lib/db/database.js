@@ -40,8 +40,8 @@ class Database {
 
         try {
             //create the files for storing user images
-            if (!fs.existsSync(userImagesPath)) {
-                fs.mkdirSync(userImagesPath, {recursive: true});
+            if (!fs.existsSync("." + userImagesPath)) {
+                fs.mkdirSync("." + userImagesPath, {recursive: true});
             }
             // create tables if not exists
             let client = await this.dbConnection.client

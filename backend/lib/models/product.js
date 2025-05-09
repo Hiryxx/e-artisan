@@ -32,6 +32,10 @@ export default class Product {
             index++;
         }
 
+        if (whereClause.length === 0) {
+            whereClause = '1=1'; // No filter, select all
+        }
+
         const query = `SELECT * FROM products WHERE ${whereClause}`;
         console.log(query);
         const values = Object.values(filter);

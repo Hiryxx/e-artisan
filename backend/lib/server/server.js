@@ -36,17 +36,18 @@ export class Server {
 
     loadServer() {
         this.app.use(cors())
+
         // configures dotenv to work in your application
-        this.app.use(unless(["/","/images", "/auth/login", "/auth/register"], this.middleware))
+        this.app.use(unless(["/","/images", "/auth/login", "/auth/register", "/product"], this.middleware))
         this.app.use(express.json())
         this.app.use(apiRouter) // This has all routers
         this.app.get("/", (request, response) => {
             response.status(200).send("Hello World");
         });
-       // this.app.use('/images', express.static(userImagesPath));
+        //todo this could be better? maybe with no db fetch since we already have the image path
+        //this.app.use('/images', express.static(userImagesPath));
         this.app.get('/images', async (req, res) => {
             const productId = req.query.product_id;
-            console.log("Product ID: ", productId)
             if (!productId) {
                 return res.status(400).send("Bad Request");
             }
@@ -60,7 +61,6 @@ export class Server {
             }
             //res.sendFile(product.image_url, { root: '../' });
             const imgPath = path.join(".", product.image_url)
-            console.log(imgPath)
             res.sendFile(path.resolve(imgPath));
         });
     }

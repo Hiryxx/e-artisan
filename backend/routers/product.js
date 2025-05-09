@@ -25,7 +25,10 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
     try {
-        const products = await Product.getProduct(req.query)
+        let params = req.query;
+        if (!req.query)
+            params = {}
+        const products = await Product.getProduct(params)
         res.status(200).json(products);
     } catch (error) {
         console.log(error);
