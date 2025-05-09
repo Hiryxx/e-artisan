@@ -1,4 +1,5 @@
 import {Pool} from 'pg'
+import User from "../models/user.js";
 
 class Database {
     _dbConnection
@@ -27,7 +28,7 @@ class Database {
         this._dbConnection = new DbConnection();
     }
 
-    get dbConnection(){
+    get dbConnection() {
         return this._dbConnection
     }
 
@@ -47,10 +48,24 @@ class Database {
             if (role.rows.length === 0) {//create roles if not exists
                 await client.query(this.insertRoles);
             }
-            if( category.rows.length === 0) {//create categories if not exists
+            if (category.rows.length === 0) {//create categories if not exists
                 await client.query(this.insertCategory);
             }
 
+            const artisan = {
+                name: "Franco",
+                lastname: "Rossi",
+                email: "franco.rossi@gmail.com",
+                password: "franco",
+                role_id: 3
+            }
+            if (await User.getUserByEmail(artisan.email)!== null) {
+                const hashedPassword = User.hashPassword(artisan.password)
+
+                const artisanId = await User.newUser({hashedPassword: hashedPassword, ...artisan})
+
+                
+            }
 
             client.release()
             console.log("Database tables created successfully");
@@ -59,6 +74,7 @@ class Database {
             console.error(err);
         }
     }
+
 }
 
 // for now a pool is fine but i need to acquire a client in the future
@@ -80,12 +96,11 @@ class DbConnection {
     }
 
 
-
-    get client(){
+    get client() {
         return this._pool.connect()
     }
 
-    get pool(){
+    get pool() {
         return this._pool
     }
 
