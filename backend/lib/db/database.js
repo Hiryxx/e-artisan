@@ -12,10 +12,16 @@ class Database {
 
     createCategories = `CREATE TABLE IF NOT EXISTS categories (id_category INT PRIMARY KEY,name VARCHAR(50) NOT NULL);`
 
-    createProducts = `CREATE TABLE IF NOT EXISTS products (product_id INT PRIMARY KEY,price NUMERIC(10, 2) NOT NULL,id_category INT NOT NULL,description TEXT,seller_id CHAR(32) NOT NULL,image_url TEXT,stock INT NOT NULL CHECK (stock >= 0),FOREIGN KEY (id_category) REFERENCES categories(id_category),FOREIGN KEY (seller_id) REFERENCES users(user_uuid));`
-    createOrders = `CREATE TABLE IF NOT EXISTS orders (order_id INT PRIMARY KEY,payment_id INT NOT NULL,user_uuid CHAR(32) NOT NULL,product_id INT NOT NULL,date DATE NOT NULL,status VARCHAR(50) NOT NULL,received_date DATE,FOREIGN KEY (payment_id) REFERENCES payment_infos(payment_id),FOREIGN KEY (user_uuid) REFERENCES users(user_uuid),FOREIGN KEY (product_id) REFERENCES products(product_id));`
+    createProducts = `CREATE TABLE IF NOT EXISTS products (product_id INT PRIMARY KEY,productName VARCHAR(256) NOT NULL,price NUMERIC(10, 2) NOT NULL,id_category INT NOT NULL,description TEXT,seller_id CHAR(32) NOT NULL,image_url TEXT,FOREIGN KEY (id_category) REFERENCES categories(id_category),FOREIGN KEY (seller_id) REFERENCES users(user_uuid));`
+
+    createOrders = `CREATE TABLE IF NOT EXISTS orders (order_id INT PRIMARY KEY,payment_id INT NOT NULL,user_uuid CHAR(32) NOT NULL,item_id INT NOT NULL,date DATE NOT NULL,status VARCHAR(50) NOT NULL,received_date DATE,FOREIGN KEY (payment_id) REFERENCES payment_infos(payment_id),FOREIGN KEY (user_uuid) REFERENCES users(user_uuid),FOREIGN KEY (item_id) REFERENCES stock(item_id));`
+
+    createStock = `CREATE TABLE IF NOT EXISTS stock(item_id INT PRIMARY KEY,product_id INT NOT NULL, FOREIGN KEY (product_id) REFERENCES products(product_id),);`
 
     insertRoles = "INSERT INTO user_roles (role_id, name) VALUES (1, 'admin'), (2, 'user'), (3, 'artisan')"
+
+    insertCategory = "INSERT INTO categories (id_category, name) VALUES (1, 'Ceramica'),(2, 'Gioielli Artigianali'),(3, 'Lavorazione del Legno'),(4, 'Tessuti e Ricami'),(5, 'Candele e Saponi'),(6, 'Pittura e Illustrazione'),(7, 'Accessori in Cuoio'),(8, 'Decorazioni per la Casa'),(9, 'Articoli in Vetro Soffiato'),(10, 'Oggettistica in Metallo');"
+
 
     constructor() {
         this._dbConnection = new DbConnection();
@@ -33,13 +39,18 @@ class Database {
             await client.query(this.createShipmentInfos);
             await client.query(this.createUsers);
             await client.query(this.createPaymentInfos);
-            await client.query(this.createCategories);
+            const category = await client.query(this.createCategories);
             await client.query(this.createProducts);
+            await client.query(this.createStock);
             await client.query(this.createOrders);
             const role = await client.query("SELECT role_id FROM user_roles");
             if (role.rows.length === 0) {//create roles if not exists
                 await client.query(this.insertRoles);
             }
+            if( category.rows.length === 0) {//create categories if not exists
+                await client.query(this.insertCategory);
+            }
+
 
             client.release()
             console.log("Database tables created successfully");
