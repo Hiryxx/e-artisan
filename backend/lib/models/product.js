@@ -28,13 +28,14 @@ export default class Product {
             if (whereClause.length > 0) {
                 whereClause += ' AND ';
             }
-            whereClause += `${key} = ${index}`;
+            whereClause += `${key} = ${"$"+index}`;
             index++;
         }
 
         const query = `SELECT * FROM products WHERE ${whereClause}`;
         console.log(query);
         const values = Object.values(filter);
+        console.log(values);
 
         const result = await db.dbConnection.pool.query(query, values);
 
