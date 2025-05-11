@@ -54,50 +54,85 @@ const extractHtml = (htmlUrl, elementId, callAfter) => {
         });
 }
 
+const putComps = (productsDiv, products) => {
+    productsDiv.innerText = ""
+
+    for (let prod of products) {
+        productsDiv.innerHTML += `
+                <div class="product">
+                    <div class="product-img">
+                        <img src="http://localhost:900/images?product_id=${prod.product_id}" alt="prod-img">
+                    </div>
+                    <div class="product-info">
+                        <p class="product-info-text">
+                            ${prod.productname}
+                        </p>
+                         <p class="product-info-text">
+                            $${prod.price}
+                        </p>
+                    </div>
+                </div>
+            `
+    }
+}
 const loadComponents = () => {
     const productsDiv = document.getElementById("products")
     if (!productsDiv) {
         console.error("No products div found")
     }
-    // todo save after fetch and check whether to fetch again or not
-    fetch("http://localhost:900/product", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        },
-    }).then(res => {
-        if (!res.ok) {
-            throw new Error(`Server responded with status: ${res.status}`);
-        }
-        return res.json();
-    }).then(products =>{
-        productsDiv.innerText = ""
-
-        for (let prod of products) {
-            productsDiv.innerHTML += `
-            <div class="product">
-                <div class="product-img">
-                    <img src="http://localhost:900/images?product_id=${prod.product_id}" alt="prod-img">
-                </div>
-                <div class="product-info">
-                    <p class="product-info-text">
-                        ${prod.productname}
-                    </p>
-                     <p class="product-info-text">
-                        $${prod.price}
-                    </p>
-                </div>
-            </div>
-        `
-        }
-    })
+    const stateProducts = State.getAllProducts()
+    if (stateProducts.length === 0){
+        console.log("Loading products from server")
+        fetch("http://localhost:900/product", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        }).then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            return res.json();
+        }).then(products =>{
+            State.setAllProducts(products)
+            putComps(productsDiv, products)
+        })
+    } else {
+        console.log("Loading products from state")
+        putComps(productsDiv, stateProducts)
+    }
 
 }
 
 
 const loadNavbarAuth = () => {
-    const token = localStorage.getItem("token")
+    let token = localStorage.getItem("token")
+
+    if (token) {
+        fetch("http://localhost:900/auth/token/validate", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        }).then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            return res.json();
+        }).then(data => {
+            if (!data.valid){
+                console.log("Token is invalid")
+                localStorage.removeItem("token")
+            }
+        })
+    }
+
+
+    token = localStorage.getItem("token")
+
 
     if (token) {
         document.getElementById("nav-options").innerHTML = `
@@ -195,15 +230,13 @@ const register = () => {
         .then(data => {
             console.log("Registration successful:", data);
             const token = data.token;
-            const user = data.user;
 
             if (token) {
                 localStorage.setItem("token", token);
-                localStorage.setItem("user", JSON.stringify(user));
-
+                State.seUserInfo(data.user)
                 document.dispatchEvent(createPageChangeEvent("home"));
             } else {
-                alert("Registration failed: Missing token");
+                alert("Registration failed:");
             }
         })
         .catch(err => {

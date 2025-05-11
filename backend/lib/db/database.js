@@ -83,36 +83,36 @@ class Database {
             if (product.rows.length === 0) {
                 const products = [
                     {
-                        productName: "prova1",
+                        productName: "Vaso a calice in gesso",
                         price: 50,
                         id_category: 1,
                         description: "prova1",
                         seller_id: artisanId,
-                        image_url: userImagesPath + "/prod1.webp"
+                        image_url: userImagesPath + "/vaso_gesso.webp"
                     },
                     {
-                        productName: "prova2",
+                        productName: "Vaso ceramica colorato",
                         price: 100,
                         id_category: 9,
                         description: "prova2",
                         seller_id: artisanId,
-                        image_url: userImagesPath + "/prod2.jpg"
+                        image_url: userImagesPath + "/vaso_ceramica_col.png"
                     },
                     {
-                        productName: "prova3",
+                        productName: "Vaso cristallo oceano",
                         price: 150,
                         id_category: 9,
                         description: "prova3",
                         seller_id: artisanId,
-                        image_url: userImagesPath + "/prod3.jpg"
+                        image_url: userImagesPath + "/vaso_oceano.jpg"
                     },
                     {
-                        productName: "prova4",
+                        productName: "Set 6 bicchieri vetro",
                         price: 200,
                         id_category: 8,
                         description: "prova4",
                         seller_id: artisanId,
-                        image_url: userImagesPath + "/prod4.png"
+                        image_url: userImagesPath + "/bicchieri.jpg"
                     }
                 ]
 
