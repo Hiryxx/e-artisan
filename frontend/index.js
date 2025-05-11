@@ -65,7 +65,7 @@ const putComps = (productsDiv, products) => {
                     </div>
                     <div class="product-info">
                         <p class="product-info-text">
-                            ${prod.productname}
+                            ${prod.name}
                         </p>
                          <p class="product-info-text">
                             $${prod.price}

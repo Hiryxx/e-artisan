@@ -17,7 +17,7 @@ class Database {
 
     createCategories = `CREATE TABLE IF NOT EXISTS categories (id_category INT PRIMARY KEY,name VARCHAR(50) NOT NULL);`
 
-    createProducts = `CREATE TABLE IF NOT EXISTS products (product_id SERIAL PRIMARY KEY,productName VARCHAR(256) NOT NULL,price NUMERIC(10, 2) NOT NULL,id_category INT NOT NULL,description TEXT,seller_id CHAR(36) NOT NULL,image_url TEXT,FOREIGN KEY (id_category) REFERENCES categories(id_category),FOREIGN KEY (seller_id) REFERENCES users(user_uuid));`
+    createProducts = `CREATE TABLE IF NOT EXISTS products (product_id SERIAL PRIMARY KEY,name VARCHAR(256) NOT NULL,price NUMERIC(10, 2) NOT NULL,id_category INT NOT NULL,description TEXT,seller_id CHAR(36) NOT NULL,image_url TEXT,FOREIGN KEY (id_category) REFERENCES categories(id_category),FOREIGN KEY (seller_id) REFERENCES users(user_uuid));`
 
     createOrders = `CREATE TABLE IF NOT EXISTS orders (order_id SERIAL PRIMARY KEY,payment_id INT NOT NULL,user_uuid CHAR(36) NOT NULL,item_id INT NOT NULL,date DATE NOT NULL,status VARCHAR(50) NOT NULL,received_date DATE,FOREIGN KEY (payment_id) REFERENCES payment_infos(payment_id),FOREIGN KEY (user_uuid) REFERENCES users(user_uuid),FOREIGN KEY (item_id) REFERENCES stock(item_id));`
 
@@ -83,7 +83,7 @@ class Database {
             if (product.rows.length === 0) {
                 const products = [
                     {
-                        productName: "Vaso a calice in gesso",
+                        name: "Vaso a calice in gesso",
                         price: 50,
                         id_category: 1,
                         description: "prova1",
@@ -91,7 +91,7 @@ class Database {
                         image_url: userImagesPath + "/vaso_gesso.webp"
                     },
                     {
-                        productName: "Vaso ceramica colorato",
+                        name: "Vaso ceramica colorato",
                         price: 100,
                         id_category: 9,
                         description: "prova2",
@@ -99,7 +99,7 @@ class Database {
                         image_url: userImagesPath + "/vaso_ceramica_col.png"
                     },
                     {
-                        productName: "Vaso cristallo oceano",
+                        name: "Vaso cristallo oceano",
                         price: 150,
                         id_category: 9,
                         description: "prova3",
@@ -107,7 +107,7 @@ class Database {
                         image_url: userImagesPath + "/vaso_oceano.jpg"
                     },
                     {
-                        productName: "Set 6 bicchieri vetro",
+                        name: "Set 6 bicchieri vetro",
                         price: 200,
                         id_category: 8,
                         description: "prova4",
