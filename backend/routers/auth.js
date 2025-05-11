@@ -64,7 +64,7 @@ router.get("/token/validate", (req, res) => {
     jwt.verify(token.split(" ")[1], process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
             //return res.status(403).send("Forbidden");
-            res.json({valid: true});
+            res.json({valid: false});
         }
         res.json({valid: true});
     });

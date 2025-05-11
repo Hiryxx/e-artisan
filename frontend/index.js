@@ -80,7 +80,7 @@ const loadComponents = () => {
     if (!productsDiv) {
         console.error("No products div found")
     }
-    const stateProducts = State.getAllProducts()
+    const stateProducts = ProductState.getAllProducts()
     if (stateProducts.length === 0){
         console.log("Loading products from server")
         fetch("http://localhost:900/product", {
@@ -95,7 +95,7 @@ const loadComponents = () => {
             }
             return res.json();
         }).then(products =>{
-            State.setAllProducts(products)
+            ProductState.setAllProducts(products)
             putComps(productsDiv, products)
         })
     } else {
@@ -233,7 +233,7 @@ const register = () => {
 
             if (token) {
                 localStorage.setItem("token", token);
-                State.seUserInfo(data.user)
+                UserState.seUserInfo(data.user)
                 document.dispatchEvent(createPageChangeEvent("home"));
             } else {
                 alert("Registration failed:");

@@ -1,23 +1,23 @@
-class State {
-    static userInfo = {
-
-    }
-
-    static allProducts = [];
+class UserState {
+    static userInfo
 
     static seUserInfo(userInfo) {
-        State.userInfo = userInfo;
+        UserState.userInfo = userInfo;
     }
 
     static getUserInfo() {
-        return State.userInfo;
+        return UserState.userInfo;
     }
+}
+
+class ProductState {
+    static allProducts = [];
 
     static setAllProducts(products) {
-        State.allProducts = products;
+        ProductState.allProducts = products;
     }
 
     static getAllProducts() {
-        return State.allProducts;
+        return ProductState.allProducts;
     }
 }
