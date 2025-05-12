@@ -157,8 +157,8 @@ class DbConnection {
         return this._pool
     }
 
-    async execute(query) {
-        return await this._pool.query(query)
+    async execute(query, params) {
+        return await this._pool.query(query, params)
     }
 
 }

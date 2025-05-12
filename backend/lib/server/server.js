@@ -38,7 +38,7 @@ export class Server {
         this.app.use(cors())
 
         // configures dotenv to work in your application
-        this.app.use(unless(["/","/images", "/auth/login", "/auth/register", "/product", "/auth/token/validate"], this.middleware))
+        this.app.use(unless(["/","/images", "/auth/login", "/auth/register", "/product"], this.middleware))
         this.app.use(express.json())
         this.app.use(apiRouter) // This has all routers
         this.app.get("/", (request, response) => {
@@ -80,17 +80,20 @@ export class Server {
     }
 
     middleware(req, res, next) {
-        const token = req.headers.authorization;
+        let token = req.headers.authorization;
+        console.log("dio cazzo", token)
         if (!token || !token.startsWith("Bearer ")) {
             return res.status(401).send("Unauthorized");
         }
 
+        // remove the "Bearer " part from the token
+        token = token.split(" ")[1];
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
+                console.log("error", err);
                 return res.status(403).send("Forbidden");
             }
-            req.user = decoded;
-            console.log(decoded);
+            req.user_uuid = decoded.user_uuid;
             next();
         });
     }

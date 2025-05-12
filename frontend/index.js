@@ -14,7 +14,7 @@ const getPageFunction = (page) => {
     }
 }
 
-const pageChangeEvent = new CustomEvent('pageChanged');
+const createPageChangeEvent = (page) => new CustomEvent('pageChanged', { detail: { page } });
 
 
 
@@ -23,7 +23,9 @@ const router = new Router("home", "pages/")
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    extractHtml(router.getCurrentPagePath(), pageId, getPageFunction('home'))
+    const lastPage = localStorage.getItem("currentPage")
+    switchPage(lastPage)
+    checkUserAuth()
     loadNavbarAuth()
 });
 
@@ -35,10 +37,10 @@ document.addEventListener('pageChanged', function (e) {
         return
     }
     switchPage(page);
+    extractHtml(router.getCurrentPagePath(), pageId, getPageFunction(page))
     loadNavbarAuth()
 });
 
-const createPageChangeEvent = (page) => new CustomEvent('pageChanged', { detail: { page } });
 
 
 const extractHtml = (htmlUrl, elementId, callAfter) => {
@@ -105,12 +107,11 @@ const loadComponents = () => {
 
 }
 
-
-const loadNavbarAuth = () => {
+const checkUserAuth = () => {
     let token = localStorage.getItem("token")
 
     if (token) {
-        fetch("http://localhost:900/auth/token/validate", {
+        fetch("http://localhost:900/auth/user", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -118,20 +119,21 @@ const loadNavbarAuth = () => {
                 "Authorization": `Bearer ${token}`
             }
         }).then(res => {
-            if (!res.ok) {
-                throw new Error(`Server responded with status: ${res.status}`);
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem("token")
+                UserState.removeUserInfo()
             }
             return res.json();
-        }).then(data => {
-            if (!data.valid){
-                console.log("Token is invalid")
-                localStorage.removeItem("token")
+        }).then(user => {
+            if(user) {
+                UserState.seUserInfo(user)
             }
         })
     }
+}
 
-
-    token = localStorage.getItem("token")
+const loadNavbarAuth = () => {
+    const token = localStorage.getItem("token")
 
 
     if (token) {
@@ -183,6 +185,7 @@ const loadNavbarAuth = () => {
  */
 let switchPage = (page) => {
     router.changePage(page)
+    localStorage.setItem("currentPage", page)
     extractHtml(router.getCurrentPagePath(), pageId, getPageFunction(page))
 }
 
@@ -282,8 +285,8 @@ const login = () => {
             if (token) {
                 localStorage.setItem("token", token);
                 localStorage.setItem("user", JSON.stringify(user));
+                UserState.seUserInfo(data.user)
                 document.dispatchEvent(createPageChangeEvent("home"));
-                //location.reload();
             } else {
                 alert("Login failed: Missing token");
             }
@@ -298,6 +301,7 @@ const login = () => {
 const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    UserState.removeUserInfo()
     document.dispatchEvent(createPageChangeEvent("home"));
 }
 

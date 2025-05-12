@@ -32,4 +32,14 @@ export default class User {
     }
 
 
+    static async getUserById(user_uuid) {
+        const result = await db.dbConnection.execute(
+            'SELECT user_uuid, email, name, lastname, role_id FROM users WHERE user_uuid = $1',
+            [user_uuid]
+        );
+        if (result.rows.length === 0) {
+            return null;
+        }
+        return result.rows[0];
+    }
 }

@@ -9,7 +9,7 @@ const router = express.Router()
 
 // JWT Token generator
 const generateToken = (id) => {
-    return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: '1h'});
+    return jwt.sign({user_uuid: id}, process.env.JWT_SECRET, {expiresIn: '1h'});
 };
 
 router.post("/login", async (req, res) => {
@@ -71,11 +71,12 @@ router.get("/token/validate", (req, res) => {
 })
 
 router.get("/user", async (req, res) => {
-    const email = req.query.email;
-    const user = await User.getUserByEmail(email)
+    const user_uuid = req.user_uuid
+    console.log(user_uuid)
+    const user = await User.getUserById(user_uuid)
 
     if (user === null) {
-        return res.status(401).json({message: "User not found"});
+        return res.status(404).json({message: "User not found"});
     }
 
     res.json({user});

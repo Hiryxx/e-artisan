@@ -8,6 +8,10 @@ class UserState {
     static getUserInfo() {
         return UserState.userInfo;
     }
+
+    static removeUserInfo() {
+        UserState.userInfo = null;
+    }
 }
 
 class ProductState {
