@@ -11,11 +11,12 @@ const getPageFunction = (page) => {
             return () => {
                 console.log("About page loaded")
             }
+        case "account":
+            return loadAccountPage
     }
 }
 
 const createPageChangeEvent = (page) => new CustomEvent('pageChanged', { detail: { page } });
-
 
 
 const pageId = "current-page"
@@ -24,9 +25,26 @@ const router = new Router("home", "pages/")
 
 document.addEventListener('DOMContentLoaded', function () {
     const lastPage = localStorage.getItem("currentPage")
-    switchPage(lastPage)
-    checkUserAuth()
-    loadNavbarAuth()
+    const res = checkUserAuth()
+    if (res) {
+        res.then(res => {
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem("token")
+                UserState.removeUserInfo()
+            }
+            return res.json();
+        }).then(user => {
+            if(user) {
+                console.log("User found ", user)
+                UserState.seUserInfo(user)
+            }
+        }).finally(()=>{
+            console.log("Loading page ", lastPage)
+            document.dispatchEvent(createPageChangeEvent(lastPage))
+        })
+    } else{
+        document.dispatchEvent(createPageChangeEvent(lastPage))
+    }
 });
 
 
@@ -37,7 +55,7 @@ document.addEventListener('pageChanged', function (e) {
         return
     }
     switchPage(page);
-    extractHtml(router.getCurrentPagePath(), pageId, getPageFunction(page))
+    //extractHtml(router.getCurrentPagePath(), pageId, getPageFunction(page))
     loadNavbarAuth()
 });
 
@@ -56,7 +74,7 @@ const extractHtml = (htmlUrl, elementId, callAfter) => {
         });
 }
 
-const putComps = (productsDiv, products) => {
+const putProds = (productsDiv, products) => {
     productsDiv.innerText = ""
 
     for (let prod of products) {
@@ -98,11 +116,11 @@ const loadComponents = () => {
             return res.json();
         }).then(products =>{
             ProductState.setAllProducts(products)
-            putComps(productsDiv, products)
+            putProds(productsDiv, products)
         })
     } else {
         console.log("Loading products from state")
-        putComps(productsDiv, stateProducts)
+        putProds(productsDiv, stateProducts)
     }
 
 }
@@ -111,22 +129,12 @@ const checkUserAuth = () => {
     let token = localStorage.getItem("token")
 
     if (token) {
-        fetch("http://localhost:900/auth/user", {
+        return fetch("http://localhost:900/auth/user", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
                 "Authorization": `Bearer ${token}`
-            }
-        }).then(res => {
-            if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem("token")
-                UserState.removeUserInfo()
-            }
-            return res.json();
-        }).then(user => {
-            if(user) {
-                UserState.seUserInfo(user)
             }
         })
     }
@@ -176,6 +184,56 @@ const loadNavbarAuth = () => {
         </svg>
     </p>`
     }
+}
+
+const loadAccountPage = () => {
+    const user = UserState.getUserInfo()
+    const userDiv = document.getElementById("user-info")
+    if (!userDiv) {
+        console.error("No user div found")
+    }
+    const token = localStorage.getItem("token")
+    //todo optimize
+    const products = ProductState.fetchProducts({seller_id:user.user_uuid}, token)
+
+
+    if (user) {
+        userDiv.innerHTML = `
+            <p>
+                Name: ${user.name}
+            </p>
+            <p>
+                Lastname: ${user.lastname}
+            </p>
+            <p>
+                Email: ${user.email}
+            </p>
+        `
+    }
+
+    const accountProductsDiv = document.getElementById("account-products")
+
+    if (!accountProductsDiv) {
+        console.error("No orders div found")
+    }
+
+
+    if (products) {
+        products.then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            return res.json();
+        } ).then(products => {
+            putProds(accountProductsDiv, products)
+        } )
+    }
+
+
+
+
+    // understand how to show both orders and products
+
 }
 
 

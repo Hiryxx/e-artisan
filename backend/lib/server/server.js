@@ -40,7 +40,7 @@ export class Server {
         // configures dotenv to work in your application
         this.app.use(unless(["/","/images", "/auth/login", "/auth/register", "/product"], this.middleware))
         this.app.use(express.json())
-        this.app.use(apiRouter) // This has all routers
+        this.app.use(apiRouter) // This has all the routers
         this.app.get("/", (request, response) => {
             response.status(200).send("Hello World");
         });
@@ -81,7 +81,6 @@ export class Server {
 
     middleware(req, res, next) {
         let token = req.headers.authorization;
-        console.log("dio cazzo", token)
         if (!token || !token.startsWith("Bearer ")) {
             return res.status(401).send("Unauthorized");
         }

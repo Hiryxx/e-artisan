@@ -10,6 +10,7 @@ class UserState {
     }
 
     static removeUserInfo() {
+        console.log("Removing user info");
         UserState.userInfo = null;
     }
 }
@@ -23,5 +24,25 @@ class ProductState {
 
     static getAllProducts() {
         return ProductState.allProducts;
+    }
+
+    static fetchProducts(filter, token) {
+        let textFilter = ""
+        for (const key in filter) {
+            if (filter[key] !== "") {
+                textFilter += `${key}=${filter[key]}&`
+            }
+        }
+        if (textFilter.length > 0) {
+            textFilter = textFilter.slice(0, -1)
+        }
+        return fetch(`http://localhost:900/product?${textFilter}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+        })
+
     }
 }

@@ -29,12 +29,13 @@ router.get("/", async (req, res) => {
         if (!req.query)
             params = {}
         const products = await Product.getProduct(params)
+
         res.status(200).json(products);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Server error" });
     }
-} )
+})
 
 router.delete("/", async (req, res) => {
     const { product_id } = req.params;
