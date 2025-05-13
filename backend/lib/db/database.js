@@ -119,6 +119,13 @@ class Database {
                 for (const product of products) {
                     await Product.newProduct(product)
                 }
+                for (const product of products) {
+                    const productId = await Product.getProduct({name: product.name})
+                    for (let i = 0; i < 3; i++) {
+                        await Product.addToStock(productId[0].product_id)
+                    }
+                }
+
 
                 client.release()
                 console.log("Database tables created successfully");

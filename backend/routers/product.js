@@ -29,7 +29,6 @@ router.get("/", async (req, res) => {
         if (!req.query)
             params = {}
         const products = await Product.getProduct(params)
-
         res.status(200).json(products);
     } catch (error) {
         console.log(error);

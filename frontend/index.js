@@ -25,6 +25,9 @@ const router = new Router("home", "pages/")
 
 document.addEventListener('DOMContentLoaded', function () {
     const lastPage = localStorage.getItem("currentPage")
+    if(!lastPage) {
+        localStorage.setItem("currentPage", "home")
+    }
     const res = checkUserAuth()
     if (res) {
         res.then(res => {
@@ -90,11 +93,15 @@ const putProds = (productsDiv, products) => {
                          <p class="product-info-text">
                             $${prod.price}
                         </p>
+                        <p class="product-info-text">
+                            Disponibilità: ${prod.stock_count || 0}
+                        </p>
                     </div>
                 </div>
             `
     }
 }
+
 const loadComponents = () => {
     const productsDiv = document.getElementById("products")
     if (!productsDiv) {

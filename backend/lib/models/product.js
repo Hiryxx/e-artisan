@@ -28,7 +28,7 @@ export default class Product {
             if (whereClause.length > 0) {
                 whereClause += ' AND ';
             }
-            whereClause += `${key} = ${"$"+index}`;
+            whereClause += `p.${key} = ${"$" + index}`;
             index++;
         }
 
@@ -36,15 +36,19 @@ export default class Product {
             whereClause = '1=1'; // No filter, select all
         }
 
-        const query = `SELECT * FROM products WHERE ${whereClause}`;
-        console.log(query);
+        const query = `SELECT p.*, COUNT(s.item_id) as stock_count
+                       FROM products p
+                                LEFT JOIN stock s ON p.product_id = s.product_id
+                       WHERE ${whereClause}
+                       GROUP BY p.product_id`;
         const values = Object.values(filter);
-        console.log(values);
 
-        const result = await db.dbConnection.pool.query(query, values);
-
+        const result = await db.dbConnection.execute(query, values);
         return result.rows;
     }
+
+
+
     static async deleteProduct(productId) {
         await db.dbConnection.execute(
             'DELETE FROM products WHERE product_id = $1',
