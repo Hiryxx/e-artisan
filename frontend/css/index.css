@@ -56,7 +56,7 @@ For more control:
     width: 22rem;
     height: 25rem;
     margin-right: 2.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 4rem;
 }
 
 .product > .product-img {
@@ -81,7 +81,7 @@ For more control:
 
 .product > .product-info{
     /*TODO fix to fit behaviour*/
-    height: 5.7rem;
+    height: 9rem;
     /*background-color: blueviolet;*/
     display: flex;
     flex-direction: column;

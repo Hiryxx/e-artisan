@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem("token")
                 UserState.removeUserInfo()
+                window.location.reload()
             }
             return res.json();
         }).then(user => {
@@ -90,12 +91,13 @@ const putProds = (productsDiv, products) => {
                         <p class="product-info-text">
                             ${prod.name}
                         </p>
+                          <p class="product-info-text">
+                            Disponibilità: ${prod.stock_count}
+                        </p>
                          <p class="product-info-text">
                             $${prod.price}
                         </p>
-                        <p class="product-info-text">
-                            Disponibilità: ${prod.stock_count || 0}
-                        </p>
+                   
                     </div>
                 </div>
             `
