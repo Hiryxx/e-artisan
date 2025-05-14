@@ -1,33 +1,35 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16
     container_name: my-postgres-db
     restart: always
-
-    # importa tutte le variabili da .env
     env_file:
       - .env
-
-    # le mette anche come environment nel container
     environment:
       POSTGRES_USER: user_root
       POSTGRES_PASSWORD: root
       POSTGRES_DB: e_artisan
-
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - postgres-network
+      - app-network
+
+  website:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ../frontend:/usr/share/nginx/html
+    restart: unless-stopped
 
 volumes:
   postgres_data:
     name: postgres_data
 
 networks:
-  postgres-network:
-    name: postgres-network
+  app-network:
+    name: app-network
     driver: bridge
