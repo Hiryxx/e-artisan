@@ -26,6 +26,7 @@ class ProductState {
         return ProductState.allProducts;
     }
 
+
     static fetchProducts(filter, token) {
         let textFilter = ""
         for (const key in filter) {
@@ -36,13 +37,45 @@ class ProductState {
         if (textFilter.length > 0) {
             textFilter = textFilter.slice(0, -1)
         }
+        let headers = {
+            "Content-Type": "application/json",
+        }
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
         return fetch(`http://localhost:900/product?${textFilter}`, {
             method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
+            headers: headers
         })
 
+    }
+}
+
+class CartState {
+    static itemToAdd = null; // this is the item to add when the user clicks on the add to cart button
+    static cartItems = [];
+
+    static setCartItems(cartItems) {
+        CartState.cartItems = cartItems;
+    }
+
+    static getCartItems() {
+        return CartState.cartItems;
+    }
+
+    static addToCart(product) {
+        CartState.cartItems.push(product);
+    }
+
+    static removeFromCart(productId) {
+        CartState.cartItems = CartState.cartItems.filter(item => item.id !== productId);
+    }
+
+    static getItemToAdd() {
+        return CartState.itemToAdd;
+    }
+
+    static setItemToAdd(productId) {
+        CartState.itemToAdd = productId;
     }
 }

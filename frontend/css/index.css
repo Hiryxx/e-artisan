@@ -93,3 +93,13 @@ For more control:
     font-size: 1rem;
     padding-left: 0.5rem;
 }
+
+.product-info > .product-info-button{
+    font-size: 1rem;
+    padding-left: 0.5rem;
+    cursor: pointer;
+}
+
+#current-page{
+    height: 100%;
+}

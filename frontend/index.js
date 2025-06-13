@@ -1,6 +1,6 @@
 /**
  * Get the function to call after loading the page
- * @param page
+ * @param page Page name without url (e.g. "home" for "/pages/home.html")
  * @returns {(function(): void)|*|loadComponents}
  */
 const getPageFunction = (page) => {
@@ -13,6 +13,8 @@ const getPageFunction = (page) => {
             }
         case "account":
             return loadAccountPage
+        case "shopping_cart":
+            return loadCartPage
     }
 }
 
@@ -78,6 +80,99 @@ const extractHtml = (htmlUrl, elementId, callAfter) => {
         });
 }
 
+// todo check if correct and add quantity
+const loadCartPage = () => {
+    let cartItems = CartState.getCartItems() // at least always []
+    const itemToAdd = CartState.getItemToAdd()
+
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems"))
+
+    if (storedCartItems && cartItems.length === 0 && !itemToAdd)
+        cartItems.push(...storedCartItems)
+
+    if (itemToAdd) {
+        // add the item to the cart
+        console.log("Adding item to cart: ", itemToAdd)
+        cartItems.push(itemToAdd)
+        CartState.setCartItems(cartItems)
+        localStorage.setItem("cartItems", JSON.stringify(cartItems))
+        CartState.setItemToAdd(null) // reset item to add
+    }
+
+        // getting them from local storage
+
+    console.log("Loading cart items from local storage", storedCartItems)
+
+    const cartDiv = document.getElementById("cart-items")
+
+    for(let prod of cartItems){
+        if (!prod || !prod.product_id) {
+            continue
+        }
+        cartDiv.innerHTML += `
+           <div class="cart-item">
+            <div id="cart-image">
+                <img src="http://localhost:900/images?product_id=${prod.product_id}" alt="">
+            </div>
+            <div class="cart-info">
+                <div class="cart-title">
+                     ${prod.name}
+                </div>
+                <div class="cart-price">
+                    $${prod.price}
+                </div>
+                <div onclick="removeProdFromCart(${prod.product_id})" class="cart-remove">
+                    Remove
+                </div>
+                <div>
+                    quantity: va messa di fianco
+                </div>
+            </div>
+        </div>
+        `
+    }
+}
+
+// todo remove quantity from cart
+let removeProdFromCart = (productId) => {
+    let cartItems = localStorage.getItem("cartItems")
+    if (!cartItems) {
+        console.error("No cart items found in local storage")
+        return
+    }
+
+    cartItems = JSON.parse(cartItems)
+    const newCartItems = cartItems.filter(item => item.product_id !== productId)
+    CartState.setCartItems(newCartItems)
+    localStorage.setItem("cartItems", JSON.stringify(newCartItems))
+
+    document.dispatchEvent(createPageChangeEvent("shopping_cart"));
+}
+
+/**
+ * Go to shopping cart with product
+ * @param productId JSON string of product object
+ */
+let goToShoppingCartWithProduct = (productId) => {
+    console.log("Tryinh to shopping cart with product id: ", productId)
+
+    ProductState.fetchProducts({product_id: productId}).then((res) => {
+        if (!res.ok) {
+            throw new Error(`Server responded with status: ${res.status}`);
+        }
+        return res.json();
+    }).then(products => {
+        if (products.length === 0) {
+            console.error("No product found with id: ", productId)
+            return null
+        }
+        console.log("Going to shopping cart with product: ", products[0])
+        CartState.setItemToAdd(products[0])
+        switchPage('shopping_cart')
+    })
+
+}
+
 const putProds = (productsDiv, products) => {
     productsDiv.innerText = ""
 
@@ -97,6 +192,10 @@ const putProds = (productsDiv, products) => {
                          <p class="product-info-text">
                             $${prod.price}
                         </p>
+                        <div onclick="goToShoppingCartWithProduct(${prod.product_id})" class="product-info-button">
+                        Add to cart
+                        </div>
+                         
                    
                     </div>
                 </div>
@@ -377,3 +476,5 @@ window.switchPage = switchPage;
 window.register = register;
 window.login = login;
 window.logout = logout;
+window.goToShoppingCartWithProduct = goToShoppingCartWithProduct;
+window.removeProdFromCart = removeProdFromCart;

@@ -22,7 +22,7 @@ services:
     env_file:
       - .env
     ports:
-      - "${WEBSITE_PORT:-3000:80}"
+      - "${WEBSITE_PORT:-63342:80}"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend:/usr/share/nginx/html
