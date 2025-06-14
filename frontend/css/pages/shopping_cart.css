@@ -19,6 +19,7 @@
     padding: 10px;
     border: 1px solid black;
     border-radius: 10px;
+    justify-content: safe start;
 }
 
 #cart-items > .cart-image{
@@ -42,4 +43,24 @@
 
 .cart-remove{
     cursor: pointer;
+}
+
+.cart-quantity{
+    display: flex;
+    align-items: center;
+
+    margin: 0 auto;
+    padding: 0 20px;
+    justify-content: center;
+    text-align: center;
+}
+.quantity-minus{
+    cursor: pointer;
+    padding: 0 10px;
+    font-size: 20px;
+}
+.quantity-plus{
+    cursor: pointer;
+    padding: 0 10px;
+    font-size: 20px;
 }

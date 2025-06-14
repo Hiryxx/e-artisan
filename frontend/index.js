@@ -93,7 +93,15 @@ const loadCartPage = () => {
     if (itemToAdd) {
         // add the item to the cart
         console.log("Adding item to cart: ", itemToAdd)
-        cartItems.push(itemToAdd)
+        // check if the item is already in the cart
+        const existingItemIndex = cartItems.findIndex(item => item.product_id === itemToAdd.product_id)
+        if (existingItemIndex !== -1) {
+            // if it is, increase the quantity
+            cartItems[existingItemIndex].quantity += itemToAdd.quantity
+        } else {
+            cartItems.push(itemToAdd)
+        }
+
         CartState.setCartItems(cartItems)
         localStorage.setItem("cartItems", JSON.stringify(cartItems))
         CartState.setItemToAdd(null) // reset item to add
@@ -104,6 +112,18 @@ const loadCartPage = () => {
     console.log("Loading cart items from local storage", storedCartItems)
 
     const cartDiv = document.getElementById("cart-items")
+
+
+
+    if (cartItems.length === 0) {
+        cartDiv.innerHTML = `
+        <div class="cart-empty">
+            <p>
+                Your cart is empty
+            </p>
+        </div>
+        `
+    }
 
     for(let prod of cartItems){
         if (!prod || !prod.product_id) {
@@ -124,13 +144,56 @@ const loadCartPage = () => {
                 <div onclick="removeProdFromCart(${prod.product_id})" class="cart-remove">
                     Remove
                 </div>
-                <div>
-                    quantity: va messa di fianco
+            </div>
+            <div class="cart-quantity">
+                <div class="quantity-minus" onclick="modifyQuantity(${prod.product_id}, -1)">
+                 -
+                </div>
+                <p>
+                    ${prod.quantity}
+                </p>
+                <div class="quantity-plus" onclick="modifyQuantity(${prod.product_id}, 1)">
+                 +
                 </div>
             </div>
         </div>
         `
     }
+}
+
+let modifyQuantity = (productId, quantity) => {
+    let cartItems = localStorage.getItem("cartItems")
+    if (!cartItems) {
+        console.error("No cart items found in local storage")
+        return
+    }
+
+    cartItems = JSON.parse(cartItems)
+    const itemIndex = cartItems.findIndex(item => item.product_id === productId)
+
+    if (itemIndex === -1) {
+        console.error("Product not found in cart")
+        return
+    }
+
+    // Modify the quantity
+    if (quantity < 0 && cartItems[itemIndex].quantity <= 1) {
+        console.warn("Cannot reduce quantity below 1")
+        return
+    }
+    // ensure maximum quantity is not exceeded. Max is 10
+
+    if (quantity > 0 && cartItems[itemIndex].quantity >= 10) {
+        console.warn("Cannot increase quantity above 10")
+        return
+    }
+
+    cartItems[itemIndex].quantity += quantity
+
+    CartState.setCartItems(cartItems)
+    localStorage.setItem("cartItems", JSON.stringify(cartItems))
+
+    document.dispatchEvent(createPageChangeEvent("shopping_cart"));
 }
 
 // todo remove quantity from cart
@@ -154,7 +217,7 @@ let removeProdFromCart = (productId) => {
  * @param productId JSON string of product object
  */
 let goToShoppingCartWithProduct = (productId) => {
-    console.log("Tryinh to shopping cart with product id: ", productId)
+    console.log("Trying to shopping cart with product id: ", productId)
 
     ProductState.fetchProducts({product_id: productId}).then((res) => {
         if (!res.ok) {
@@ -166,8 +229,10 @@ let goToShoppingCartWithProduct = (productId) => {
             console.error("No product found with id: ", productId)
             return null
         }
+        let productForCart = products[0]
+        productForCart['quantity'] = 1 // default quantity
         console.log("Going to shopping cart with product: ", products[0])
-        CartState.setItemToAdd(products[0])
+        CartState.setItemToAdd(productForCart)
         switchPage('shopping_cart')
     })
 
@@ -195,7 +260,6 @@ const putProds = (productsDiv, products) => {
                         <div onclick="goToShoppingCartWithProduct(${prod.product_id})" class="product-info-button">
                         Add to cart
                         </div>
-                         
                    
                     </div>
                 </div>
@@ -478,3 +542,4 @@ window.login = login;
 window.logout = logout;
 window.goToShoppingCartWithProduct = goToShoppingCartWithProduct;
 window.removeProdFromCart = removeProdFromCart;
+window.modifyQuantity = modifyQuantity;
