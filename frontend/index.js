@@ -21,6 +21,31 @@ const getPageFunction = (page) => {
 }
 
 
+const toastClose = (toastContainer) => {
+    toastContainer.innerHTML = "";
+}
+
+let spawnToast = (message, type = "info", timeout = 2500) => {
+    console.log("Spawning toast with message: ", message, " and type: ", type)
+    const toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+        console.error("No toast container found")
+        return
+    }
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.innerText = message;
+    toastContainer.innerHTML = toast.outerHTML;
+    toastContainer.onclick = () => {
+        toastClose(toastContainer);
+    }
+
+    setTimeout(() => {
+        toastClose(toastContainer)
+    }, timeout);
+}
+
+
 const pageId = "current-page"
 const router = new Router("home", "pages/")
 
@@ -380,5 +405,7 @@ window.switchPage = switchPage;
 window.register = register;
 window.login = login;
 window.logout = logout;
+window.spawnToast = spawnToast;
 
 window.createPageChangeEvent = createPageChangeEvent;
+

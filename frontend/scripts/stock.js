@@ -1,5 +1,3 @@
-
-// todo check if correct and add quantity
 let loadCartPage = () => {
     let cartItems = CartState.getCartItems() // at least always []
     const itemToAdd = CartState.getItemToAdd()
@@ -10,13 +8,11 @@ let loadCartPage = () => {
         cartItems.push(...storedCartItems)
 
     if (itemToAdd) {
-        // add the item to the cart
-        console.log("Adding item to cart: ", itemToAdd)
         // check if the item is already in the cart
         const existingItemIndex = cartItems.findIndex(item => item.product_id === itemToAdd.product_id)
         if (existingItemIndex !== -1) {
-            // if it is, increase the quantity
             if (cartItems[existingItemIndex].quantity + itemToAdd.quantity > itemToAdd.stock_count) {
+                spawnToast("Cannot increase quantity above: " + itemToAdd.stock_count, "error")
                 console.warn("Cannot add more than stock count. Max is: " + itemToAdd.stock_count)
             } else {
                 cartItems[existingItemIndex].quantity += itemToAdd.quantity
@@ -103,12 +99,14 @@ let modifyQuantity = (productId, quantity, maxQuantity) => {
     // Modify the quantity
     if (quantity < 0 && cartItems[itemIndex].quantity <= 1) {
         console.warn("Cannot reduce quantity below 1")
+        spawnToast("Cannot reduce quantity below 1", "error")
         return
     }
     // ensure maximum quantity is not exceeded. Max is product stock count.
 
     if (quantity > 0 && cartItems[itemIndex].quantity >= maxQuantity) {
         console.warn("Cannot increase quantity above " + maxQuantity)
+        spawnToast("Cannot increase quantity above " + maxQuantity, "error")
         return
     }
 
