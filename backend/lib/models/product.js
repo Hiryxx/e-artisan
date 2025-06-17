@@ -16,11 +16,6 @@ export default class Product {
         return result.rows;
     }
 
-    /**
-     *
-     * @param filter Object containing the filter to apply to the where query (e.g., { id_category: 1 })
-     * @returns {Promise<void>}
-     */
     static async getProduct(filter) {
         let whereClause = '';
         let index = 1;
@@ -36,11 +31,12 @@ export default class Product {
             whereClause = '1=1'; // No filter, select all
         }
 
-        const query = `SELECT p.*, COUNT(s.item_id) as stock_count
+        const query = `SELECT p.*, COUNT(s.item_id) as stock_count, u.name as seller_name, u.lastname as seller_lastname
                        FROM products p
                                 LEFT JOIN stock s ON p.product_id = s.product_id
+                                LEFT JOIN users u ON p.seller_id = u.user_uuid
                        WHERE ${whereClause}
-                       GROUP BY p.product_id`;
+                       GROUP BY p.product_id, u.name, u.lastname`;
         const values = Object.values(filter);
 
         const result = await db.dbConnection.execute(query, values);

@@ -17,6 +17,8 @@ const getPageFunction = (page) => {
             return loadAccountPage
         case "shopping_cart":
             return loadCartPage
+        case "product_details":
+            return loadProductDetails
     }
 }
 
@@ -109,29 +111,69 @@ const putProds = (productsDiv, products) => {
     productsDiv.innerText = ""
 
     for (let prod of products) {
-        productsDiv.innerHTML += `
-                <div class="product">
-                    <div class="product-img">
-                        <img src="http://localhost:900/images?product_id=${prod.product_id}" alt="prod-img">
-                    </div>
-                    <div class="product-info">
-                        <p class="product-info-text">
-                            ${prod.name}
-                        </p>
-                          <p class="product-info-text">
-                            Disponibilità: ${prod.stock_count}
-                        </p>
-                         <p class="product-info-text">
-                            $${prod.price}
-                        </p>
-                        <div onclick="goToShoppingCartWithProduct(${prod.product_id})" class="product-info-button">
-                        Add to cart
-                        </div>
-                   
+        const productDiv = document.createElement('div');
+        productDiv.className = 'product';
+        productDiv.innerHTML = `
+                <div class="product-img">
+                    <img src="http://localhost:900/images?product_id=${prod.product_id}" alt="prod-img">
+                </div>
+                <div class="product-info">
+                    <p class="product-info-text">
+                        ${prod.name}
+                    </p>
+                    <p class="product-info-text">
+                        Disponibilità: ${prod.stock_count}
+                    </p>
+                    <p class="product-info-text">
+                        $${prod.price}
+                    </p>
+                    <div class="product-info-button" id="add-cart-${prod.product_id}">
+                    Add to cart
                     </div>
                 </div>
-            `
+        `;
+
+        productDiv.addEventListener('click', () => {
+            ProductState.setSelectedProduct(prod);
+            switchPage('product_details');
+        });
+
+        productsDiv.appendChild(productDiv);
+
+        document.getElementById(`add-cart-${prod.product_id}`).addEventListener('click', (e) => {
+            e.stopPropagation();
+            goToShoppingCartWithProduct(prod.product_id);
+        });
     }
+}
+
+const loadProductDetails = () => {
+    const productDetailsDiv = document.getElementById('product-details');
+    const selectedProduct = ProductState.getSelectedProduct();
+
+    if (!selectedProduct) {
+        console.error("Nessun prodotto selezionato");
+        switchPage('home');
+        return;
+    }
+
+    productDetailsDiv.innerHTML = `
+        <div class="product-details-image">
+            <img src="http://localhost:900/images?product_id=${selectedProduct.product_id}" alt="${selectedProduct.name}">
+        </div>
+        <div class="product-details-info">
+            <h2>${selectedProduct.name}</h2>
+            <p class="product-price">Prezzo: $${selectedProduct.price}</p>
+            <p class="product-stock">Disponibilità: ${selectedProduct.stock_count}</p>
+            <p class="product-description">${selectedProduct.description || 'Nessuna descrizione disponibile'}</p>
+            <p class="product-category">Categoria: ${selectedProduct.category_id || selectedProduct.id_category || 'N/A'}</p>
+            <p class="product-seller">Venditore: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
+        </div>
+    `;
+
+    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+        goToShoppingCartWithProduct(selectedProduct.product_id);
+    });
 }
 
 const loadComponents = () => {

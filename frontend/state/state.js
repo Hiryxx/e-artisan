@@ -17,6 +17,7 @@ class UserState {
 
 class ProductState {
     static allProducts = [];
+    static selectedProduct = null;
 
     static setAllProducts(products) {
         ProductState.allProducts = products;
@@ -48,6 +49,13 @@ class ProductState {
             headers: headers
         })
 
+    }
+    static setSelectedProduct(product) {
+        ProductState.selectedProduct = product;
+    }
+
+    static getSelectedProduct() {
+        return ProductState.selectedProduct;
     }
 }
 
