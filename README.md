@@ -24,8 +24,8 @@ docker-compose up -d
 | Funzionalità                                                                 | Stato       | Grafica     | Responsabile                    | Note                                                                 |
 |------------------------------------------------------------------------------|-------------|-------------|----------------------------------|----------------------------------------------------------------------|
 | Pagina utente                                                               | ☐ Da fare   | ☐ Da fare   | Tommaso, Mauro                   |                                                                      |
-| Pagina prodotto                                                             | ☐ Da fare   | ☐ Da fare   | Francesco                        |                                                                      |
-| Carrello                                                                    | ✅ Fatto     | ✅ Fatto     | Paolo                            |                                                                      |
+| Pagina prodotto                                                             | ✅ Da fare   | ☐ Da fare   | Francesco                        |                                                                      |
+| Carrello                                                                    | ✅ Fatto     | ☐ Fatto     | Paolo                            |                                                                      |
 | Ricerca con filtri                                                          | ☐ Da fare   | ☐ Da fare   | Paolo                            |                                                                      |
 | Acquisto, pagamento e gestione ordini                                       | ☐ Da fare   | ☐ Da fare   | Paolo, Francesco                 |                                                                      |
 | Dashboard artigiano (vendite, prodotti, stock)                              | ☐ Da fare   | ☐ Da fare   | Davide                           |                                                                      |
