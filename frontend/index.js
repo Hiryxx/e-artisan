@@ -165,7 +165,7 @@ const loadProductDetails = () => {
             <h2>${selectedProduct.name}</h2>
             <p class="product-price">Prezzo: $${selectedProduct.price}</p>
             <p class="product-stock">Disponibilità: ${selectedProduct.stock_count}</p>
-            <p class="product-description">${selectedProduct.description || 'Nessuna descrizione disponibile'}</p>
+            <p class="product-description">Descrizione: ${selectedProduct.description || 'Nessuna descrizione disponibile'}</p>
             <p class="product-category">Categoria: ${selectedProduct.category_id || selectedProduct.id_category || 'N/A'}</p>
             <p class="product-seller">Venditore: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
         </div>

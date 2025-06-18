@@ -11,7 +11,7 @@ class Database {
 
     createShipmentInfos = `CREATE TABLE IF NOT EXISTS shipment_infos (info_id SERIAL PRIMARY KEY,street VARCHAR(100) NOT NULL,number VARCHAR(10) NOT NULL,zipcode VARCHAR(10) NOT NULL,state VARCHAR(50) NOT NULL,city VARCHAR(50) NOT NULL);`
 
-    createUsers = `CREATE TABLE IF NOT EXISTS users (user_uuid CHAR(36) PRIMARY KEY,password VARCHAR(255),email VARCHAR(100) UNIQUE NOT NULL,name VARCHAR(50) NOT NULL,lastname VARCHAR(50) NOT NULL,role_id INT NOT NULL,info_id INT,google_id VARCHAR(255) UNIQUE,avatar_url TEXT,auth_provider VARCHAR(50) DEFAULT 'local',FOREIGN KEY (role_id) REFERENCES user_roles(role_id),FOREIGN KEY (info_id) REFERENCES shipment_infos(info_id));`
+    createUsers = `CREATE TABLE IF NOT EXISTS users (user_uuid CHAR(36) PRIMARY KEY,password VARCHAR(255) NOT NULL,email VARCHAR(100) UNIQUE NOT NULL,name VARCHAR(50) NOT NULL,lastname VARCHAR(50) NOT NULL,role_id INT NOT NULL,info_id INT,FOREIGN KEY (role_id) REFERENCES user_roles(role_id),FOREIGN KEY (info_id) REFERENCES shipment_infos(info_id));`
 
     createPaymentInfos = `CREATE TABLE IF NOT EXISTS payment_infos (payment_id SERIAL PRIMARY KEY,payment_method VARCHAR(50) NOT NULL);`
 
@@ -111,7 +111,7 @@ class Database {
                         price: 200,
                         id_category: 8,
                         description: "prova4",
-                        seller_id: artisanId + "ciao",
+                        seller_id: artisanId,
                         image_url: userImagesPath + "/bicchieri.jpg"
                     }
                 ]
@@ -125,7 +125,6 @@ class Database {
                         await Product.addToStock(productId[0].product_id)
                     }
                 }
-
 
                 client.release()
                 console.log("Database tables created successfully");
@@ -171,7 +170,6 @@ class DbConnection {
 }
 
 export default Database;
-
 
 
 
