@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 import cors from "cors";
 import Product from "../models/product.js";
 import * as path from "node:path";
+import adminRouter from "../../routers/admin.js";
+
 
 dotenv.config();
 export const db = new Database()
@@ -38,12 +40,13 @@ export class Server {
         this.app.use(cors())
 
         // configures dotenv to work in your application
-        this.app.use(unless(["/","/images", "/auth/login", "/auth/register", "/product"], this.middleware))
+        this.app.use(unless(["/", "/images", "/auth/login", "/auth/register", "/product", "/admin/reports:"], this.middleware))
         this.app.use(express.json())
         this.app.use(apiRouter) // This has all the routers
         this.app.get("/", (request, response) => {
             response.status(200).send("Hello World");
         });
+        this.app.use('/admin', adminRouter);
         //todo this could be better? maybe with no db fetch since we already have the image path
         //this.app.use('/images', express.static(userImagesPath));
         this.app.get('/images', async (req, res) => {
