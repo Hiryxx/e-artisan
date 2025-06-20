@@ -29,7 +29,7 @@ docker-compose up -d
 | Ricerca con filtri                                                          | ☐ Da fare   | ☐ Da fare   | Paolo                            |                                                                      |
 | Acquisto, pagamento e gestione ordini                                       | ☐ Da fare   | ☐ Da fare   | Paolo, Francesco                 |                                                                      |
 | Dashboard artigiano (vendite, prodotti, stock)                              | ☐ Da fare   | ☐ Da fare   | Davide                           |                                                                      |
-| Amministratore (monitoraggio, segnalazioni, funzionamento)                 | ☐ Da fare   | ☐ Da fare   | Francesco                        |                                                                      |
+| Amministratore (monitoraggio, segnalazioni, funzionamento)                 | ✅ Fatto   | ☐ Da fare   | Francesco                        |                                                                      |
 | Test unitari e integration test                                             | ☐ Da fare   | —           | Paolo                            |                                                                      |
 | Schema ER                                                                   | ☐ Da fare   | —           | Tommaso                          |                                                                      |
 | Documentazione operazioni CRUD                                              | ☐ Da fare   | —           | Tutti                            |                                                                      |
