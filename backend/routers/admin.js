@@ -31,7 +31,7 @@ router.get("/reports/history", requireAdmin, async (req, res) => {
 
 router.put("/reports/:productId/resolve", requireAdmin, async (req, res) => {
     const { productId } = req.params;
-    const { message } = req.body; // Messaggio opzionale per la risoluzione
+    const { message } = req.body;
 
     try {
         const currentTime = new Date();
@@ -142,6 +142,26 @@ router.post("/reports", async (req, res) => {
             message: "Segnalazione creata con successo",
             report_id: reportId
         });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Errore del server" });
+    }
+});
+
+router.get("/user-reports", async (req, res) => {
+    try {
+        const reporter_id = req.user_uuid;
+        if (!reporter_id) {
+            return res.status(401).json({ message: "Utente non autenticato" });
+        }
+
+        const result = await db.dbConnection.execute(
+            `SELECT product_id FROM reports 
+             WHERE reporter_id = $1`,
+            [reporter_id]
+        );
+
+        res.status(200).json(result.rows.map(row => row.product_id));
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Errore del server" });

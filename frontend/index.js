@@ -163,32 +163,57 @@ const reportProduct = (productId) => {
         headers["Authorization"] = `Bearer ${token}`;
     }
 
-    console.log("Invio segnalazione per prodotto:", productId); // Debug
-
     fetch("http://localhost:900/admin/reports", {
         method: "POST",
         headers: headers,
-        body: JSON.stringify({
-            product_id: parseInt(productId),
-            reason: reason.trim()
-        })
+        body: JSON.stringify({product_id: productId, reason})
     })
         .then(res => {
-            console.log("Risposta server:", res.status); // Debug
             if (!res.ok) {
                 throw new Error(`Il server ha risposto con stato: ${res.status}`);
             }
             return res.json();
         })
         .then(data => {
-            console.log("Segnalazione creata:", data); // Debug
-            alert("Prodotto segnalato con successo");
+            UserState.addReportedProduct(productId);
+            spawnToast("Prodotto segnalato con successo", "success");
+
+            const reportBtn = document.getElementById('report-btn');
+            if (reportBtn) {
+                reportBtn.style.display = "none";
+            }
         })
-        .catch(err => {
-            console.error("Errore durante la segnalazione:", err);
-            alert("Errore durante la segnalazione: " + err.message);
+        .catch(error => {
+            console.error("Errore nella segnalazione:", error);
+            spawnToast("Errore durante la segnalazione", "error");
         });
 };
+
+const loadUserReportedProducts = () => {
+    const token = localStorage.getItem("token");
+    if (!token) return Promise.resolve([]);
+
+    return fetch("http://localhost:900/admin/user-reports", {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+        .then(res => {
+            if (!res.ok) {
+                return [];
+            }
+            return res.json();
+        })
+        .then(productIds => {
+            UserState.setReportedProducts(productIds);
+            return productIds;
+        })
+        .catch(err => {
+            console.error("Errore nel caricamento dei prodotti segnalati:", err);
+            return [];
+        });
+};
+
 
 const loadAdminPage = () => {
     const user = UserState.getUserInfo();
@@ -246,19 +271,18 @@ const loadProductDetails = () => {
             <p class="product-seller">Venditore: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
         </div>
     `;
-
-    // Verifica se l'utente è loggato
     const token = localStorage.getItem("token");
 
-    // Nascondi il pulsante di segnalazione se l'utente non è loggato
     if (!token) {
         reportBtn.style.display = "none";
     } else {
-        reportBtn.style.display = "inline-block";
-        reportBtn.addEventListener('click', () => {
-            const selectedProduct = ProductState.getSelectedProduct();
-            reportProduct(selectedProduct.product_id);
-        });
+        if (UserState.hasReportedProduct(selectedProduct.product_id)) {
+            reportBtn.style.display = "none";
+        } else {
+            reportBtn.addEventListener('click', () => {
+                reportProduct(selectedProduct.product_id);
+            });
+        }
     }
 
     document.getElementById('add-to-cart-btn').addEventListener('click', () => {
@@ -301,14 +325,18 @@ const checkUserAuth = () => {
 
     if (token) {
         return fetch("http://localhost:900/auth/user", {
-            method: "GET",
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
                 "Authorization": `Bearer ${token}`
             }
         })
+            .then(res => res.json())
+            .then(user => {
+                UserState.seUserInfo(user);
+                // Carica i prodotti segnalati dall'utente
+                return loadUserReportedProducts().then(() => user);
+            });
     }
+    return null;
 }
 
 const loadNavbarAuth = () => {
@@ -455,7 +483,6 @@ function resolveReport(productId) {
         })
         .then(data => {
             spawnToast("Segnalazione risolta con successo", "success");
-            // Ricarica la pagina admin
             loadAdminPage();
         })
         .catch(err => {
@@ -608,6 +635,8 @@ const loadReports = () => {
 };
 
 
+
+
 const loadReportsHistory = () => {
     const reportedProductsDiv = document.getElementById("reported-products");
 
@@ -671,22 +700,6 @@ const loadReportsHistory = () => {
         `;
         });
 };
-
-
-function acceptReport(productId) {
-    if (!confirm("Sei sicuro di voler accettare questo prodotto? La segnalazione verrà archiviata.")) {
-        return;
-    }
-
-    const token = localStorage.getItem("token");
-
-    // Per ora usiamo l'endpoint di update status
-    // Dovrai implementare un endpoint specifico nel backend se necessario
-    spawnToast("Segnalazione accettata", "success");
-
-    // Ricarica la pagina admin
-    loadAdminPage();
-}
 
 
 /**

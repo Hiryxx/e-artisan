@@ -52,28 +52,4 @@ export default class Report {
     `);
         return result.rows;
     }
-
-    static async updateReportStatus(productId, status) {
-        const result = await db.dbConnection.execute(
-            'UPDATE reports SET status = $1 WHERE product_id = $2 AND status = $3',
-            [status, productId, 'pending']
-        );
-        return result.rowCount; // Ritorna il numero di righe aggiornate
-    }
-
-    static async getReportsByProduct(productId) {
-        const result = await db.dbConnection.execute(
-            'SELECT * FROM reports WHERE product_id = $1',
-            [productId]
-        );
-        return result.rows;
-    }
-
-    static async deleteReportsByProduct(productId) {
-        const result = await db.dbConnection.execute(
-            'DELETE FROM reports WHERE product_id = $1',
-            [productId]
-        );
-        return result.rowCount;
-    }
 }

@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import apiRouter from "../../routers/index.js";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import Product from "../models/product.js";
 import * as path from "node:path";
 import adminRouter from "../../routers/admin.js";
 

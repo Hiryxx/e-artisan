@@ -1,5 +1,20 @@
 class UserState {
     static userInfo
+    static reportedProducts = [];
+
+    static setReportedProducts(productIds) {
+        UserState.reportedProducts = productIds;
+    }
+
+    static hasReportedProduct(productId) {
+        return UserState.reportedProducts.includes(Number(productId));
+    }
+
+    static addReportedProduct(productId) {
+        if (!UserState.reportedProducts.includes(Number(productId))) {
+            UserState.reportedProducts.push(Number(productId));
+        }
+    }
 
     static seUserInfo(userInfo) {
         UserState.userInfo = userInfo;
@@ -50,6 +65,7 @@ class ProductState {
         })
 
     }
+
     static setSelectedProduct(product) {
         ProductState.selectedProduct = product;
     }
