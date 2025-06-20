@@ -23,6 +23,7 @@ class Database {
 
     createStock = `CREATE TABLE IF NOT EXISTS stock(item_id SERIAL PRIMARY KEY,product_id INT NOT NULL, FOREIGN KEY (product_id) REFERENCES products(product_id));`
 
+    createReports = "CREATE TABLE IF NOT EXISTS reports (report_id SERIAL PRIMARY KEY,product_id INT,reporter_id CHAR(36),reason TEXT NOT NULL,status VARCHAR(20) NOT NULL DEFAULT 'pending',created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,resolved_at TIMESTAMP,resolution_message TEXT,FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE SET NULL,FOREIGN KEY (reporter_id) REFERENCES users(user_uuid));"
     insertRoles = "INSERT INTO user_roles (role_id, name) VALUES (1, 'admin'), (2, 'user'), (3, 'artisan')"
 
     insertCategory = "INSERT INTO categories (id_category, name) VALUES (1, 'Ceramica'),(2, 'Gioielli Artigianali'),(3, 'Lavorazione del Legno'),(4, 'Tessuti e Ricami'),(5, 'Candele e Saponi'),(6, 'Pittura e Illustrazione'),(7, 'Accessori in Cuoio'),(8, 'Decorazioni per la Casa'),(9, 'Articoli in Vetro Soffiato'),(10, 'Oggettistica in Metallo');"
@@ -53,6 +54,7 @@ class Database {
             await client.query(this.createProducts);
             await client.query(this.createStock);
             await client.query(this.createOrders);
+            await client.query(this.createReports);
             const role = await client.query("SELECT role_id FROM user_roles");
             if (role.rows.length === 0) {//create roles if not exists
                 await client.query(this.insertRoles);
@@ -69,6 +71,20 @@ class Database {
                 password: "franco",
                 role_id: 3
             }
+            const admin = {
+                name: "admin",
+                lastname: "admin",
+                email: "admin@gmail.com",
+                password: "admin",
+                role_id: 1
+            }
+            const dbAdmin = await User.getUserByEmail(admin.email)
+            if (dbAdmin === null) {
+                const hashedPassword = User.hashPassword(admin.password)
+
+                await User.newUser({hashedPassword: hashedPassword, ...admin})
+            }
+
             const dbArtisan = await User.getUserByEmail(artisan.email)
             let artisanId;
             if (dbArtisan === null) {

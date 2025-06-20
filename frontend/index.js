@@ -19,6 +19,8 @@ const getPageFunction = (page) => {
             return loadCartPage
         case "product_details":
             return loadProductDetails
+        case "admin_dashboard":
+            return loadAdminPage;
     }
 }
 
@@ -76,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.dispatchEvent(createPageChangeEvent(lastPage))
         })
     } else {
+        console.log("loading page ", lastPage)
         document.dispatchEvent(createPageChangeEvent(lastPage))
     }
 });
@@ -88,7 +91,6 @@ document.addEventListener('pageChanged', function (e) {
         return
     }
     switchPage(page);
-    //extractHtml(router.getCurrentPagePath(), pageId, getPageFunction(page))
     loadNavbarAuth()
 });
 
@@ -147,10 +149,81 @@ const putProds = (productsDiv, products) => {
     }
 }
 
+const reportProduct = (productId) => {
+    const reason = prompt("Inserisci il motivo della segnalazione:");
+    if (!reason || reason.trim() === "") {
+        return;
+    }
+
+    const token = localStorage.getItem("token");
+    const headers = {
+        "Content-Type": "application/json"
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    fetch("http://localhost:900/admin/reports", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({product_id: productId, reason})
+    })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Il server ha risposto con stato: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            UserState.addReportedProduct(productId);
+            spawnToast("Prodotto segnalato con successo", "success");
+
+            const reportBtn = document.getElementById('report-btn');
+            if (reportBtn) {
+                reportBtn.style.display = "none";
+            }
+        })
+        .catch(error => {
+            console.error("Errore nella segnalazione:", error);
+            spawnToast("Errore durante la segnalazione", "error");
+        });
+};
+
+const loadUserReportedProducts = () => {
+    const token = localStorage.getItem("token");
+    if (!token) return Promise.resolve([]);
+
+    return fetch("http://localhost:900/admin/user-reports", {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+        .then(res => {
+            if (!res.ok) {
+                return [];
+            }
+            return res.json();
+        })
+        .then(productIds => {
+            UserState.setReportedProducts(productIds);
+            return productIds;
+        })
+        .catch(err => {
+            console.error("Errore nel caricamento dei prodotti segnalati:", err);
+            return [];
+        });
+};
+
+
+
 const loadProductDetails = () => {
     const productDetailsDiv = document.getElementById('product-details');
     const selectedProduct = ProductState.getSelectedProduct();
+    const reportBtn = document.getElementById('report-btn');
 
+    // TODO FIX THIS SINCE IT CAUSES UNEXPECTED BEHAVIOR
+    // TODO IF product is not found, then i can fetch it from the server
     if (!selectedProduct) {
         console.error("Nessun prodotto selezionato");
         switchPage('home');
@@ -170,6 +243,19 @@ const loadProductDetails = () => {
             <p class="product-seller">Venditore: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
         </div>
     `;
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        reportBtn.style.display = "none";
+    } else {
+        if (UserState.hasReportedProduct(selectedProduct.product_id)) {
+            reportBtn.style.display = "none";
+        } else {
+            reportBtn.addEventListener('click', () => {
+                reportProduct(selectedProduct.product_id);
+            });
+        }
+    }
 
     document.getElementById('add-to-cart-btn').addEventListener('click', () => {
         goToShoppingCartWithProduct(selectedProduct.product_id);
@@ -211,19 +297,27 @@ const checkUserAuth = () => {
 
     if (token) {
         return fetch("http://localhost:900/auth/user", {
-            method: "GET",
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
                 "Authorization": `Bearer ${token}`
             }
         })
+            .then(res => res.json())
+            .then(user => {
+                UserState.seUserInfo(user);
+                // Carica i prodotti segnalati dall'utente
+                return loadUserReportedProducts().then(() => user);
+            });
     }
+    return null;
 }
 
 const loadNavbarAuth = () => {
     const token = localStorage.getItem("token")
-
+    const user = UserState.getUserInfo()
+    let adminOption = "";
+    if (user && user.role_id === 1) {
+        adminOption = `<p onclick="switchPage('admin_dashboard')">Admin</p>`;
+    }
 
     if (token) {
         document.getElementById("nav-options").innerHTML = `
@@ -236,6 +330,7 @@ const loadNavbarAuth = () => {
         <p onclick="switchPage('account')">
             Account
         </p>
+        ${adminOption || ""}
         <p onclick="logout()">
             Logout
         </p>
@@ -314,7 +409,6 @@ const loadAccountPage = () => {
     // understand how to show both orders and products
 
 }
-
 
 /**
  * Switch page
@@ -448,6 +542,7 @@ window.register = register;
 window.login = login;
 window.logout = logout;
 window.spawnToast = spawnToast;
-
 window.createPageChangeEvent = createPageChangeEvent;
+
+
 

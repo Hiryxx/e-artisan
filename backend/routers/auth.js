@@ -73,9 +73,8 @@ router.get("/token/validate", (req, res) => {
 });
 
 router.get("/user", async (req, res) => {
-  const user_uuid = req.user_uuid;
-  console.log(user_uuid);
-  const user = await User.getUserById(user_uuid);
+    const user_uuid = req.user_uuid
+    const user = await User.getUserById(user_uuid)
 
   if (user === null) {
     return res.status(404).json({ message: "User not found" });
