@@ -42,6 +42,10 @@ class ProductState {
         return ProductState.allProducts;
     }
 
+    static removeAllProducts() {
+        ProductState.allProducts = [];
+    }
+
 
     static fetchProducts(filter, token) {
         let textFilter = ""
