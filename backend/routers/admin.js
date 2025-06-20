@@ -156,8 +156,8 @@ router.get("/user-reports", async (req, res) => {
         }
 
         const result = await db.dbConnection.execute(
-            `SELECT product_id FROM reports 
-             WHERE reporter_id = $1`,
+            `SELECT product_id FROM reports
+             WHERE reporter_id = $1 AND status = 'pending'`,
             [reporter_id]
         );
 
