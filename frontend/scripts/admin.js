@@ -45,6 +45,7 @@ function resolveReport(productId) {
         })
         .then(data => {
             spawnToast("Segnalazione risolta con successo", "success");
+            UserState.removeReportedProduct(productId)
             loadAdminPage();
         })
         .catch(err => {
