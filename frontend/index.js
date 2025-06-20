@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.dispatchEvent(createPageChangeEvent(lastPage))
         })
     } else {
+        console.log("loading page ", lastPage)
         document.dispatchEvent(createPageChangeEvent(lastPage))
     }
 });
@@ -221,6 +222,8 @@ const loadProductDetails = () => {
     const selectedProduct = ProductState.getSelectedProduct();
     const reportBtn = document.getElementById('report-btn');
 
+    // TODO FIX THIS SINCE IT CAUSES UNEXPECTED BEHAVIOR
+    // TODO IF product is not found, then i can fetch it from the server
     if (!selectedProduct) {
         console.error("Nessun prodotto selezionato");
         switchPage('home');
