@@ -18,7 +18,7 @@ router.post("/login", async (req, res) => {
         const user = await User.getUserByEmail(email)
 
         if (user === null) {
-            return res.status(401).json({message: "Invalid credentials"});
+            return res.status(401).json({message: "User not found"});
         }
 
         const isMatch = User.checkPassword(password, user.password);
