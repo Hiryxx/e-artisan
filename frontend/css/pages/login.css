@@ -137,11 +137,6 @@ body {
     align-items: center;
 }
 
-.login__check-input:checked {
-    background-color: var(--first-color);
-
-}
-
 .login__check-input:checked::before {
     content: '✔️';
     display: block;

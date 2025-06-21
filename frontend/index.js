@@ -19,6 +19,11 @@ const getPageFunction = (page) => {
             return loadCartPage
         case "product_details":
             return loadProductDetails
+        case "login":
+            return loadAuthPages
+        case "register":
+            return loadAuthPages
+
     }
 }
 
@@ -375,12 +380,11 @@ const register = () => {
                 UserState.seUserInfo(data.user)
                 document.dispatchEvent(createPageChangeEvent("home"));
             } else {
-                alert("Registration failed:");
+                spawnToast("Registration failed", "error");
             }
         })
         .catch(err => {
-            console.error("Registration error:", err.message);
-            alert(`Registration failed: ${err.message}`);
+            spawnToast(`Registration failed: ${err}`, "error");
         });
 };
 
