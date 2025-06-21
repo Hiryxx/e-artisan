@@ -1,10 +1,128 @@
-<div>
-
-    <div id="user-info">
-
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/pages/account.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="account-container">
+    <!-- Header con info utente -->
+    <div class="account-header">
+        <div class="user-profile">
+            <div class="profile-image">
+                <img src="default-avatar.png" alt="Profile" id="profile-img">
+                <div class="edit-overlay">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <div class="user-details">
+                <h2 id="user-name">Nome Cognome</h2>
+                <p id="user-email">email@example.com</p>
+                <span class="user-role" id="user-role">Ruolo</span>
+            </div>
+        </div>
     </div>
 
-    <div id="account-products">
+    <!-- Menu di navigazione -->
+    <div class="account-nav">
+        <button class="nav-btn active" data-tab="dashboard">
+            <i class="fas fa-home"></i> Dashboard
+        </button>
+        <button class="nav-btn" data-tab="orders">
+            <i class="fas fa-shopping-bag"></i> Ordini
+        </button>
+        <button class="nav-btn" data-tab="settings">
+            <i class="fas fa-cog"></i> Impostazioni
+        </button>
+        <!-- Bottoni specifici per Artisan -->
+        <div id="artisan-buttons" style="display: none;">
+            <button class="nav-btn" data-tab="products">
+                <i class="fas fa-box"></i> I Miei Prodotti
+            </button>
+            <button class="nav-btn" data-tab="statistics">
+                <i class="fas fa-chart-line"></i> Statistiche
+            </button>
+        </div>
+    </div>
 
+    <!-- Contenuto principale -->
+    <div class="account-content">
+        <!-- Dashboard Tab -->
+        <div class="content-tab active" id="dashboard-tab">
+            <div class="dashboard-cards">
+                <div class="card">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Ordini Recenti</h3>
+                    <p id="recent-orders-count">0</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-heart"></i>
+                    <h3>Lista Desideri</h3>
+                    <p id="wishlist-count">0</p>
+                </div>
+                <div class="card artisan-only">
+                    <i class="fas fa-box-open"></i>
+                    <h3>Prodotti Attivi</h3>
+                    <p id="active-products-count">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ordini Tab -->
+        <div class="content-tab" id="orders-tab">
+            <div class="orders-list">
+                <!-- Gli ordini verranno inseriti dinamicamente qui -->
+            </div>
+        </div>
+
+        <!-- Impostazioni Tab -->
+        <div class="content-tab" id="settings-tab">
+            <div class="settings-form">
+                <h3>Informazioni Personali</h3>
+                <form id="personal-info-form">
+                    <div class="form-group">
+                        <label for="edit-name">Nome</label>
+                        <input type="text" id="edit-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email">Email</label>
+                        <input type="email" id="edit-email">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-password">Nuova Password</label>
+                        <input type="password" id="edit-password">
+                    </div>
+                    <button type="submit" class="save-btn">Salva Modifiche</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Prodotti Tab (solo per Artisan) -->
+        <div class="content-tab" id="products-tab">
+            <div class="products-management">
+                <button class="add-product-btn">
+                    <i class="fas fa-plus"></i> Aggiungi Prodotto
+                </button>
+                <div class="products-grid">
+                    <!-- I prodotti verranno inseriti dinamicamente qui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiche Tab (solo per Artisan) -->
+        <div class="content-tab" id="statistics-tab">
+            <div class="statistics-container">
+                <div class="stat-card">
+                    <h3>Vendite Mensili</h3>
+                    <div class="chart-container">
+                        <!-- Qui verrà inserito il grafico -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+</body>
+</html>
