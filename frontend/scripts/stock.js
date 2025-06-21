@@ -32,6 +32,8 @@ let loadCartPage = () => {
 
     const cartDiv = document.getElementById("cart-items")
 
+    // Calcola il totale
+    let total = 0;
 
     if (cartItems.length === 0) {
         cartDiv.innerHTML = `
@@ -41,12 +43,27 @@ let loadCartPage = () => {
             </p>
         </div>
         `
+        // Nascondi il footer del carrello se è vuoto
+        const cartFooter = document.getElementById("cart-footer")
+        if (cartFooter) {
+            cartFooter.style.display = 'none'
+        }
+    } else {
+        // Mostra il footer del carrello se ci sono articoli
+        const cartFooter = document.getElementById("cart-footer")
+        if (cartFooter) {
+            cartFooter.style.display = 'block'
+        }
     }
 
     for (let prod of cartItems) {
         if (!prod || !prod.product_id) {
             continue
         }
+
+        // Aggiungi al totale
+        total += prod.price * prod.quantity;
+
         cartDiv.innerHTML += `
            <div class="cart-item">
                 <div id="cart-image">
@@ -57,7 +74,7 @@ let loadCartPage = () => {
                          ${prod.name}
                     </div>
                     <div class="cart-price">
-                        $${prod.price}
+                        €${prod.price}
                     </div>
                     <div onclick="removeProdFromCart(${prod.product_id})" class="cart-remove">
                         Remove
@@ -77,6 +94,9 @@ let loadCartPage = () => {
         </div>
         `
     }
+
+    // Aggiorna il totale nel DOM
+    updateCartTotal();
 }
 
 
@@ -164,3 +184,4 @@ window.loadCartPage = loadCartPage;
 window.modifyQuantity = modifyQuantity;
 window.removeProdFromCart = removeProdFromCart;
 window.goToShoppingCartWithProduct = goToShoppingCartWithProduct;
+window.updateCartTotal = updateCartTotal;

@@ -21,9 +21,12 @@ const getPageFunction = (page) => {
             return loadProductDetails
         case "admin_dashboard":
             return loadAdminPage;
+        case "checkout":
+            return loadCheckoutPage;
+        case "payment":
+            return loadPaymentPage;
     }
 }
-
 
 const toastClose = (toastContainer) => {
     toastContainer.innerHTML = "";
@@ -412,6 +415,7 @@ const loadAccountPage = () => {
 
 /**
  * Switch page
+ * @param page Page name without url (e.g. "home" for "/pages/home.html")
  * @param page Page name without url (e.g. "home" for "/pages/home.html")
  */
 let switchPage = (page) => {

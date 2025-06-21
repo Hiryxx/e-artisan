@@ -1,0 +1,47 @@
+<section id="page-body">
+    <section id="checkout-section">
+        <h2>Checkout - Informazioni di Spedizione</h2>
+
+        <div id="checkout-container">
+            <form id="shipping-form">
+                <div class="form-group">
+                    <label for="street">Via/Strada</label>
+                    <input type="text" id="street" name="street" required maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="number">Numero Civico</label>
+                    <input type="text" id="number" name="number" required maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label for="zipcode">CAP</label>
+                    <input type="text" id="zipcode" name="zipcode" required maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label for="city">Città</label>
+                    <input type="text" id="city" name="city" required maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label for="state">Provincia/Stato</label>
+                    <input type="text" id="state" name="state" required maxlength="50">
+                </div>
+
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="goBackToCart()">Indietro</button>
+                    <button type="submit" class="btn btn-primary">Procedi al Pagamento</button>
+                </div>
+            </form>
+
+            <div id="order-summary">
+                <h3>Riepilogo Ordine</h3>
+                <div id="order-items"></div>
+                <div id="order-total">
+                    <strong>Totale: €<span id="total-amount">0.00</span></strong>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>

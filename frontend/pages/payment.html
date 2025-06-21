@@ -1,0 +1,56 @@
+<section id="page-body">
+  <section id="payment-section">
+    <h2>Completa il tuo ordine</h2>
+
+    <div id="payment-container">
+      <form id="payment-form">
+        <h3>Dettagli di pagamento</h3>
+
+        <div class="form-group">
+          <label for="card-number">Numero carta</label>
+          <input type="text" id="card-number" name="card-number" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" required>
+        </div>
+
+        <div class="form-group">
+          <label for="card-holder">Titolare carta</label>
+          <input type="text" id="card-holder" name="card-holder" placeholder="Nome Cognome" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="expiry-date">Scadenza (MM/YY)</label>
+            <input type="text" id="expiry-date" name="expiry-date" placeholder="MM/YY" maxlength="5" required>
+          </div>
+
+          <div class="form-group half">
+            <label for="cvv">CVV</label>
+            <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn btn-secondary" onclick="goBackToCheckout()">Indietro</button>
+          <button type="submit" class="btn btn-primary" id="submit-payment">Conferma Pagamento</button>
+        </div>
+      </form>
+
+      <div id="order-summary">
+        <h3>Riepilogo Ordine</h3>
+
+        <div class="summary-section">
+          <h4>Indirizzo di spedizione</h4>
+          <p id="shipping-address"></p>
+        </div>
+
+        <div class="summary-section">
+          <h4>Articoli ordinati</h4>
+          <ul id="order-items-list"></ul>
+        </div>
+
+        <div id="order-total">
+          <strong>Totale: €<span id="total-amount">0.00</span></strong>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>

@@ -16,10 +16,6 @@ class UserState {
         }
     }
 
-    static removeReportedProduct(productId) {
-        UserState.reportedProducts = UserState.reportedProducts.filter(product_id => product_id !== Number(productId));
-    }
-
     static seUserInfo(userInfo) {
         UserState.userInfo = userInfo;
     }
@@ -44,10 +40,6 @@ class ProductState {
 
     static getAllProducts() {
         return ProductState.allProducts;
-    }
-
-    static removeAllProducts() {
-        ProductState.allProducts = [];
     }
 
 
