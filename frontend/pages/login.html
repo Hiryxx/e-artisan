@@ -1,11 +1,44 @@
 <div id="login-page">
-  <div class="login-form">
-    <label for="email">Email:</label>
-    <input id="email" type="email"/>
+    <div class="container">
+        <div class="login__form">
+            <div>
+                <h1 class="login__title">
+                    <span>Welcome</span> Back
+                </h1>
+                <p class="login__description">
+                    Welcome! Please log in to continue
+                </p>
+            </div>
+            <div>
+                <div class="login__inputs">
+                    <div>
+                        <label for="email" class="login__label">Email</label>
+                        <input id="email" type="email" placeholder="Enter your email address" required
+                               class="login__input">
+                    </div>
 
-    <label for="password">Password:</label>
-    <input id="password" type="password"/>
+                    <div>
+                        <label for="password" class="login__label">Password</label>
+                        <div class="login__box">
+                            <input id="password" type="password" placeholder="Enter your password" required
+                                   class="login__input">
+                        </div>
+                    </div>
+                </div>
 
-    <button onclick="login()">login</button>
-  </div>
+                <div class="login__check">
+                    <input id="show-pass" type="checkbox" class="login__check-input">
+                    <label for="show-pass" class="login__check-label">Show Password</label>
+                </div>
+            </div>
+
+            <div>
+                <div class="login__buttons">
+                    <button onclick="login()" class="login__button">Log In</button>
+                    <button onclick="switchPage('register')" class="login__button">Sign Up</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>

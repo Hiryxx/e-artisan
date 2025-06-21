@@ -19,6 +19,11 @@ const getPageFunction = (page) => {
             return loadCartPage
         case "product_details":
             return loadProductDetails
+        case "login":
+            return loadAuthPages
+        case "register":
+            return loadAuthPages
+
         case "admin_dashboard":
             return loadAdminPage;
     }
@@ -78,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function () {
             document.dispatchEvent(createPageChangeEvent(lastPage))
         })
     } else {
-        console.log("loading page ", lastPage)
         document.dispatchEvent(createPageChangeEvent(lastPage))
     }
 });
@@ -297,7 +301,10 @@ const checkUserAuth = () => {
 
     if (token) {
         return fetch("http://localhost:900/auth/user", {
+            method: "GET",
             headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
                 "Authorization": `Bearer ${token}`
             }
         })
@@ -444,7 +451,6 @@ const register = () => {
         role_id: user_role ? 2 : 3
     };
 
-    //console.log(JSON.stringify(user))
 
     fetch("http://localhost:900/auth/register", {
         method: "POST",
@@ -470,12 +476,11 @@ const register = () => {
                 UserState.seUserInfo(data.user)
                 document.dispatchEvent(createPageChangeEvent("home"));
             } else {
-                alert("Registration failed:");
+                spawnToast("Registration failed", "error");
             }
         })
         .catch(err => {
-            console.error("Registration error:", err.message);
-            alert(`Registration failed: ${err.message}`);
+            spawnToast(`Registration failed: ${err}`, "error");
         });
 };
 
@@ -486,10 +491,9 @@ const login = () => {
 
     // Basic validation
     if (!email || !password) {
-        alert("Please fill all required fields");
+        spawnToast("Please fill all required fields", "error");
         return;
     }
-
 
     fetch(`http://localhost:900/auth/login`, {
         method: "POST",
@@ -504,7 +508,9 @@ const login = () => {
     })
         .then(res => {
             if (!res.ok) {
-                throw new Error(`Server responded with status: ${res.status}`);
+                return res.json().then(errorData => {
+                    throw new Error(errorData.message);
+                });
             }
             return res.json();
         })
@@ -519,12 +525,11 @@ const login = () => {
                 UserState.seUserInfo(data.user)
                 document.dispatchEvent(createPageChangeEvent("home"));
             } else {
-                alert("Login failed: Missing token");
+                spawnToast("Login failed: Missing token", "error");
             }
         })
         .catch(err => {
-            console.error("Login error:", err.message);
-            alert(`Login failed: ${err.message}`);
+            spawnToast(`Login failed: ${err}`, "error");
         });
 }
 
@@ -542,7 +547,6 @@ window.register = register;
 window.login = login;
 window.logout = logout;
 window.spawnToast = spawnToast;
+
 window.createPageChangeEvent = createPageChangeEvent;
-
-
 

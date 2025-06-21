@@ -4,12 +4,15 @@ import uuid4 from "uuid4";
 
 export default class User {
     static _salt = 10
+
     static hashPassword(password) {
-        return bcrypt.hash(password, User._salt);
+        return bcrypt.hashSync(password, User._salt);
     }
+
     static checkPassword(password, hashedPassword) {
-        return bcrypt.compare(password, hashedPassword);
+        return bcrypt.compareSync(password, hashedPassword);
     }
+
     static async newUser(user) {
         const uuid = uuid4();
         await db.dbConnection.execute(
