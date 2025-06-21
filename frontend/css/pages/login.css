@@ -125,6 +125,20 @@ body {
     align-items: center;
 }
 
+.roles_radio {
+    display: flex;
+    flex-direction: row;
+    column-gap: .5rem;
+    align-items: center;
+    margin-bottom: .5rem;
+}
+
+.role_radio {
+    display: flex;
+    column-gap: .5rem;
+    align-items: center;
+}
+
 .login__check-input {
     appearance: none;
     width: 16px;
