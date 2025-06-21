@@ -160,7 +160,12 @@ let goToShoppingCartWithProduct = (productId) => {
 
 }
 
+let addProductToCart = (productId) => {
+    // todo add to cart
+}
+
 window.loadCartPage = loadCartPage;
 window.modifyQuantity = modifyQuantity;
 window.removeProdFromCart = removeProdFromCart;
 window.goToShoppingCartWithProduct = goToShoppingCartWithProduct;
+window.addProductToCart = addProductToCart;

@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const res = checkUserAuth()
     if (res) {
         res.then(res => {
+            console.log("User auth response: ", res)
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem("token")
                 UserState.removeUserInfo()
@@ -76,7 +77,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }).then(user => {
             if (user) {
                 console.log("User found ", user)
-                UserState.seUserInfo(user)
+                UserState.seUserInfo(user);
+                loadUserReportedProducts().then(() => user);
             }
         }).finally(() => {
             console.log("Loading page ", lastPage)
@@ -308,14 +310,7 @@ const checkUserAuth = () => {
                 "Authorization": `Bearer ${token}`
             }
         })
-            .then(res => res.json())
-            .then(user => {
-                UserState.seUserInfo(user);
-                // Carica i prodotti segnalati dall'utente
-                return loadUserReportedProducts().then(() => user);
-            });
     }
-    return null;
 }
 
 const loadNavbarAuth = () => {
