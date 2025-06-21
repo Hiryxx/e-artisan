@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem("token")
                 UserState.removeUserInfo()
-                window.location.reload()
+                document.dispatchEvent(createPageChangeEvent("home"))
             }
             return res.json();
         }).then(user => {
@@ -227,7 +227,6 @@ const loadUserReportedProducts = () => {
 };
 
 
-
 const loadProductDetails = () => {
     const productDetailsDiv = document.getElementById('product-details');
     const selectedProduct = ProductState.getSelectedProduct();
@@ -377,29 +376,61 @@ const loadNavbarAuth = () => {
 
 const loadAccountPage = () => {
     const user = UserState.getUserInfo()
-    const userDiv = document.getElementById("user-info")
-    if (!userDiv) {
-        console.error("No user div found")
+    const userDiv = document.getElementById("user-details")
+    const accountNav = document.getElementById("account-nav")
+    const accountContent = document.getElementById("account-content")
+
+    if (!userDiv || !accountNav || !accountContent) {
+        console.error("No div found")
+        return;
     }
+
     const token = localStorage.getItem("token")
     //todo optimize
     const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
 
 
-    if (user) {
-        userDiv.innerHTML = `
-            <p>
-                Name: ${user.name}
-            </p>
-            <p>
-                Lastname: ${user.lastname}
-            </p>
-            <p>
-                Email: ${user.email}
-            </p>
+    // todo should never happen
+    if (!user) {
+        console.error("No user found")
+        switchPage("home")
+        return;
+    }
+    userDiv.innerHTML = `
+         <h2 id="user-name">${user.name} ${user.lastname}</h2>
+         <p id="user-email">${user.email}</p>
         `
+
+
+    // TODO USE ACTIVE CLASS TO SHOW BUTTONS
+
+    // 2 user, 3 artisan
+    if (user.role_id === 2) {
+        accountNav.innerHTML = `
+            <button class="nav-btn active" data-tab="dashboard">
+                <i class="fas fa-home"></i> Dashboard
+            </button>
+            <button class="nav-btn" data-tab="orders">
+                <i class="fas fa-shopping-bag"></i> Ordini
+            </button>
+            <button class="nav-btn" data-tab="settings">
+                <i class="fas fa-cog"></i> Impostazioni
+            </button>
+         `
+    } else if (user.role_id === 3) {
+        accountNav.innerHTML = `
+             <button class="nav-btn" data-tab="products">
+                <i class="fas fa-box"></i> I Miei Prodotti
+            </button>
+            <button class="nav-btn" data-tab="statistics">
+                <i class="fas fa-chart-line"></i> Statistiche
+            </button>
+         `
     }
 
+
+    // todo depend on user role, show different options
+    /*
     const accountProductsDiv = document.getElementById("account-products")
 
     if (!accountProductsDiv) {
@@ -417,6 +448,8 @@ const loadAccountPage = () => {
             putProds(accountProductsDiv, products)
         })
     }
+
+     */
 
 
     // understand how to show both orders and products

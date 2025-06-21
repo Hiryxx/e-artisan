@@ -61,13 +61,13 @@
     opacity: 1;
 }
 
-.user-details h2 {
+#user-details h2 {
     margin: 0;
     color: var(--text-color);
     font-size: 1.8rem;
 }
 
-.user-details p {
+#user-details p {
     margin: 5px 0;
     color: #666;
 }
@@ -82,7 +82,7 @@
 }
 
 /* Navigation Styling */
-.account-nav {
+#account-nav {
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
@@ -248,7 +248,7 @@
         text-align: center;
     }
 
-    .account-nav {
+    #account-nav {
         flex-direction: column;
     }
 
