@@ -1,22 +1,68 @@
-<div id="register-page">
-    <div class="register-form">
-        <label for="fname">First name:</label>
-        <input id="fname" type="text"/>
+<div id="login-page">
+    <div class="container">
+        <div class="login__form">
+            <div>
+                <h1 class="login__title">
+                    <span>Welcome</span>
+                </h1>
+                <p class="login__description">
+                    Welcome! Please register to continue
+                </p>
+            </div>
+            <div>
+                <div class="login__inputs">
+                    <div>
+                        <label for="fname" class="login__label">First name</label>
+                        <input id="fname" type="email" placeholder="Enter your name" required
+                               class="login__input">
+                    </div>
 
-        <label for="lname">Last name:</label>
-        <input id="lname" type="text"/>
+                    <div>
+                        <label for="lname" class="login__label">Last name</label>
+                        <input id="lname" type="email" placeholder="Enter your last name" required
+                               class="login__input">
+                    </div>
 
-        <label for="email">Email:</label>
-        <input id="email" type="email"/>
+                    <div>
+                        <label for="email" class="login__label">Email</label>
+                        <input id="email" type="email" placeholder="Enter your email address" required
+                               class="login__input">
+                    </div>
 
-        <label for="password">Password:</label>
-        <input id="password" type="password"/>
+                    <div>
+                        <label for="password" class="login__label">Password</label>
+                        <div class="login__box">
+                            <input id="password" type="password" placeholder="Enter your password" required
+                                   class="login__input">
+                        </div>
+                    </div>
 
-        <label for="user-role">User:</label>
-        <input name="role" id="user-role" type="radio" value="user"/>
-        <label for="artisan-role">Artisan:</label>
-        <input name="role" id="artisan-role" type="radio" value="artisan"/>
+                    <div class="roles_radio">
+                        <div class="role_radio">
+                            <input id="user-role" type="radio" class="login__check-input" value="user"/>
+                            <label for="user-role" class="login__check-label">User</label>
+                        </div>
 
-        <button onclick="register()">Register</button>
+                        <div class="role_radio">
+                            <input id="artisan-role" type="radio" class="login__check-input" value="artisan"/>
+                            <label for="artisan-role" class="login__check-label">Artisan</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="login__check">
+                    <input id="show-pass" type="checkbox" class="login__check-input">
+                    <label for="show-pass" class="login__check-label">Show Password</label>
+                </div>
+            </div>
+
+            <div>
+                <div class="login__buttons">
+                    <button onclick="register()" class="login__button">Sign Up</button>
+                    <button onclick="switchPage('login')" class="login__button">Log in</button>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>

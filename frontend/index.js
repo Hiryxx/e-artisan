@@ -19,6 +19,11 @@ const getPageFunction = (page) => {
             return loadCartPage
         case "product_details":
             return loadProductDetails
+        case "login":
+            return loadAuthPages
+        case "register":
+            return loadAuthPages
+
         case "admin_dashboard":
             return loadAdminPage;
     }
@@ -62,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const res = checkUserAuth()
     if (res) {
         res.then(res => {
+            console.log("User auth response: ", res)
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem("token")
                 UserState.removeUserInfo()
@@ -71,14 +77,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }).then(user => {
             if (user) {
                 console.log("User found ", user)
-                UserState.seUserInfo(user)
+                UserState.seUserInfo(user);
+                loadUserReportedProducts().then(() => user);
             }
         }).finally(() => {
             console.log("Loading page ", lastPage)
             document.dispatchEvent(createPageChangeEvent(lastPage))
         })
     } else {
-        console.log("loading page ", lastPage)
         document.dispatchEvent(createPageChangeEvent(lastPage))
     }
 });
@@ -150,12 +156,17 @@ const putProds = (productsDiv, products) => {
 }
 
 const reportProduct = (productId) => {
-    const reason = prompt("Inserisci il motivo della segnalazione:");
+    const reason = prompt("Add a report reason:");
     if (!reason || reason.trim() === "") {
+        spawnToast("You need to add a reason", "error");
         return;
     }
 
     const token = localStorage.getItem("token");
+    if (!token) {
+        spawnToast("You need to be logged in to report a product", "error");
+        return;
+    }
     const headers = {
         "Content-Type": "application/json"
     };
@@ -220,7 +231,6 @@ const loadUserReportedProducts = () => {
 const loadProductDetails = () => {
     const productDetailsDiv = document.getElementById('product-details');
     const selectedProduct = ProductState.getSelectedProduct();
-    const reportBtn = document.getElementById('report-btn');
 
     // TODO FIX THIS SINCE IT CAUSES UNEXPECTED BEHAVIOR
     // TODO IF product is not found, then i can fetch it from the server
@@ -235,14 +245,21 @@ const loadProductDetails = () => {
             <img src="http://localhost:900/images?product_id=${selectedProduct.product_id}" alt="${selectedProduct.name}">
         </div>
         <div class="product-details-info">
-            <h2>${selectedProduct.name}</h2>
+            <p class="product-name">${selectedProduct.name}</p>
             <p class="product-price">Prezzo: $${selectedProduct.price}</p>
             <p class="product-stock">Disponibilità: ${selectedProduct.stock_count}</p>
             <p class="product-description">Descrizione: ${selectedProduct.description || 'Nessuna descrizione disponibile'}</p>
             <p class="product-category">Categoria: ${selectedProduct.category_id || selectedProduct.id_category || 'N/A'}</p>
             <p class="product-seller">Venditore: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
+            <div class="actions">
+                <button id="add-to-cart-btn" class="add-to-cart-btn">Aggiungi al carrello</button>
+                <button id="report-btn" class="back-btn">Segnala</button>
+                <button id="back-btn" class="back-btn" onclick="switchPage('home')">Torna alla home</button>
+            </div>
         </div>
     `;
+
+    const reportBtn = document.getElementById('report-btn');
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -297,18 +314,14 @@ const checkUserAuth = () => {
 
     if (token) {
         return fetch("http://localhost:900/auth/user", {
+            method: "GET",
             headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
                 "Authorization": `Bearer ${token}`
             }
         })
-            .then(res => res.json())
-            .then(user => {
-                UserState.seUserInfo(user);
-                // Carica i prodotti segnalati dall'utente
-                return loadUserReportedProducts().then(() => user);
-            });
     }
-    return null;
 }
 
 const loadNavbarAuth = () => {
@@ -444,7 +457,6 @@ const register = () => {
         role_id: user_role ? 2 : 3
     };
 
-    //console.log(JSON.stringify(user))
 
     fetch("http://localhost:900/auth/register", {
         method: "POST",
@@ -470,12 +482,11 @@ const register = () => {
                 UserState.seUserInfo(data.user)
                 document.dispatchEvent(createPageChangeEvent("home"));
             } else {
-                alert("Registration failed:");
+                spawnToast("Registration failed", "error");
             }
         })
         .catch(err => {
-            console.error("Registration error:", err.message);
-            alert(`Registration failed: ${err.message}`);
+            spawnToast(`Registration failed: ${err}`, "error");
         });
 };
 
@@ -486,10 +497,9 @@ const login = () => {
 
     // Basic validation
     if (!email || !password) {
-        alert("Please fill all required fields");
+        spawnToast("Please fill all required fields", "error");
         return;
     }
-
 
     fetch(`http://localhost:900/auth/login`, {
         method: "POST",
@@ -504,7 +514,9 @@ const login = () => {
     })
         .then(res => {
             if (!res.ok) {
-                throw new Error(`Server responded with status: ${res.status}`);
+                return res.json().then(errorData => {
+                    throw new Error(errorData.message);
+                });
             }
             return res.json();
         })
@@ -519,12 +531,11 @@ const login = () => {
                 UserState.seUserInfo(data.user)
                 document.dispatchEvent(createPageChangeEvent("home"));
             } else {
-                alert("Login failed: Missing token");
+                spawnToast("Login failed: Missing token", "error");
             }
         })
         .catch(err => {
-            console.error("Login error:", err.message);
-            alert(`Login failed: ${err.message}`);
+            spawnToast(`Login failed: ${err}`, "error");
         });
 }
 
@@ -542,7 +553,6 @@ window.register = register;
 window.login = login;
 window.logout = logout;
 window.spawnToast = spawnToast;
+
 window.createPageChangeEvent = createPageChangeEvent;
-
-
 
