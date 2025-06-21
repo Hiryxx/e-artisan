@@ -156,12 +156,17 @@ const putProds = (productsDiv, products) => {
 }
 
 const reportProduct = (productId) => {
-    const reason = prompt("Inserisci il motivo della segnalazione:");
+    const reason = prompt("Add a report reason:");
     if (!reason || reason.trim() === "") {
+        spawnToast("You need to add a reason", "error");
         return;
     }
 
     const token = localStorage.getItem("token");
+    if (!token) {
+        spawnToast("You need to be logged in to report a product", "error");
+        return;
+    }
     const headers = {
         "Content-Type": "application/json"
     };
@@ -226,7 +231,6 @@ const loadUserReportedProducts = () => {
 const loadProductDetails = () => {
     const productDetailsDiv = document.getElementById('product-details');
     const selectedProduct = ProductState.getSelectedProduct();
-    const reportBtn = document.getElementById('report-btn');
 
     // TODO FIX THIS SINCE IT CAUSES UNEXPECTED BEHAVIOR
     // TODO IF product is not found, then i can fetch it from the server
@@ -241,14 +245,21 @@ const loadProductDetails = () => {
             <img src="http://localhost:900/images?product_id=${selectedProduct.product_id}" alt="${selectedProduct.name}">
         </div>
         <div class="product-details-info">
-            <h2>${selectedProduct.name}</h2>
+            <p class="product-name">${selectedProduct.name}</p>
             <p class="product-price">Prezzo: $${selectedProduct.price}</p>
             <p class="product-stock">Disponibilità: ${selectedProduct.stock_count}</p>
             <p class="product-description">Descrizione: ${selectedProduct.description || 'Nessuna descrizione disponibile'}</p>
             <p class="product-category">Categoria: ${selectedProduct.category_id || selectedProduct.id_category || 'N/A'}</p>
             <p class="product-seller">Venditore: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
+            <div class="actions">
+                <button id="add-to-cart-btn" class="add-to-cart-btn">Aggiungi al carrello</button>
+                <button id="report-btn" class="back-btn">Segnala</button>
+                <button id="back-btn" class="back-btn" onclick="switchPage('home')">Torna alla home</button>
+            </div>
         </div>
     `;
+
+    const reportBtn = document.getElementById('report-btn');
     const token = localStorage.getItem("token");
 
     if (!token) {
