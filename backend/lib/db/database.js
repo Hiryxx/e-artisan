@@ -90,8 +90,6 @@ class Database {
             if (dbArtisan === null) {
                 const hashedPassword = User.hashPassword(artisan.password)
 
-                console.log("Creating artisan user with:", hashedPassword);
-
                 artisanId = await User.newUser({hashedPassword: hashedPassword, ...artisan})
                 //todo create products with their images
             } else{
