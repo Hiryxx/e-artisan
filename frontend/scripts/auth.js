@@ -1,14 +1,16 @@
 let loadAuthPages = () => {
     let showPassInput = document.getElementById("show-pass");
 
+
     showPassInput.addEventListener("click", (e) => {
         let passwordInput = document.getElementById("password");
+        let showPassLabel = document.getElementById("show-pass-text-register") || document.getElementById("show-pass-text-login");
         if (passwordInput.type === "password") {
             passwordInput.type = "text";
-            showPassInput.textContent = "Hide Password";
+            showPassLabel.textContent = "Hide Password";
         } else {
             passwordInput.type = "password";
-            showPassInput.textContent = "Show Password";
+            showPassLabel.textContent = "Show Password";
         }
     } );
 }
