@@ -35,9 +35,14 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
     try {
-        let params = req.query;
-        if (!req.query)
-            params = {}
+        let params = req.query || {};
+
+        // Convert search parameter to name parameter for the model
+        if (params.search) {
+            params.name = params.search;
+            delete params.search;
+        }
+
         const products = await Product.getProduct(params)
         res.status(200).json(products);
     } catch (error) {
@@ -45,7 +50,6 @@ router.get("/", async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 })
-
 router.delete("/", async (req, res) => {
     const { product_id } = req.params;
     try {
