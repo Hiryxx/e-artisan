@@ -1,9 +1,6 @@
-<!-- Questo è il contenuto aggiornato per pages/home.html -->
 <div class="home-container">
-    <!-- Search Container -->
     <div class="search-container">
         <div class="search-wrapper">
-            <!-- Search Bar -->
             <div class="search-bar">
                 <div class="search-input-wrapper">
                     <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -16,29 +13,21 @@
                             class="search-input"
                             placeholder="Cerca prodotti per nome..."
                             autocomplete="off"
-                    >
+                    />
                 </div>
                 <button id="search-button" class="search-button">
-                    <span>Cerca</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
+                    <i class="fas fa-search"></i>
                 </button>
             </div>
 
-            <!-- Filters Section -->
             <div class="filters-section">
-                <span class="filter-label">Filtra per:</span>
+                <span class="filter-label">Filter with:</span>
                 <select id="category-filter" class="filter-select">
-                    <option value="">Tutte le categorie</option>
-                    <!-- todo add the category from db -->
-
+                    <option value="" disabled>Categories</option>
                 </select>
-                <button id="clear-filters" class="clear-filters">Pulisci filtri</button>
+                <button id="clear-filters" class="clear-filters">Clean filters</button>
             </div>
 
-            <!-- Active Filters Display -->
             <div id="active-filters" class="active-filters"></div>
         </div>
     </div>

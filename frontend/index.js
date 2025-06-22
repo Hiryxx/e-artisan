@@ -285,6 +285,19 @@ const loadComponents = () => {
         return
     }
 
+    loadCategories()
+        .then(categories => {
+            const categoriesDiv = document.getElementById("category-filter");
+            for (let category of categories) {
+                categoriesDiv.innerHTML += `
+                        <option value="${category.id_category}">${category.name}</option>
+                     `
+            }
+        })
+        .catch(error => {
+            console.error("Error loading categories:", error);
+        });
+
     // Initialize search functionality
     initializeSearch()
 
@@ -356,7 +369,7 @@ const performSearch = () => {
 
     // Add category filter if selected
     if (categoryId) {
-        filters.id_category = categoryId
+        filters.id_category = categoryFilter.options[categoryFilter.selectedIndex].value
         const categoryName = categoryFilter.options[categoryFilter.selectedIndex].text
         activeFilters.push({
             type: "category",
@@ -408,7 +421,7 @@ const loadProducts = (filters = {}) => {
         if (resultsInfoDiv) {
             if (Object.keys(filters).length > 0) {
                 resultsInfoDiv.innerHTML = `
-                    <p>Trovati <strong>${products.length}</strong> prodotti</p>
+                    <p>Found <strong>${products.length}</strong> products</p>
                 `
             } else {
                 resultsInfoDiv.innerHTML = ""
@@ -424,6 +437,7 @@ const loadProducts = (filters = {}) => {
                 </div>
             `
         } else {
+            console.log("Products loaded: ", products)
             ProductState.setAllProducts(products)
             putProds(productsDiv, products)
         }

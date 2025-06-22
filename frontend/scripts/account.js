@@ -18,8 +18,6 @@ const loadCategories = (token) => {
             })
             .catch(err => {
                 console.error("Error fetching categories:", err);
-                spawnToast("Cannot load categories: " + err, "error");
-                document.dispatchEvent(createPageChangeEvent("home"));
                 throw err; // Re-throwing to allow error handling by caller
             });
     }
@@ -223,7 +221,7 @@ const loadContent = (type) => {
                     console.log("Categories aaa: ", categories)
                     for (let category of categories) {
                         categoriesDiv.innerHTML += `
-                        <option value="${category.category_id}">${category.name}</option>
+                        <option value="${category.id_category}">${category.name}</option>
                      `
                     }
                 })

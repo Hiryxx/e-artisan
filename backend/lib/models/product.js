@@ -28,6 +28,8 @@ export default class Product {
             whereClause = '1=1'; // Nessun filtro, seleziona tutto
         }
 
+        console.log("Where clause:", whereClause);
+
         const query = `SELECT p.*, COUNT(s.item_id) as stock_count, u.name as seller_name, u.lastname as seller_lastname
                        FROM products p
                                 LEFT JOIN stock s ON p.product_id = s.product_id

@@ -68,6 +68,7 @@ class ProductState {
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
         }
+        console.log("Fetching products with filter:", textFilter);
         return fetch(`http://localhost:900/product?${textFilter}`, {
             method: "GET",
             headers: headers
