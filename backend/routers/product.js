@@ -4,6 +4,16 @@ import Product from "../lib/models/product.js";
 const router = express.Router();
 
 
+router.get("/categories", async (req, res) => {
+    try {
+        const categories = await Product.getCategories();
+
+        res.status(200).json(categories.rows);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Server error" });
+    }
+})
 
 router.post("/", async (req, res) => {
     const { name, description, price, category_id } = req.body;

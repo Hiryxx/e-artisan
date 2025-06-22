@@ -12,7 +12,7 @@
     </div>
 
     <div id="account-content">
-        <div class="content-tab active" id="dashboard-tab">
+        <div class="content-tab" id="dashboard-tab">
             <div class="dashboard-cards">
                 <div class="card">
                     <i class="fas fa-shopping-cart"></i>
@@ -61,8 +61,34 @@
         </div>
 
         <!-- Prodotti Tab (solo per Artisan) -->
-        <div class="content-tab" id="products-tab">
+        <div class="content-tab active" id="products-tab">
             <div class="products-management">
+                <form id="personal-info-form">
+                    <div class="form-group">
+                        <label for="edit-name">Name</label>
+                        <input type="text" id="edit-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-name">Price ($)</label>
+                        <input type="text" id="edit-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email">Description</label>
+                        <input type="email" id="edit-email">
+                    </div>
+                    <div class="form-group">
+                        <label for="categories">Category</label>
+                        <select id="categories" name="category">
+                            <option value="volvo" disabled >Categories</option>
+                           <!-- Categories from db -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-password">Picture</label>
+                        <input type="file" id="edit-password">
+                    </div>
+                </form>
+
                 <button class="add-product-btn">
                     <i class="fas fa-plus"></i> Aggiungi Prodotto
                 </button>

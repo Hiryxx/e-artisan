@@ -37,6 +37,7 @@ class UserState {
 class ProductState {
     static allProducts = [];
     static selectedProduct = null;
+    static categories = [];
 
     static setAllProducts(products) {
         ProductState.allProducts = products;
@@ -72,6 +73,27 @@ class ProductState {
             headers: headers
         })
 
+    }
+
+    static fetchCategories(token) {
+        let headers = {
+            "Content-Type": "application/json",
+        }
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        return fetch("http://localhost:900/product/categories", {
+            method: "GET",
+            headers: headers
+        })
+    }
+
+    static setCategories(categories) {
+        ProductState.categories = categories;
+    }
+
+    static getCategories() {
+        return ProductState.categories;
     }
 
     static setSelectedProduct(product) {

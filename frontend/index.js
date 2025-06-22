@@ -23,7 +23,6 @@ const getPageFunction = (page) => {
             return loadAuthPages
         case "register":
             return loadAuthPages
-
         case "admin_dashboard":
             return loadAdminPage;
     }
@@ -385,7 +384,31 @@ const loadAccountPage = () => {
         return;
     }
 
+
     const token = localStorage.getItem("token")
+
+
+    let categories = ProductState.getCategories();
+
+    if (categories.length === 0) {
+        ProductState.fetchCategories(token).then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            console.log(res)
+            return res.json()
+        }).then(fetchedCategories => {
+            //console.log("Fetched categories: ", fetchedCategories)
+            ProductState.setCategories(fetchedCategories);
+            categories = fetchedCategories; // TODO DOESNT WORK SINCE IT IS ASYNC
+            console.log("setting categories: ", categories)
+        }).catch(err => {
+            console.error("Error fetching categories: ", err);
+            spawnToast("Cannot load categories " + err, "error");
+        })
+    }
+
+
     //todo optimize
     const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
 
@@ -426,6 +449,14 @@ const loadAccountPage = () => {
                 <i class="fas fa-chart-line"></i> Statistiche
             </button>
          `
+
+        const categoriesDiv = document.getElementById("categories");
+        console.log("Categories aaa: ", categories)
+        for (let category of categories) {
+            categoriesDiv.innerHTML += `
+            <option value="$">Categories</option>
+            `
+        }
     }
 
 

@@ -91,7 +91,6 @@ export class Server {
         token = token.split(" ")[1];
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
-                console.log("error", err);
                 return res.status(403).send("Forbidden");
             }
             req.user_uuid = decoded.user_uuid;

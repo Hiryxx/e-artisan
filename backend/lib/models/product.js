@@ -68,4 +68,10 @@ export default class Product {
             [itemId]
         );
     }
+
+    static async getCategories() {
+        return await db.dbConnection.execute(
+            'SELECT * FROM categories'
+        );
+    }
 }
