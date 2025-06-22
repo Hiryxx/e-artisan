@@ -27,6 +27,7 @@ const loadCategories = (token) => {
 
 const loadAccountPage = () => {
     const user = UserState.getUserInfo()
+
     const userDiv = document.getElementById("user-details")
     const accountNav = document.getElementById("account-nav")
     const accountContent = document.getElementById("account-content")
@@ -35,11 +36,6 @@ const loadAccountPage = () => {
         console.error("No div found")
         return;
     }
-
-    const token = localStorage.getItem("token")
-
-    //todo optimize
-    const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
 
 
     // todo should never happen
@@ -54,33 +50,33 @@ const loadAccountPage = () => {
                 `
 
 
-    // TODO USE ACTIVE CLASS TO SHOW BUTTONS
-
     // 2 user, 3 artisan
     if (user.role_id === 2) {
+        loadContent('dashboard')
         accountNav.innerHTML = `
-                    <button class="nav-btn active" data-tab="dashboard">
+                    <button id="dashboard" onclick="loadContent('dashboard')" class="nav-btn active" data-tab="dashboard">
                         <i class="fas fa-home"></i>Dashboard
                     </button>
-                    <button class="nav-btn" data-tab="orders">
+                    <button id="orders" onclick="loadContent('orders')" class="nav-btn" data-tab="orders">
                         <i class="fas fa-shopping-bag"></i>Orders
                     </button>
-                    <button class="nav-btn" data-tab="settings">
+                      <button id="settings" onclick="loadContent('settings')" class="nav-btn" data-tab="settings">
                         <i class="fas fa-cog"></i>Settings
                     </button>
                 `
     } else if (user.role_id === 3) { // or fa-plus-circle
+        loadContent('my-products')
         accountNav.innerHTML = `
-                     <button onclick="loadContent('my-products')" class="nav-btn" data-tab="products">
+                     <button id="my-products" onclick="loadContent('my-products')" class="nav-btn" data-tab="products">
                         <i class="fas fa-box"></i>My products
                     </button>
-                     <button onclick="loadContent('add-product')" class="nav-btn" data-tab="products">
+                     <button id="add-product" onclick="loadContent('add-product')" class="nav-btn" data-tab="products">
                         <i class="fas fa-cart-plus"></i>Add product
                     </button>
-                    <button onclick="loadContent('statistics')" class="nav-btn" data-tab="statistics">
+                    <button id="statistics" onclick="loadContent('statistics')" class="nav-btn" data-tab="statistics">
                         <i class="fas fa-chart-line"></i>Statistics
                     </button>
-                    <button onclick="loadContent('settings')" class="nav-btn" data-tab="settings">
+                    <button id="settings" onclick="loadContent('settings')" class="nav-btn" data-tab="settings">
                         <i class="fas fa-cog"></i>Settings
                     </button>
                    `
@@ -163,10 +159,62 @@ const loadContent = (type) => {
         return;
     }
 
+    const buttonType = document.getElementById(type)
+
+    // is this good?
+    if (buttonType) {
+        const activeButton = document.querySelector(".nav-btn.active");
+        if (activeButton) {
+            activeButton.classList.remove("active");
+        }
+        buttonType.classList.add("active");
+    }
+
+
     switch (type) {
         case "my-products":
-            content.innerHTML = `
-            `
+            const user = UserState.getUserInfo()
+            // todo maybe improve
+            const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
+            products.then(res => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status: ${res.status}`);
+                }
+                return res.json();
+            }).then(products => {
+                ProductState.setAllProducts(products);
+                console.log("Products loaded:", products);
+                let productsContent;
+                if (products.length === 0) {
+                    productsContent = `<p>No products found.</p>`;
+                } else {
+                    productsContent = products.map(product => `
+                    <div class="product-card">
+                        <div class="product-img">
+                           <img src="http://localhost:900/images?product_id=${product.product_id}" alt="prod-img">
+                        </div>
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <p>$${product.price}</p>
+                    </div>
+                `).join("");
+                }
+
+                content.innerHTML = `
+                    <div class="content-tab active" id="products-tab">
+                        <div class="products-management">
+                            <h2>My Products</h2>
+                            <div class="products-grid">
+                                ${productsContent}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).catch(error => {
+                console.error("Error loading products:", error);
+                spawnToast("Cannot load products: " + error, "error");
+
+            });
             break
         case "add-product":
             loadCategories(token)
@@ -250,6 +298,26 @@ const loadContent = (type) => {
                         <button type="submit" class="save-btn">Save</button>
                     </form>
                 </div>
+            </div>
+            `
+            break
+
+        case "dashboard":
+            content.innerHTML = `
+            <div class="content-tab active" id="dashboard-tab">
+                <h2>Dashboard</h2>
+                <p>Welcome to your dashboard!</p>
+                <!-- Add more dashboard content here -->
+            </div>
+            `
+            break
+
+        case "orders":
+            content.innerHTML = `
+            <div class="content-tab active" id="orders-tab">
+                <h2>Orders</h2>
+                <p>Your orders will be displayed here.</p>
+                <!-- Orders will be dynamically loaded here -->
             </div>
             `
             break

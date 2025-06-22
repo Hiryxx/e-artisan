@@ -92,7 +92,7 @@ For more control:
     margin-bottom: 4rem;
 }
 
-.product > .product-img {
+.product-img {
     width: 100%;
     height: 19.3rem;
     /*background-color: green;*/

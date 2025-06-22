@@ -370,3 +370,10 @@ textarea {
         height: 250px;
     }
 }
+
+.products-grid{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
