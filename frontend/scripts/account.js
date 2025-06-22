@@ -70,9 +70,6 @@ const loadAccountPage = () => {
                      <button id="add-product" onclick="loadContent('add-product')" class="nav-btn" data-tab="products">
                         <i class="fas fa-cart-plus"></i>Add product
                     </button>
-                    <button id="statistics" onclick="loadContent('statistics')" class="nav-btn" data-tab="statistics">
-                        <i class="fas fa-chart-line"></i>Statistics
-                    </button>
                     <button id="settings" onclick="loadContent('settings')" class="nav-btn" data-tab="settings">
                         <i class="fas fa-cog"></i>Settings
                     </button>
@@ -216,8 +213,7 @@ const loadContent = (type) => {
         case "add-product":
             loadCategories(token)
                 .then(categories => {
-                    const categoriesDiv = document.getElementById("categories");
-                    console.log("Categories aaa: ", categories)
+                    const categoriesDiv = document.getElementById("category-filter");
                     for (let category of categories) {
                         categoriesDiv.innerHTML += `
                         <option value="${category.id_category}">${category.name}</option>
@@ -248,9 +244,9 @@ const loadContent = (type) => {
                         </div>
                         <div class="form-group">
                             <label for="categories">Category</label>
-                            <select id="categories" name="category">
+                            <select id="category-filter" class="filter-select">
                                 <option value="" disabled>Categories</option>
-                                <!-- Categories from db -->
+                                 <!-- Categories from db -->
                             </select>
                         </div>
                         <div class="form-group">
@@ -267,11 +263,6 @@ const loadContent = (type) => {
                     </div>
                 </div>
         `;
-            break
-
-        case "statistics":
-            content.innerHTML = `
-            `
             break
 
         case "settings":
@@ -310,13 +301,50 @@ const loadContent = (type) => {
             break
 
         case "orders":
-            content.innerHTML = `
-            <div class="content-tab active" id="orders-tab">
+            let orders = OrderState.getOrders()
+            if (orders.length === 0) {
+                content.innerHTML = `
+                <div class="content-tab active" id="orders-tab">
+                    <h2>Orders</h2>
+                    <p>No orders found.</p>
+                </div>
+                `;
+                return;
+            }
+
+            OrderState.fetchOrders().then(res => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status: ${res.status}`);
+                }
+                return res.json();
+            }).then(orders => {
+                OrderState.setOrders(orders);
+                console.log("Orders loaded:", orders);
+
+                let ordersContent = orders.map(order => `
+                    <div class="order-card ${order.status}">
+                        <h3>Order #${order.order_id}</h3>
+                        <p>Date: ${new Date(order.date).toLocaleDateString()}</p>
+                        <p>Total: $${order.total}</p>
+                        <p>Status: ${order.status}</p>
+                        <button class="view-order-btn" onclick="OrderState.setSelectedOrder(${order.order_id})">View Order</button>
+                    </div>
+                `).join("");
+
+                content.innerHTML = `
+                <div class="content-tab active" id="orders-tab">
                 <h2>Orders</h2>
-                <p>Your orders will be displayed here.</p>
-                <!-- Orders will be dynamically loaded here -->
-            </div>
+                <div class="orders-management">
+                    <div class="orders-grid">
+                        ${ordersContent}
+                    </div>
+                 </div>
             `
+            }).catch(error => {
+                console.error("Error loading orders:", error);
+                spawnToast("Cannot load orders: " + error, "error");
+            });
+
             break
     }
 }

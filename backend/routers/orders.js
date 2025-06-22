@@ -13,18 +13,18 @@ router.post("/", async (req, res) => {
 
         // Validazione dati
         if (!orderData || !shippingInfo || !paymentInfo) {
-            return res.status(400).json({ message: "Dati mancanti" });
+            return res.status(400).json({ message: "Missing data" });
         }
 
         if (!orderData.items || orderData.items.length === 0) {
-            return res.status(400).json({ message: "Il carrello è vuoto" });
+            return res.status(400).json({ message: "The chart is empty" });
         }
 
         // Validazione campi spedizione
         const requiredShippingFields = ['street', 'number', 'zipcode', 'city', 'state'];
         for (const field of requiredShippingFields) {
             if (!shippingInfo[field]) {
-                return res.status(400).json({ message: `Campo mancante: ${field}` });
+                return res.status(400).json({ message: `Missing field: ${field}` });
             }
         }
 
@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
         }, userId);
 
         res.status(201).json({
-            message: "Ordine creato con successo",
+            message: "Order created successfully",
             order_id: orderId
         });
 

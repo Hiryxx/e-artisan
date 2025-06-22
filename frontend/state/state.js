@@ -125,3 +125,37 @@ class CartState {
         CartState.itemToAdd = productId;
     }
 }
+
+class OrderState {
+    static orders = [];
+    static selectedOrder = null;
+
+    static setOrders(orders) {
+        OrderState.orders = orders;
+    }
+
+    static getOrders() {
+        return OrderState.orders;
+    }
+
+    static setSelectedOrder(order) {
+        OrderState.selectedOrder = order;
+    }
+
+    static getSelectedOrder() {
+        return OrderState.selectedOrder;
+    }
+
+    static fetchOrders(token) {
+        let headers = {
+            "Content-Type": "application/json",
+        }
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        return fetch("http://localhost:900/orders", {
+            method: "GET",
+            headers: headers
+        });
+    }
+}
