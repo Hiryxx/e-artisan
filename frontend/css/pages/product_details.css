@@ -1,39 +1,166 @@
-#product-details-container{
+/* Contenitore principale dettagli prodotto */
+#product-details-container {
     display: flex;
     flex-direction: column;
     height: 100%;
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    box-sizing: border-box;
 }
 
-#product-details{
+/* Layout dettagli con immagine a sinistra */
+#product-details {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    font-family: "Sans Serif Collection", sans-serif;
+    gap: 3rem;
+    align-items: flex-start;
 }
 
-.product-name{
-    font-size: 38px;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
+/* Nome prodotto in alto */
+.product-name {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: #111;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
 }
 
-.product-details-image{
-    width: 25rem;
-    height: 25rem;
-    /*background-color: green;*/
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.5rem;
-    margin: 20rem;
+/* Contenitore immagine */
+.product-details-image {
+    width: 28rem;
+    height: 28rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-details-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
 }
 
 .product-details-image > img {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
-    width: auto;
-    height: auto;
+    display: block;
+}
+
+/* Colonna info prodotto a destra */
+.product-details-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Paragrafi descrizione, prezzo, stock */
+.product-details-info p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.4;
+}
+
+/* Container pulsanti */
+.actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Bottone base moderno */
+button {
+    padding: 0.75rem 1.8rem;
+    font-size: 1rem;
+    border-radius: 0.6rem;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+    user-select: none;
+    min-width: 140px;
+    max-width: 220px;
+    flex: 1 1 auto;
+}
+
+/* Pulsante Aggiungi al carrello - blu soft */
+.add-to-cart-btn {
+    background-color: #007bff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.add-to-cart-btn:hover,
+.add-to-cart-btn:focus {
+    background-color: #0056b3;
+    box-shadow: 0 8px 20px rgba(0, 86, 179, 0.5);
+    transform: scale(1.05);
+}
+
+/* Pulsante Segnala - rosso chiaro */
+#report-btn {
+    background-color: #dc3545;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    border: none;
+}
+
+#report-btn:hover,
+#report-btn:focus {
+    background-color: #a71d2a;
+    box-shadow: 0 8px 20px rgba(167, 29, 42, 0.5);
+    transform: scale(1.05);
+}
+
+/* Pulsante Torna alla home - grigio */
+#back-btn {
+    background-color: #6c757d;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    border: none;
+}
+
+#back-btn:hover,
+#back-btn:focus {
+    background-color: #495057;
+    box-shadow: 0 8px 20px rgba(73, 80, 87, 0.5);
+    transform: scale(1.05);
+}
+
+/* Effetto click */
+button:active {
+    transform: scale(0.95);
+    box-shadow: none;
+}
+
+/* Responsive: su schermi stretti cambia il layout */
+@media (max-width: 768px) {
+    #product-details {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .product-details-image {
+        width: 80vw;
+        height: 80vw;
+        max-width: 350px;
+        max-height: 350px;
+        margin: 0 auto;
+    }
+
+    .product-details-info {
+        width: 100%;
+        text-align: center;
+    }
+
+    .actions {
+        justify-content: center;
+    }
 }
