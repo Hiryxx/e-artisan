@@ -130,45 +130,4 @@ export default class Order {
         return order;
     }
 
-    static async updateOrderStatus(orderId, status) {
-        const result = await db.dbConnection.execute(
-            `UPDATE orders 
-             SET status = $1 
-             WHERE order_id = $2 
-             RETURNING *`,
-            [status, orderId]
-        );
-
-        return result.rows[0];
-    }
-
-    static async getAllOrders() {
-        const result = await db.dbConnection.execute(
-            `SELECT o.*, 
-                    pi.payment_method,
-                    si.street, si.number, si.zipcode, si.city, si.state,
-                    u.name as user_name, u.lastname as user_lastname, u.email
-             FROM orders o
-             JOIN payment_infos pi ON o.payment_id = pi.payment_id
-             JOIN shipment_infos si ON o.shipment_id = si.shipment_id
-             JOIN users u ON o.user_id = u.user_uuid
-             ORDER BY o.created_at DESC`
-        );
-
-        return result.rows;
-    }
-
-    static async getOrdersByStatus(status) {
-        const result = await db.dbConnection.execute(
-            `SELECT o.*, 
-                    u.name as user_name, u.lastname as user_lastname, u.email
-             FROM orders o
-             JOIN users u ON o.user_id = u.user_uuid
-             WHERE o.status = $1
-             ORDER BY o.created_at DESC`,
-            [status]
-        );
-
-        return result.rows;
-    }
 }

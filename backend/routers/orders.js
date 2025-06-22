@@ -4,19 +4,6 @@ import User from "../lib/models/user.js";
 
 const router = express.Router();
 
-// Middleware per verificare che l'utente sia admin
-const requireAdmin = async (req, res, next) => {
-    try {
-        const user = await User.getUserById(req.user_uuid);
-        if (!user || user.role_id !== 1) {
-            return res.status(403).json({ message: "Accesso negato" });
-        }
-        next();
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Errore del server" });
-    }
-};
 
 // POST /orders - Crea un nuovo ordine
 router.post("/", async (req, res) => {
@@ -106,69 +93,6 @@ router.get("/:orderId", async (req, res) => {
     }
 });
 
-// ADMIN ROUTES
 
-// GET /orders/admin/all - Ottieni tutti gli ordini (solo admin)
-router.get("/admin/all", requireAdmin, async (req, res) => {
-    try {
-        const orders = await Order.getAllOrders();
-        res.status(200).json(orders);
-
-    } catch (error) {
-        console.error("Errore nel recupero ordini:", error);
-        res.status(500).json({ message: "Errore del server" });
-    }
-});
-
-// GET /orders/admin/status/:status - Ottieni ordini per stato (solo admin)
-router.get("/admin/status/:status", requireAdmin, async (req, res) => {
-    try {
-        const { status } = req.params;
-        const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({
-                message: "Stato non valido. Stati validi: " + validStatuses.join(", ")
-            });
-        }
-
-        const orders = await Order.getOrdersByStatus(status);
-        res.status(200).json(orders);
-
-    } catch (error) {
-        console.error("Errore nel recupero ordini:", error);
-        res.status(500).json({ message: "Errore del server" });
-    }
-});
-
-// PUT /orders/:orderId/status - Aggiorna lo stato di un ordine (solo admin)
-router.put("/:orderId/status", requireAdmin, async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const { status } = req.body;
-
-        const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-        if (!status || !validStatuses.includes(status)) {
-            return res.status(400).json({
-                message: "Stato non valido. Stati validi: " + validStatuses.join(", ")
-            });
-        }
-
-        const updatedOrder = await Order.updateOrderStatus(orderId, status);
-
-        if (!updatedOrder) {
-            return res.status(404).json({ message: "Ordine non trovato" });
-        }
-
-        res.status(200).json({
-            message: "Stato ordine aggiornato con successo",
-            order: updatedOrder
-        });
-
-    } catch (error) {
-        console.error("Errore nell'aggiornamento dello stato:", error);
-        res.status(500).json({ message: "Errore del server" });
-    }
-});
 
 export default router;
