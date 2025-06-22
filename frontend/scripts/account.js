@@ -1,0 +1,262 @@
+const loadCategories = (token) => {
+    let categories = ProductState.getCategories();
+
+    if (categories.length > 0) {
+        return Promise.resolve(categories);
+    } else {
+        return ProductState.fetchCategories(token)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(fetchedCategories => {
+                ProductState.setCategories(fetchedCategories);
+                console.log("Categories loaded:", fetchedCategories);
+                return fetchedCategories;
+            })
+            .catch(err => {
+                console.error("Error fetching categories:", err);
+                spawnToast("Cannot load categories: " + err, "error");
+                document.dispatchEvent(createPageChangeEvent("home"));
+                throw err; // Re-throwing to allow error handling by caller
+            });
+    }
+}
+
+const loadAccountPage = () => {
+    const user = UserState.getUserInfo()
+    const userDiv = document.getElementById("user-details")
+    const accountNav = document.getElementById("account-nav")
+    const accountContent = document.getElementById("account-content")
+
+    if (!userDiv || !accountNav || !accountContent) {
+        console.error("No div found")
+        return;
+    }
+
+    const token = localStorage.getItem("token")
+
+    //todo optimize
+    const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
+
+
+    // todo should never happen
+    if (!user) {
+        console.error("No user found")
+        switchPage("home")
+        return;
+    }
+    userDiv.innerHTML = `
+             <h2 id="user-name">${user.name} ${user.lastname}</h2>
+             <p id="user-email">${user.email}</p>
+                `
+
+
+    // TODO USE ACTIVE CLASS TO SHOW BUTTONS
+
+    // 2 user, 3 artisan
+    if (user.role_id === 2) {
+        accountNav.innerHTML = `
+                    <button class="nav-btn active" data-tab="dashboard">
+                        <i class="fas fa-home"></i>Dashboard
+                    </button>
+                    <button class="nav-btn" data-tab="orders">
+                        <i class="fas fa-shopping-bag"></i>Orders
+                    </button>
+                    <button class="nav-btn" data-tab="settings">
+                        <i class="fas fa-cog"></i>Settings
+                    </button>
+                `
+    } else if (user.role_id === 3) { // or fa-plus-circle
+        accountNav.innerHTML = `
+                     <button onclick="loadContent('my-products')" class="nav-btn" data-tab="products">
+                        <i class="fas fa-box"></i>My products
+                    </button>
+                     <button onclick="loadContent('add-product')" class="nav-btn" data-tab="products">
+                        <i class="fas fa-cart-plus"></i>Add product
+                    </button>
+                    <button onclick="loadContent('statistics')" class="nav-btn" data-tab="statistics">
+                        <i class="fas fa-chart-line"></i>Statistics
+                    </button>
+                    <button onclick="loadContent('settings')" class="nav-btn" data-tab="settings">
+                        <i class="fas fa-cog"></i>Settings
+                    </button>
+                   `
+
+
+    }
+
+
+    // todo depend on user role, show different options
+    /*
+    const accountProductsDiv = document.getElementById("account-products")
+
+    if (!accountProductsDiv) {
+        console.error("No orders div found")
+    }
+
+
+    if (products) {
+        products.then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            return res.json();
+        }).then(products => {
+            putProds(accountProductsDiv, products)
+        })
+    }
+
+     */
+
+
+    // understand how to show both orders and products
+
+}
+
+const addArtisanProduct = () => {
+    const name = document.getElementById("name").value;
+    const price = document.getElementById("price").value;
+    const description = document.getElementById("description").value;
+    const category = document.getElementById("categories").value;
+    const picture = document.getElementById("picture").files[0];
+
+
+    if (!name || !price || !description || !category || !picture) {
+        spawnToast("Please fill all fields", "error");
+        return;
+    }
+
+    console.log("Adding product with values:", {name, price, description, category, picture});
+    /*
+    const token = localStorage.getItem("token");
+
+    ProductState.addProduct({name, price, description, category, picture}, token)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(product => {
+            spawnToast("Product added successfully", "success");
+            console.log("Product added:", product);
+            // Optionally, refresh the product list or redirect
+        })
+        .catch(err => {
+            console.error("Error adding product:", err);
+            spawnToast("Cannot add product: " + err, "error");
+        });
+
+     */
+}
+
+
+const loadContent = (type) => {
+    const content = document.getElementById("content");
+    const token = localStorage.getItem("token")
+
+    if (!content) {
+        console.error("No content div found");
+        return;
+    }
+
+    switch (type) {
+        case "my-products":
+            content.innerHTML = `
+            `
+            break
+        case "add-product":
+            loadCategories(token)
+                .then(categories => {
+                    const categoriesDiv = document.getElementById("categories");
+                    console.log("Categories aaa: ", categories)
+                    for (let category of categories) {
+                        categoriesDiv.innerHTML += `
+                        <option value="${category.category_id}">${category.name}</option>
+                     `
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading categories:", error);
+                    spawnToast("Cannot load categories: " + error, "error");
+                    document.dispatchEvent(createPageChangeEvent("home"));
+                });
+
+            content.innerHTML = `
+              <!-- Add product (only for Artisan) -->
+                <div class="content-tab active" id="products-tab">
+                    <div class="products-management">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Price ($)</label>
+                            <input type="number" id="price">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <input type="email" id="description">
+                        </div>
+                        <div class="form-group">
+                            <label for="categories">Category</label>
+                            <select id="categories" name="category">
+                                <option value="" disabled>Categories</option>
+                                <!-- Categories from db -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="picture">Picture</label>
+                            <input type="file" id="picture">
+                        </div>
+        
+                        <button onclick="addArtisanProduct()" class="add-product-btn">
+                            <i class="fas fa-plus"></i>Add Product
+                        </button>
+                        <div class="products-grid">
+                            <!-- I prodotti verranno inseriti dinamicamente qui -->
+                        </div>
+                    </div>
+                </div>
+        `;
+            break
+
+        case "statistics":
+            content.innerHTML = `
+            `
+            break
+
+        case "settings":
+            content.innerHTML = `
+             <div class="content-tab active" id="settings-tab">
+                <div class="settings-form">
+                    <h3>Personal information</h3>
+                    <form id="personal-info-form">
+                        <div class="form-group">
+                            <label for="edit-name">Name</label>
+                            <input type="text" id="edit-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-email">Email</label>
+                            <input type="email" id="edit-email">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-password">New Password</label>
+                            <input type="password" id="edit-password">
+                        </div>
+                        <button type="submit" class="save-btn">Save</button>
+                    </form>
+                </div>
+            </div>
+            `
+            break
+    }
+}
+
+window.loadCategories = loadCategories;
+window.loadAccountPage = loadAccountPage;
+window.loadContent = loadContent;
+window.addArtisanProduct = addArtisanProduct;

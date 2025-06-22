@@ -32,6 +32,10 @@
             </div>
         </div>
 
+        <div id="content">
+
+        </div>
+
         <div class="content-tab" id="orders-tab">
             <div class="orders-list">
                 <!-- Gli ordini verranno inseriti dinamicamente qui -->
@@ -39,64 +43,7 @@
         </div>
 
         <!-- Impostazioni Tab -->
-        <div class="content-tab" id="settings-tab">
-            <div class="settings-form">
-                <h3>Informazioni Personali</h3>
-                <form id="personal-info-form">
-                    <div class="form-group">
-                        <label for="edit-name">Nome</label>
-                        <input type="text" id="edit-name">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-email">Email</label>
-                        <input type="email" id="edit-email">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-password">Nuova Password</label>
-                        <input type="password" id="edit-password">
-                    </div>
-                    <button type="submit" class="save-btn">Salva Modifiche</button>
-                </form>
-            </div>
-        </div>
 
-        <!-- Prodotti Tab (solo per Artisan) -->
-        <div class="content-tab active" id="products-tab">
-            <div class="products-management">
-                <form id="personal-info-form">
-                    <div class="form-group">
-                        <label for="edit-name">Name</label>
-                        <input type="text" id="edit-name">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-name">Price ($)</label>
-                        <input type="text" id="edit-name">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-email">Description</label>
-                        <input type="email" id="edit-email">
-                    </div>
-                    <div class="form-group">
-                        <label for="categories">Category</label>
-                        <select id="categories" name="category">
-                            <option value="volvo" disabled >Categories</option>
-                           <!-- Categories from db -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-password">Picture</label>
-                        <input type="file" id="edit-password">
-                    </div>
-                </form>
-
-                <button class="add-product-btn">
-                    <i class="fas fa-plus"></i> Aggiungi Prodotto
-                </button>
-                <div class="products-grid">
-                    <!-- I prodotti verranno inseriti dinamicamente qui -->
-                </div>
-            </div>
-        </div>
 
         <!-- Statistiche Tab (solo per Artisan) -->
         <div class="content-tab" id="statistics-tab">
