@@ -45,4 +45,18 @@ export default class User {
         }
         return result.rows[0];
     }
+
+    static async updateUser(user_uuid, updatedFields) {
+        const fields = Object.keys(updatedFields);
+        const values = Object.values(updatedFields);
+        const setClause = fields.map((field, index) => `${field} = $${index + 1}`).join(', ');
+
+        console.log("Set clause:", setClause);
+
+        await db.dbConnection.execute(
+            `UPDATE users SET ${setClause} WHERE user_uuid = $${fields.length + 1}`,
+            [...values, user_uuid]
+        );
+
+    }
 }

@@ -2,85 +2,111 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import uuid4 from "uuid4";
-import { db } from "../lib/server/server.js";
+import {db} from "../lib/server/server.js";
 import User from "../lib/models/user.js";
 
 const router = express.Router();
 
 // JWT Token generator
 const generateToken = (id) => {
-  return jwt.sign({ user_uuid: id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+    return jwt.sign({user_uuid: id}, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+    });
 };
 
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.getUserByEmail(email);
+    const {email, password} = req.body;
+    try {
+        const user = await User.getUserByEmail(email);
 
         if (user === null) {
             return res.status(401).json({message: "User not found"});
         }
 
-    const isMatch = User.checkPassword(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+        const isMatch = User.checkPassword(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({message: "Invalid credentials"});
+        }
 
-    const token = generateToken(user.user_uuid);
-    res.json({ token, user });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error" });
-  }
+        const token = generateToken(user.user_uuid);
+        res.json({token, user});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message: "Server error"});
+    }
 });
 
 router.post("/register", async (req, res) => {
-  const { name, lastname, email, password, role_id } = req.body;
-  const hashedPassword = User.hashPassword(password);
+    const {name, lastname, email, password, role_id} = req.body;
+    const hashedPassword = User.hashPassword(password);
 
-  try {
-    const user = {
-      name,
-      lastname,
-      email,
-      hashedPassword,
-      role_id,
-    };
-    const userUUid = await User.newUser(user);
-    res.json({ token: generateToken(userUUid), user: user });
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({ message: "User already exists" });
-  }
+    try {
+        const user = {
+            name, lastname, email, hashedPassword, role_id,
+        };
+        const userUUid = await User.newUser(user);
+        res.json({token: generateToken(userUUid), user: user});
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({message: "User already exists"});
+    }
 });
 
 router.get("/token/validate", (req, res) => {
-  const token = req.headers.authorization;
-  if (!token || !token.startsWith("Bearer ")) {
-    //return res.status(401).send("Unauthorized");
-    res.json({ valid: false });
-  }
-
-  jwt.verify(token.split(" ")[1], process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      //return res.status(403).send("Forbidden");
-      res.json({ valid: false });
+    const token = req.headers.authorization;
+    if (!token || !token.startsWith("Bearer ")) {
+        //return res.status(401).send("Unauthorized");
+        res.json({valid: false});
     }
-    res.json({ valid: true });
-  });
+
+    jwt.verify(token.split(" ")[1], process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            //return res.status(403).send("Forbidden");
+            res.json({valid: false});
+        }
+        res.json({valid: true});
+    });
 });
 
 router.get("/user", async (req, res) => {
     const user_uuid = req.user_uuid
     const user = await User.getUserById(user_uuid)
 
-  if (user === null) {
-    return res.status(404).json({ message: "User not found" });
-  }
+    if (user === null) {
+        return res.status(404).json({message: "User not found"});
+    }
 
-  res.json(user);
+    res.json(user);
+});
+// Update only provided user fields
+router.patch("/user", async (req, res) => {
+    const user_uuid = req.user_uuid;
+    const {name, lastname, email, password} = req.body;
+
+    try {
+        const user = await User.getUserById(user_uuid);
+
+        if (user === null) {
+            return res.status(404).json({message: "User not found"});
+        }
+
+
+        // Update only provided fields
+        const updatedFields = {};
+        if (name) updatedFields.name = name;
+        if (lastname) updatedFields.lastname = lastname;
+        if (email) updatedFields.email = email;
+        if (password) updatedFields.password = User.hashPassword(password);
+
+        await User.updateUser(user_uuid, updatedFields);
+
+        const updatedUser = await User.getUserById(user_uuid);
+
+        res.json(updatedUser);
+    } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).json({message: "Server error"});
+    }
 });
 
 export default router;

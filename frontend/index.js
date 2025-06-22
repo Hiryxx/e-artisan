@@ -617,7 +617,6 @@ const login = () => {
             return res.json();
         })
         .then(data => {
-            console.log("Login successful:", data);
             const token = data.token;
             const user = data.user;
 

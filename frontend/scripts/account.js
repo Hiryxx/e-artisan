@@ -142,6 +142,51 @@ const addArtisanProduct = () => {
 
      */
 }
+// todo fix
+// only changes information that are provided
+const changePersonalInfo = () => {
+    const name = document.getElementById("edit-name").value;
+    const email = document.getElementById("edit-email").value;
+    const password = document.getElementById("edit-password").value;
+
+    const user = UserState.getUserInfo();
+    if (!user) {
+        spawnToast("No user found", "error");
+        return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    // Prepare the data to be sent
+    const data = {};
+    if (name) data.name = name;
+    if (email) data.email = email;
+    if (password) data.password = password;
+
+    if (Object.keys(data).length === 0) {
+        spawnToast("Please fill at least one field", "error");
+        return;
+    }
+
+    UserState.updateUserInfo(data, token)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(updatedUser => {
+            UserState.seUserInfo(updatedUser);
+            spawnToast("Personal information updated successfully", "success");
+            console.log("Updated user info:", updatedUser);
+            loadAccountPage(); // Reload the account page to reflect changes
+        })
+        .catch(err => {
+            console.error("Error updating personal info:", err);
+            spawnToast("Cannot update personal info: " + err, "error");
+        });
+
+}
 
 
 const loadContent = (type) => {
@@ -257,9 +302,6 @@ const loadContent = (type) => {
                         <button onclick="addArtisanProduct()" class="add-product-btn">
                             <i class="fas fa-plus"></i>Add Product
                         </button>
-                        <div class="products-grid">
-                            <!-- I prodotti verranno inseriti dinamicamente qui -->
-                        </div>
                     </div>
                 </div>
         `;
@@ -269,8 +311,7 @@ const loadContent = (type) => {
             content.innerHTML = `
              <div class="content-tab active" id="settings-tab">
                 <div class="settings-form">
-                    <h3>Personal information</h3>
-                    <form id="personal-info-form">
+                    <h3>Personal information (changes only the provided ones)</h3>
                         <div class="form-group">
                             <label for="edit-name">Name</label>
                             <input type="text" id="edit-name">
@@ -283,8 +324,7 @@ const loadContent = (type) => {
                             <label for="edit-password">New Password</label>
                             <input type="password" id="edit-password">
                         </div>
-                        <button type="submit" class="save-btn">Save</button>
-                    </form>
+                        <button onclick="changePersonalInfo()" type="submit" class="save-btn">Save</button>
                 </div>
             </div>
             `
@@ -353,3 +393,4 @@ window.loadCategories = loadCategories;
 window.loadAccountPage = loadAccountPage;
 window.loadContent = loadContent;
 window.addArtisanProduct = addArtisanProduct;
+window.changePersonalInfo = changePersonalInfo;

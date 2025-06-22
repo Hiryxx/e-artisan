@@ -28,6 +28,21 @@ class UserState {
         console.log("Removing user info");
         UserState.userInfo = null;
     }
+
+    static updateUserInfo(data, token) {
+        let headers = {
+            "Content-Type": "application/json",
+        }
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        return fetch("http://localhost:900/auth/user", {
+            method: "PATCH",
+            headers: headers,
+            body: JSON.stringify(data)
+        })
+
+    }
 }
 
 class ProductState {

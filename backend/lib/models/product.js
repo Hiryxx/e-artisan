@@ -38,7 +38,6 @@ export default class Product {
         }
 
 
-        console.log("Where clause:", whereClause);
 
         const query = `SELECT p.*, COUNT(s.item_id) as stock_count, u.name as seller_name, u.lastname as seller_lastname
                        FROM products p
