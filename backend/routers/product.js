@@ -50,6 +50,7 @@ router.get("/", async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 })
+
 router.delete("/", async (req, res) => {
     const { product_id } = req.params;
     try {

@@ -146,6 +146,7 @@ const addArtisanProduct = () => {
 // only changes information that are provided
 const changePersonalInfo = () => {
     const name = document.getElementById("edit-name").value;
+    const lname = document.getElementById("edit-last-name").value;
     const email = document.getElementById("edit-email").value;
     const password = document.getElementById("edit-password").value;
 
@@ -162,6 +163,7 @@ const changePersonalInfo = () => {
     if (name) data.name = name;
     if (email) data.email = email;
     if (password) data.password = password;
+    if (lname) data.lastname = lname;
 
     if (Object.keys(data).length === 0) {
         spawnToast("Please fill at least one field", "error");
@@ -178,7 +180,6 @@ const changePersonalInfo = () => {
         .then(updatedUser => {
             UserState.seUserInfo(updatedUser);
             spawnToast("Personal information updated successfully", "success");
-            console.log("Updated user info:", updatedUser);
             loadAccountPage(); // Reload the account page to reflect changes
         })
         .catch(err => {
@@ -315,6 +316,10 @@ const loadContent = (type) => {
                         <div class="form-group">
                             <label for="edit-name">Name</label>
                             <input type="text" id="edit-name">
+                        </div>
+                         <div class="form-group">
+                            <label for="edit-name">Last Name</label>
+                            <input type="text" id="edit-last-name">
                         </div>
                         <div class="form-group">
                             <label for="edit-email">Email</label>
