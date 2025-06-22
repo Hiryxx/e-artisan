@@ -278,35 +278,164 @@ const loadProductDetails = () => {
     });
 }
 
+
 const loadComponents = () => {
     const productsDiv = document.getElementById("products")
     if (!productsDiv) {
         console.error("No products div found")
-    }
-    const stateProducts = ProductState.getAllProducts()
-    if (stateProducts.length === 0) {
-        console.log("Loading products from server")
-        fetch("http://localhost:900/product", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-        }).then(res => {
-            if (!res.ok) {
-                throw new Error(`Server responded with status: ${res.status}`);
-            }
-            return res.json();
-        }).then(products => {
-            ProductState.setAllProducts(products)
-            putProds(productsDiv, products)
-        })
-    } else {
-        console.log("Loading products from state")
-        putProds(productsDiv, stateProducts)
+        return
     }
 
+    // Initialize search functionality
+    initializeSearch()
+
+    // Load all products initially
+    loadProducts({})
 }
+
+const initializeSearch = () => {
+    const searchInput = document.getElementById("search-input")
+    const searchButton = document.getElementById("search-button")
+    const categoryFilter = document.getElementById("category-filter")
+    const clearFiltersBtn = document.getElementById("clear-filters")
+
+    if (!searchInput || !searchButton || !categoryFilter || !clearFiltersBtn) {
+        console.error("Search elements not found")
+        return
+    }
+
+    // Search button click
+    searchButton.addEventListener("click", performSearch)
+
+    // Search on Enter key
+    searchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            performSearch()
+        }
+    })
+
+    // Live search with debounce
+    let searchTimeout;
+    searchInput.addEventListener("input", () => {
+        clearTimeout(searchTimeout)
+        searchTimeout = setTimeout(performSearch, 500) // 500ms delay
+    })
+
+    // Category filter change
+    categoryFilter.addEventListener("change", performSearch)
+
+    // Clear filters
+    clearFiltersBtn.addEventListener("click", () => {
+        searchInput.value = ""
+        categoryFilter.value = ""
+        document.getElementById("active-filters").innerHTML = ""
+        document.getElementById("search-results-info").innerHTML = ""
+        loadProducts({})
+    })
+}
+
+const performSearch = () => {
+    const searchInput = document.getElementById("search-input")
+    const categoryFilter = document.getElementById("category-filter")
+    const activeFiltersDiv = document.getElementById("active-filters")
+
+    const searchTerm = searchInput.value.trim()
+    const categoryId = categoryFilter.value
+
+    const filters = {}
+    const activeFilters = []
+
+    // Add search term to filters
+    if (searchTerm) {
+        filters.search = searchTerm
+        activeFilters.push({
+            type: "search",
+            value: searchTerm,
+            label: `Ricerca: "${searchTerm}"`
+        })
+    }
+
+    // Add category filter if selected
+    if (categoryId) {
+        filters.id_category = categoryId
+        const categoryName = categoryFilter.options[categoryFilter.selectedIndex].text
+        activeFilters.push({
+            type: "category",
+            value: categoryId,
+            label: `Categoria: ${categoryName}`
+        })
+    }
+
+    // Display active filters
+    activeFiltersDiv.innerHTML = activeFilters.map(filter => `
+        <div class="filter-tag">
+            ${filter.label}
+            <button onclick="removeFilter('${filter.type}', '${filter.value}')">×</button>
+        </div>
+    `).join("")
+
+    // Load products with filters
+    loadProducts(filters)
+}
+
+const removeFilter = (type, value) => {
+    if (type === "category") {
+        document.getElementById("category-filter").value = ""
+    } else if (type === "search") {
+        document.getElementById("search-input").value = ""
+    }
+    performSearch()
+}
+
+const loadProducts = (filters = {}) => {
+    const productsDiv = document.getElementById("products")
+    const loadingDiv = document.getElementById("search-loading")
+    const resultsInfoDiv = document.getElementById("search-results-info")
+
+    // Show loading
+    if (loadingDiv) loadingDiv.classList.add("active")
+    productsDiv.innerHTML = ""
+
+    ProductState.fetchProducts(filters).then(res => {
+        if (!res.ok) {
+            throw new Error(`Server responded with status: ${res.status}`)
+        }
+        return res.json()
+    }).then(products => {
+        // Hide loading
+        if (loadingDiv) loadingDiv.classList.remove("active")
+
+        // Update results info
+        if (resultsInfoDiv) {
+            if (Object.keys(filters).length > 0) {
+                resultsInfoDiv.innerHTML = `
+                    <p>Trovati <strong>${products.length}</strong> prodotti</p>
+                `
+            } else {
+                resultsInfoDiv.innerHTML = ""
+            }
+        }
+
+        // Display products
+        if (products.length === 0) {
+            productsDiv.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: #666;">
+                    <h3>Nessun prodotto trovato</h3>
+                    <p>Prova a modificare i filtri di ricerca</p>
+                </div>
+            `
+        } else {
+            ProductState.setAllProducts(products)
+            putProds(productsDiv, products)
+        }
+    }).catch(error => {
+        console.error("Error loading products:", error)
+        if (loadingDiv) loadingDiv.classList.remove("active")
+        spawnToast("Errore nel caricamento dei prodotti", "error")
+    })
+}
+
+
 
 const checkUserAuth = () => {
     let token = localStorage.getItem("token")
@@ -586,6 +715,7 @@ window.register = register;
 window.login = login;
 window.logout = logout;
 window.spawnToast = spawnToast;
-
+window.removeFilter = removeFilter
+window.performSearch = performSearch
 window.createPageChangeEvent = createPageChangeEvent;
 

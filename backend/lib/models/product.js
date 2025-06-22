@@ -19,16 +19,13 @@ export default class Product {
     static async getProduct(filter) {
         let whereClause = '';
         let index = 1;
-        for (const key in filter) {
-            if (whereClause.length > 0) {
-                whereClause += ' AND ';
-            }
-            whereClause += `p.${key} = ${"$" + index}`;
-            index++;
-        }
+        const values = [];
 
-        if (whereClause.length === 0) {
-            whereClause = '1=1'; // No filter, select all
+        if (filter.name && filter.name !== "" && filter.name !== null && filter.name !== undefined) {
+            whereClause = `LOWER(p.name) LIKE LOWER($${index})`;
+            values.push(`%${filter.name}%`);
+        } else {
+            whereClause = '1=1'; // Nessun filtro, seleziona tutto
         }
 
         const query = `SELECT p.*, COUNT(s.item_id) as stock_count, u.name as seller_name, u.lastname as seller_lastname
@@ -36,8 +33,8 @@ export default class Product {
                                 LEFT JOIN stock s ON p.product_id = s.product_id
                                 LEFT JOIN users u ON p.seller_id = u.user_uuid
                        WHERE ${whereClause}
-                       GROUP BY p.product_id, u.name, u.lastname`;
-        const values = Object.values(filter);
+                       GROUP BY p.product_id, u.name, u.lastname
+                       ORDER BY p.product_id DESC`;
 
         const result = await db.dbConnection.execute(query, values);
         return result.rows;
