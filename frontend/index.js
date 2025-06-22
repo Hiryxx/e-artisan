@@ -437,7 +437,6 @@ const loadProducts = (filters = {}) => {
                 </div>
             `
         } else {
-            console.log("Products loaded: ", products)
             ProductState.setAllProducts(products)
             putProds(productsDiv, products)
         }

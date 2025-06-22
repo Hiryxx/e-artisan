@@ -19,14 +19,24 @@ export default class Product {
     static async getProduct(filter) {
         let whereClause = '';
         let index = 1;
-        const values = [];
-
-        if (filter.name && filter.name !== "" && filter.name !== null && filter.name !== undefined) {
-            whereClause = `LOWER(p.name) LIKE LOWER($${index})`;
-            values.push(`%${filter.name}%`);
-        } else {
-            whereClause = '1=1'; // Nessun filtro, seleziona tutto
+        for (const key in filter) {
+            if (whereClause.length > 0) {
+                whereClause += ' AND ';
+            }
+            if (key === 'name') {
+                // For name, we want to use a LIKE clause for partial matches
+                whereClause += `LOWER(p.${key}) LIKE LOWER($${index})`;
+                filter[key] = `%${filter[key]}%`; // Add wildcards for LIKE
+            } else {
+                whereClause += `p.${key} = ${"$" + index}`;
+            }
+            index++;
         }
+
+        if (whereClause.length === 0) {
+            whereClause = '1=1'; // No filter, select all
+        }
+
 
         console.log("Where clause:", whereClause);
 
@@ -38,10 +48,10 @@ export default class Product {
                        GROUP BY p.product_id, u.name, u.lastname
                        ORDER BY p.product_id DESC`;
 
+        const values = Object.values(filter);
         const result = await db.dbConnection.execute(query, values);
         return result.rows;
     }
-
 
 
     static async deleteProduct(productId) {

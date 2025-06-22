@@ -13,7 +13,6 @@ const loadCategories = (token) => {
             })
             .then(fetchedCategories => {
                 ProductState.setCategories(fetchedCategories);
-                console.log("Categories loaded:", fetchedCategories);
                 return fetchedCategories;
             })
             .catch(err => {
