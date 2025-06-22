@@ -107,11 +107,11 @@ const loadAccountPage = () => {
 }
 
 const addArtisanProduct = () => {
-    const name = document.getElementById("name").value;
-    const price = document.getElementById("price").value;
-    const description = document.getElementById("description").value;
-    const category = document.getElementById("categories").value;
-    const picture = document.getElementById("picture").files[0];
+    const name = document.getElementById("prod-name").value;
+    const price = document.getElementById("prod-price").value;
+    const description = document.getElementById("prod-description").value;
+    const category = document.getElementById("category-filter").value;
+    const picture = document.getElementById("prod-picture").files[0];
 
 
     if (!name || !price || !description || !category || !picture) {
@@ -120,7 +120,7 @@ const addArtisanProduct = () => {
     }
 
     console.log("Adding product with values:", {name, price, description, category, picture});
-    /*
+
     const token = localStorage.getItem("token");
 
     ProductState.addProduct({name, price, description, category, picture}, token)
@@ -140,7 +140,6 @@ const addArtisanProduct = () => {
             spawnToast("Cannot add product: " + err, "error");
         });
 
-     */
 }
 // todo fix
 // only changes information that are provided
@@ -278,15 +277,15 @@ const loadContent = (type) => {
                     <div class="products-management">
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" id="name">
+                            <input type="text" id="prod-name">
                         </div>
                         <div class="form-group">
                             <label for="price">Price ($)</label>
-                            <input type="number" id="price">
+                            <input type="number" id="prod-price">
                         </div>
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <input type="email" id="description">
+                            <input type="email" id="prod-description">
                         </div>
                         <div class="form-group">
                             <label for="categories">Category</label>
@@ -297,7 +296,7 @@ const loadContent = (type) => {
                         </div>
                         <div class="form-group">
                             <label for="picture">Picture</label>
-                            <input type="file" id="picture">
+                            <input type="file" id="prod-picture">
                         </div>
         
                         <button onclick="addArtisanProduct()" class="add-product-btn">
