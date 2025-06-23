@@ -87,6 +87,28 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         document.dispatchEvent(createPageChangeEvent(lastPage))
     }
+
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    });
+
+    // Close menu when clicking on a link
+    document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navMenu.classList.remove('active');
+    }));
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
+    });
 });
 
 
@@ -98,6 +120,7 @@ document.addEventListener('pageChanged', function (e) {
     }
     switchPage(page);
     loadNavbarAuth()
+
 });
 
 
@@ -484,42 +507,44 @@ const loadNavbarAuth = () => {
     const user = UserState.getUserInfo()
     let adminOption = "";
     if (user && user.role_id === 1) {
-        adminOption = `<p onclick="switchPage('admin_dashboard')">Admin</p>`;
+        adminOption = `<p onclick="switchPage('admin_dashboard')" class="nav-link">>Admin</p>`;
     }
 
     if (token) {
         document.getElementById("nav-options").innerHTML = `
-        <p onclick="switchPage('home')">
+        <p onclick="switchPage('home')" class="nav-link">
             Home
         </p>
-        <p onclick="switchPage('about')">
+        <p onclick="switchPage('about')" class="nav-link">
             About
         </p>
-        <p onclick="switchPage('account')">
+        <p onclick="switchPage('account')" class="nav-link">
             Account
         </p>
         ${adminOption || ""}
-        <p onclick="logout()">
+        <p onclick="logout()" class="nav-link">
             Logout
         </p>
-    <p onclick="switchPage('shopping_cart')">
+    <p onclick="switchPage('shopping_cart')" class="nav-link">
         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
         </svg>
-    </p>`
+    </p>
+
+`
 
     } else {
         document.getElementById("nav-options").innerHTML = `
-        <p onclick="switchPage('home')">
+        <p onclick="switchPage('home')" class="nav-link">
             Home
         </p>
-        <p onclick="switchPage('about')">
+        <p onclick="switchPage('about')" class="nav-link">
             About
         </p>
-        <p onclick="switchPage('login')">
+        <p onclick="switchPage('login')" class="nav-link">
             Login
         </p>
-        <p onclick="switchPage('register')">
+        <p onclick="switchPage('register')" class="nav-link">
             Register
         </p>
     <p onclick="switchPage('shopping_cart')">
