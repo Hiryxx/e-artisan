@@ -8,6 +8,25 @@ body {
 
 }
 
+:root {
+    --first-color: #4a90e2;
+    --first-color-darker: #217AE2FF;
+    --second-color: red;
+    --title-color: black;
+    --text-color: rgb(110, 110, 110);
+    --body-color: purple;
+
+    --body-font: 'Poppins', sans-serif;
+    --h2-font-size: 1.25rem;
+    --small-font-size: .813rem;
+    --smaller-font-size: .75rem;
+
+    --normal-font-size: 1rem;
+    --font-medium: 500;
+    --font-semi-bold: 600;
+
+}
+
 #toast-container {
     position: fixed;
     top: 3rem;
