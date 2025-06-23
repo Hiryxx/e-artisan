@@ -23,15 +23,15 @@ docker-compose up -d
 
 | Funzionalità                                                                 | Stato       | Grafica     | Responsabile                    | Note                                                                 |
 |------------------------------------------------------------------------------|-------------|-------------|----------------------------------|----------------------------------------------------------------------|
-| Pagina utente                                                               | ☐ Da fare   | ☐ Da fare   | Tommaso, Mauro                   |                                                                      |
-| Pagina prodotto                                                             | ✅ Fatto   | ☐ Da fare   | Francesco                        |                                                                      |
-| Carrello                                                                    | ✅ Fatto     | ☐ Fatto     | Paolo                            |                                                                      |
-| Ricerca con filtri                                                          | ☐ Da fare   | ☐ Da fare   | Paolo                            |                                                                      |
-| Acquisto, pagamento e gestione ordini                                       | ✅ Fatto  | ☐ Da fare   | Paolo, Francesco                 |                                                                      |
-| Dashboard artigiano (vendite, prodotti, stock)                              | ☐ Da fare   | ☐ Da fare   | Davide                           |                                                                      |
-| Amministratore (monitoraggio, segnalazioni, funzionamento)                 | ✅ Fatto   | ☐ Da fare   | Francesco                        |                                                                      |
-| Test unitari e integration test                                             | ☐ Da fare   | —           | Paolo                            |                                                                      |
-| Schema ER                                                                   | ☐ Da fare   | —           | Tommaso                          |                                                                      |
-| Documentazione operazioni CRUD                                              | ☐ Da fare   | —           | Tutti                            |                                                                      |
-| README esaustivo                                                            | ☐ Da fare   | —           | Davide                           | Include istruzioni di build, test, deploy                           |
+| Pagina utente                                                               | ✅ Da fare   | ✅ Da fare   | Tommaso, Mauro                   |                                                                      |
+| Pagina prodotto                                                             | ✅ Fatto   | ✅ Da fare   | Francesco                        |                                                                      |
+| Carrello                                                                    | ✅ Fatto     | ✅ Fatto     | Paolo                            |                                                                      |
+| Ricerca con filtri                                                          | ✅ Da fare   | ✅Da fare   | Paolo                            |                                                                      |
+| Acquisto, pagamento e gestione ordini                                       | ✅ Fatto  | ✅ Da fare   | Paolo, Francesco                 |                                                                      |
+| Dashboard artigiano (vendite, prodotti, stock)                              | ✅ Da fare   | ✅ Da fare   | Davide                           |                                                                      |
+| Amministratore (monitoraggio, segnalazioni, funzionamento)                 | ✅ Fatto   | ✅ Da fare   | Francesco                        |                                                                      |
+| Test unitari e integration test                                             | ✅ Da fare   | —           | Paolo                            |                                                                      |
+| Schema ER                                                                   | ✅ Da fare   | —           | Tommaso                          |                                                                      |
+| Documentazione operazioni CRUD                                              | ✅ Da fare   | —           | Tutti                            |                                                                      |
+| README esaustivo                                                            | ✅ Da fare   | —           | Davide                           | Include istruzioni di build, test, deploy                           |
 
