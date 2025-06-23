@@ -49,11 +49,8 @@ const loadAccountPage = () => {
 
     // 2 user, 3 artisan
     if (user.role_id === 2) {
-        loadContent('dashboard')
+
         accountNav.innerHTML = `
-                    <button id="dashboard" onclick="loadContent('dashboard')" class="nav-btn active" data-tab="dashboard">
-                        <i class="fas fa-home"></i>Dashboard
-                    </button>
                     <button id="orders" onclick="loadContent('orders')" class="nav-btn" data-tab="orders">
                         <i class="fas fa-shopping-bag"></i>Orders
                     </button>
@@ -61,8 +58,9 @@ const loadAccountPage = () => {
                         <i class="fas fa-cog"></i>Settings
                     </button>
                 `
+        loadContent('orders')
     } else if (user.role_id === 3) { // or fa-plus-circle
-        loadContent('my-products')
+
         accountNav.innerHTML = `
                      <button id="my-products" onclick="loadContent('my-products')" class="nav-btn" data-tab="products">
                         <i class="fas fa-box"></i>My products
@@ -74,7 +72,7 @@ const loadAccountPage = () => {
                         <i class="fas fa-cog"></i>Settings
                     </button>
                    `
-
+        loadContent('my-products')
 
     }
 
@@ -333,29 +331,26 @@ const loadContent = (type) => {
             `
             break
 
-        case "dashboard":
-            content.innerHTML = `
-            <div class="content-tab active" id="dashboard-tab">
-                <h2>Dashboard</h2>
-                <p>Welcome to your dashboard!</p>
-                <!-- Add more dashboard content here -->
-            </div>
-            `
-            break
-
         case "orders":
-            let orders = OrderState.getOrders()
-            if (orders.length === 0) {
+            const token = localStorage.getItem("token");
+            if (!token) {
                 content.innerHTML = `
-                <div class="content-tab active" id="orders-tab">
-                    <h2>Orders</h2>
-                    <p>No orders found.</p>
-                </div>
-                `;
+        <div class="content-tab active" id="orders-tab">
+            <h2>Orders</h2>
+            <p>Autenticazione richiesta.</p>
+        </div>
+        `;
                 return;
             }
 
-            OrderState.fetchOrders().then(res => {
+            content.innerHTML = `
+    <div class="content-tab active" id="orders-tab">
+        <h2>Orders</h2>
+        <p>Caricamento ordini...</p>
+    </div>
+    `;
+
+            OrderState.fetchOrders(token).then(res => {
                 if (!res.ok) {
                     throw new Error(`Server responded with status: ${res.status}`);
                 }
@@ -364,31 +359,40 @@ const loadContent = (type) => {
                 OrderState.setOrders(orders);
                 console.log("Orders loaded:", orders);
 
-                let ordersContent = orders.map(order => `
-                    <div class="order-card ${order.status}">
-                        <h3>Order #${order.order_id}</h3>
-                        <p>Date: ${new Date(order.date).toLocaleDateString()}</p>
-                        <p>Total: $${order.total}</p>
-                        <p>Status: ${order.status}</p>
-                        <button class="view-order-btn" onclick="OrderState.setSelectedOrder(${order.order_id})">View Order</button>
-                    </div>
-                `).join("");
+                let ordersContent = orders.length > 0 ?
+                    orders.map(order => `
+                <div class="order-card ${order.status}">
+                    <h3>Order #${order.order_id}</h3>
+                    <p>Date: ${new Date(order.created_at).toLocaleDateString()}</p>
+                    <p>Total: $${order.total_amount}</p>
+                    <p>Items: ${order.items.map(item => `${item.name} (x${item.quantity})`).join(", ")}</p>
+                    <p>Status: ${order.status}</p>
+                </div>
+            `).join("") :
+                    "<p>Nessun ordine trovato.</p>";
 
                 content.innerHTML = `
-                <div class="content-tab active" id="orders-tab">
-                <h2>Orders</h2>
-                <div class="orders-management">
-                    <div class="orders-grid">
-                        ${ordersContent}
-                    </div>
-                 </div>
-            `
+        <div class="content-tab active" id="orders-tab">
+            <h2>Orders</h2>
+            <div class="orders-management">
+                <div class="orders-grid">
+                    ${ordersContent}
+                </div>
+            </div>
+        </div>
+        `;
             }).catch(error => {
                 console.error("Error loading orders:", error);
                 spawnToast("Cannot load orders: " + error, "error");
-            });
 
-            break
+                content.innerHTML = `
+        <div class="content-tab active" id="orders-tab">
+            <h2>Orders</h2>
+            <p>Errore nel caricamento degli ordini.</p>
+        </div>
+        `;
+            });
+            break;
     }
 }
 

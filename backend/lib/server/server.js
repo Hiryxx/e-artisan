@@ -72,7 +72,7 @@ export class Server {
         );
 
         // configures dotenv to work in your application
-        this.app.use(unless(["/", "/images", "/auth/login", "/auth/register", "/product", "/admin/reports:", "/product/categories", "/orders"], this.middleware))
+        this.app.use(unless(["/", "/images", "/auth/login", "/auth/register", "/product", "/admin/reports:", "/product/categories"], this.middleware))
         this.app.use(express.json())
         this.app.use(apiRouter) // This has all the routers
         this.app.get("/", (request, response) => {

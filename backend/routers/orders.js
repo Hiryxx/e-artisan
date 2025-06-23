@@ -9,6 +9,7 @@ const router = express.Router();
 router.post("/", async (req, res) => {
     try {
         const userId = req.user_uuid;
+        console.log(userId);
         const { orderData, shippingInfo, paymentInfo } = req.body;
 
         // Validazione dati
