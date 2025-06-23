@@ -269,8 +269,6 @@ const loadProductDetails = () => {
     const productDetailsDiv = document.getElementById('product-details');
     const selectedProduct = ProductState.getSelectedProduct();
 
-    // TODO FIX THIS SINCE IT CAUSES UNEXPECTED BEHAVIOR
-    // TODO IF product is not found, then i can fetch it from the server
     if (!selectedProduct) {
         console.error("Nessun prodotto selezionato");
         switchPage('home');

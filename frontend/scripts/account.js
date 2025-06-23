@@ -24,6 +24,11 @@ const loadCategories = (token) => {
 
 const loadAccountPage = () => {
     const user = UserState.getUserInfo()
+    if (!user) {
+        console.error("No user found")
+        switchPage("home")
+        return;
+    }
 
     const userDiv = document.getElementById("user-details")
     const accountNav = document.getElementById("account-nav")
@@ -35,12 +40,7 @@ const loadAccountPage = () => {
     }
 
 
-    // should never happen
-    if (!user) {
-        console.error("No user found")
-        switchPage("home")
-        return;
-    }
+
     userDiv.innerHTML = `
              <h2 id="user-name">${user.name} ${user.lastname}</h2>
              <p id="user-email">${user.email}</p>
@@ -122,7 +122,6 @@ const addArtisanProduct = () => {
         });
 
 }
-// todo fix
 // only changes information that are provided
 const changePersonalInfo = () => {
     const name = document.getElementById("edit-name").value;

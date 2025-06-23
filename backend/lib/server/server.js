@@ -79,8 +79,6 @@ export class Server {
             response.status(200).send("Hello World");
         });
         this.app.use('/admin', adminRouter);
-        //todo this could be better? maybe with no db fetch since we already have the image path
-        //this.app.use('/images', express.static(userImagesPath));
         this.app.get('/images', async (req, res) => {
             const productId = req.query.product_id;
             if (!productId) {

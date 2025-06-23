@@ -103,7 +103,7 @@ class Database {
                         name: "Vaso a calice in gesso",
                         price: 50,
                         id_category: 1,
-                        description: "Elegante vaso artigianale in gesso, modellato a calice. Perfetto per ambienti raffinati, dona un tocco classico e senza tempo alla tua casa.",
+                        description: "Elegante vaso artigianale in gesso, modellato a calice.",
                         seller_id: artisanId,
                         image_url: userImagesPath + "/vaso_gesso.webp"
                     },
@@ -111,7 +111,7 @@ class Database {
                         name: "Vaso in ceramica colorato",
                         price: 100,
                         id_category: 9,
-                        description: "Vaso in ceramica dipinto a mano, dai colori vivaci e allegri. Un pezzo unico che unisce arte e funzionalità, ideale per ravvivare ogni stanza.",
+                        description: "Vaso in ceramica dipinto a mano, dai colori vivaci e allegri.",
                         seller_id: artisanId,
                         image_url: userImagesPath + "/vaso_ceramica_col.png"
                     },
@@ -119,18 +119,11 @@ class Database {
                         name: "Vaso in cristallo 'Oceano'",
                         price: 150,
                         id_category: 9,
-                        description: "Raffinato vaso in cristallo trasparente con sfumature ispirate ai toni dell’oceano. Un oggetto decorativo di grande pregio, perfetto per ambienti moderni ed eleganti.",
+                        description: "Raffinato vaso in cristallo trasparente.",
                         seller_id: artisanId,
                         image_url: userImagesPath + "/vaso_oceano.jpg"
                     },
-                    {
-                        name: "Set di 6 bicchieri in vetro",
-                        price: 200,
-                        id_category: 8,
-                        description: "Set composto da sei bicchieri in vetro soffiato a mano, dallo stile minimal ed elegante. Ideali per la tavola di tutti i giorni o per occasioni speciali.",
-                        seller_id: artisanId,
-                        image_url: userImagesPath + "/bicchieri.jpg"
-                    }
+
                 ];
 
                 for (const product of products) {
