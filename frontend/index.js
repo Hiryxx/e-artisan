@@ -241,6 +241,9 @@ const loadProductDetails = () => {
         return;
     }
 
+    const user = UserState.getUserInfo();
+    const role = user.role_id;
+
     productDetailsDiv.innerHTML = `
         <div class="product-details-image">
             <img src="http://localhost:900/images?product_id=${selectedProduct.product_id}" alt="${selectedProduct.name}">
@@ -253,7 +256,7 @@ const loadProductDetails = () => {
             <p class="product-category">Categoria: ${selectedProduct.category_id || selectedProduct.id_category || 'N/A'}</p>
             <p class="product-seller">Venditore: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
             <div class="actions">
-                <button id="add-to-cart-btn" class="add-to-cart-btn">Aggiungi al carrello</button>
+                ${role !== 3 ?' <button id="add-to-cart-btn" class="add-to-cart-btn">Aggiungi al carrello</button>' : ''}
                 <button id="report-btn" class="back-btn">Segnala</button>
                 <button id="back-btn" class="back-btn" onclick="switchPage('home')">Torna alla home</button>
             </div>
