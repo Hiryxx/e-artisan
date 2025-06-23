@@ -14,17 +14,21 @@ const storage = multer.diskStorage({
     }
 });
 
-
 const upload = multer({storage: storage});
-/*
 
-const upload = multer({ dest: './public/user-images/' })
+/**
+ * @swagger
+ * tags:
+ *   name: Products
+ *   description: Product management APIs
  */
+
 /**
  * @swagger
  * /product/categories:
  *   get:
  *     summary: Retrieve a list of product categories
+ *     tags: [Products]
  *     responses:
  *       200:
  *         description: A list of categories
@@ -34,6 +38,21 @@ const upload = multer({ dest: './public/user-images/' })
  *               type: array
  *               items:
  *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
  */
 router.get("/categories", async (req, res) => {
     try {
@@ -46,6 +65,63 @@ router.get("/categories", async (req, res) => {
     }
 })
 
+/**
+ * @swagger
+ * /product/with-img:
+ *   post:
+ *     summary: Add a new product with image
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     consumes:
+ *       - multipart/form-data
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               id_category:
+ *                 type: integer
+ *               stock:
+ *                 type: integer
+ *               photo:
+ *                 type: string
+ *                 format: binary
+ *             required:
+ *               - name
+ *               - price
+ *               - id_category
+ *               - photo
+ *     responses:
+ *       201:
+ *         description: Product created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Product added successfully
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
 router.post("/with-img", express.urlencoded({extended: true}), upload.single('photo'), async (req, res) => {
     const {name, description, price, id_category, stock} = req.body;
 
@@ -66,6 +142,49 @@ router.post("/with-img", express.urlencoded({extended: true}), upload.single('ph
 })
 
 
+/**
+ * @swagger
+ * /product/{product_id}/stock/{stock_number}:
+ *   post:
+ *     summary: Add stock to existing product
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: product_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *       - in: path
+ *         name: stock_number
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Number of stock items to add
+ *     responses:
+ *       200:
+ *         description: Stock added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Stock added successfully
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
 router.post("/:product_id/stock/:stock_number", async (req, res) => {
     const {product_id, stock_number} = req.params;
 
@@ -81,6 +200,69 @@ router.post("/:product_id/stock/:stock_number", async (req, res) => {
     }
 
 })
+/**
+ * @swagger
+ * /product:
+ *   get:
+ *     summary: Get products with optional filtering
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by product name
+ *       - in: query
+ *         name: id_category
+ *         schema:
+ *           type: integer
+ *         description: Filter by category ID
+ *       - in: query
+ *         name: min_price
+ *         schema:
+ *           type: number
+ *         description: Minimum price filter
+ *       - in: query
+ *         name: max_price
+ *         schema:
+ *           type: number
+ *         description: Maximum price filter
+ *     responses:
+ *       200:
+ *         description: List of products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   price:
+ *                     type: number
+ *                   image_url:
+ *                     type: string
+ *                   id_category:
+ *                     type: integer
+ *                   seller_id:
+ *                     type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+
 
 router.get("/", async (req, res) => {
     try {
@@ -100,6 +282,43 @@ router.get("/", async (req, res) => {
     }
 })
 
+/**
+ * @swagger
+ * /product:
+ *   delete:
+ *     summary: Delete a product
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: product_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID to delete
+ *     responses:
+ *       200:
+ *         description: Product deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Product deleted successfully
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
 router.delete("/", async (req, res) => {
     const {product_id} = req.params;
     try {

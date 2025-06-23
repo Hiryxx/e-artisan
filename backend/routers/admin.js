@@ -3,10 +3,25 @@ import Report from "../lib/models/report.js";
 import Product from "../lib/models/product.js";
 import {db} from "../lib/server/server.js";
 import Order from "../lib/models/order.js";
+import User from "../lib/models/user.js";
 const router = express.Router();
 
+
+/**
+ * @swagger
+ * tags:
+ *   name: Admin
+ *   description: Admin management APIs
+ */
+
 const requireAdmin = (req, res, next) => {
-    //todo verificare se l'utente è un admin
+    if (!req.user_uuid) {
+        return res.status(403).json({ message: "Only for admins" });
+    }
+    const user = User.getUserById(req.user_uuid)
+    if (!user || user.role_id !== 1) {
+        return res.status(403).json({ message: "Accesso negato: solo per amministratori" });
+    }
     next();
 };
 
