@@ -277,21 +277,31 @@ const loadProductDetails = () => {
         return;
     }
 
+    const user = UserState.getUserInfo();
+
+    let addToCartBtnContent = "";
+
+    if (user && user.role_id !== 3) {
+        addToCartBtnContent = `<button id="add-to-cart-btn" class="add-to-cart-btn">Add to cart</button>`;
+    }
+
+
+
     productDetailsDiv.innerHTML = `
         <div class="product-details-image">
             <img src="http://localhost:900/images?product_id=${selectedProduct.product_id}" alt="${selectedProduct.name}">
         </div>
         <div class="product-details-info">
             <p class="product-name">${selectedProduct.name}</p>
-            <p class="product-price">Prezzo: $${selectedProduct.price}</p>
-            <p class="product-stock">Disponibilità: ${selectedProduct.stock_count}</p>
-            <p class="product-description">Descrizione: ${selectedProduct.description || 'Nessuna descrizione disponibile'}</p>
-            <p class="product-category">Categoria: ${selectedProduct.category_id || selectedProduct.id_category || 'N/A'}</p>
-            <p class="product-seller">Venditore: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
+            <p class="product-price">Price: $${selectedProduct.price}</p>
+            <p class="product-stock">Stock: ${selectedProduct.stock_count}</p>
+            <p class="product-description">Description: ${selectedProduct.description || 'Nessuna descrizione disponibile'}</p>
+            <p class="product-category">Category: ${selectedProduct.category_id || selectedProduct.id_category || 'N/A'}</p>
+            <p class="product-seller">Seller: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
             <div class="actions">
-                <button id="add-to-cart-btn" class="add-to-cart-btn">Aggiungi al carrello</button>
-                <button id="report-btn" class="back-btn">Segnala</button>
-                <button id="back-btn" class="back-btn" onclick="switchPage('home')">Torna alla home</button>
+                ${addToCartBtnContent}
+                <button id="report-btn" class="back-btn">Report</button>
+                <button id="back-btn" class="back-btn" onclick="switchPage('home')">Go back</button>
             </div>
         </div>
     `;
@@ -506,8 +516,15 @@ const loadNavbarAuth = () => {
     const token = localStorage.getItem("token")
     const user = UserState.getUserInfo()
     let adminOption = "";
+    let cartOption = "";
     if (user && user.role_id === 1) {
         adminOption = `<p onclick="switchPage('admin_dashboard')" class="nav-link">Admin</p>`;
+    } else if (user && user.role_id !== 3) {
+        cartOption = `<p onclick="switchPage('shopping_cart')" class="nav-link">
+        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
+        </svg>
+        </p>`
     }
 
     if (token) {
@@ -525,14 +542,8 @@ const loadNavbarAuth = () => {
         <p onclick="logout()" class="nav-link">
             Logout
         </p>
-    <p onclick="switchPage('shopping_cart')" class="nav-link">
-        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
-        </svg>
-    </p>
-
-`
-
+        ${cartOption}
+        `
     } else {
         document.getElementById("nav-options").innerHTML = `
         <p onclick="switchPage('home')" class="nav-link">
@@ -547,11 +558,12 @@ const loadNavbarAuth = () => {
         <p onclick="switchPage('register')" class="nav-link">
             Register
         </p>
-    <p onclick="switchPage('shopping_cart')">
+        <p onclick="switchPage('shopping_cart')" class="nav-link">
         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
         </svg>
-    </p>`
+        </p>
+        `
     }
 }
 
