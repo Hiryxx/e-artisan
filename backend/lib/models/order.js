@@ -82,12 +82,28 @@ export default class Order {
 
     static async getOrdersByUser(userId) {
         const result = await db.dbConnection.execute(
-            `SELECT o.*, 
+            `WITH order_items_info AS (
+                SELECT oi.order_id,
+                       jsonb_agg(
+                               jsonb_build_object(
+                                       'name', p.name,
+                                       'quantity', oi.quantity,
+                                       'price', oi.price,
+                                       'product_id', p.product_id
+                               )
+                       ) as items
+                FROM order_items oi
+                         JOIN products p ON oi.product_id = p.product_id
+                GROUP BY oi.order_id
+            )
+             SELECT o.*,
                     pi.payment_method,
-                    si.street, si.number, si.zipcode, si.city, si.state
+                    si.street, si.number, si.zipcode, si.city, si.state,
+                    COALESCE(oii.items, '[]'::jsonb) as items
              FROM orders o
-             JOIN payment_infos pi ON o.payment_id = pi.payment_id
-             JOIN shipment_infos si ON o.shipment_id = si.shipment_id
+                      JOIN payment_infos pi ON o.payment_id = pi.payment_id
+                      JOIN shipment_infos si ON o.shipment_id = si.shipment_id
+                      LEFT JOIN order_items_info oii ON o.order_id = oii.order_id
              WHERE o.user_id = $1
              ORDER BY o.created_at DESC`,
             [userId]

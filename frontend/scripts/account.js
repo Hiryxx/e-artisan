@@ -49,11 +49,8 @@ const loadAccountPage = () => {
 
     // 2 user, 3 artisan
     if (user.role_id === 2) {
-        loadContent('dashboard')
+
         accountNav.innerHTML = `
-                    <button id="dashboard" onclick="loadContent('dashboard')" class="nav-btn active" data-tab="dashboard">
-                        <i class="fas fa-home"></i>Dashboard
-                    </button>
                     <button id="orders" onclick="loadContent('orders')" class="nav-btn" data-tab="orders">
                         <i class="fas fa-shopping-bag"></i>Orders
                     </button>
@@ -61,8 +58,9 @@ const loadAccountPage = () => {
                         <i class="fas fa-cog"></i>Settings
                     </button>
                 `
+        loadContent('orders')
     } else if (user.role_id === 3) { // or fa-plus-circle
-        loadContent('my-products')
+
         accountNav.innerHTML = `
                      <button id="my-products" onclick="loadContent('my-products')" class="nav-btn" data-tab="products">
                         <i class="fas fa-box"></i>My products
@@ -74,7 +72,7 @@ const loadAccountPage = () => {
                         <i class="fas fa-cog"></i>Settings
                     </button>
                    `
-
+        loadContent('my-products')
 
     }
 
@@ -330,16 +328,6 @@ const loadContent = (type) => {
                         </div>
                         <button onclick="changePersonalInfo()" type="submit" class="save-btn">Save</button>
                 </div>
-            </div>
-            `
-            break
-
-        case "dashboard":
-            content.innerHTML = `
-            <div class="content-tab active" id="dashboard-tab">
-                <h2>Dashboard</h2>
-                <p>Welcome to your dashboard!</p>
-                <!-- Add more dashboard content here -->
             </div>
             `
             break
