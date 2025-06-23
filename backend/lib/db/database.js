@@ -103,35 +103,35 @@ class Database {
                         name: "Vaso a calice in gesso",
                         price: 50,
                         id_category: 1,
-                        description: "prova1",
+                        description: "Elegante vaso artigianale in gesso, modellato a calice. Perfetto per ambienti raffinati, dona un tocco classico e senza tempo alla tua casa.",
                         seller_id: artisanId,
                         image_url: userImagesPath + "/vaso_gesso.webp"
                     },
                     {
-                        name: "Vaso ceramica colorato",
+                        name: "Vaso in ceramica colorato",
                         price: 100,
                         id_category: 9,
-                        description: "prova2",
+                        description: "Vaso in ceramica dipinto a mano, dai colori vivaci e allegri. Un pezzo unico che unisce arte e funzionalità, ideale per ravvivare ogni stanza.",
                         seller_id: artisanId,
                         image_url: userImagesPath + "/vaso_ceramica_col.png"
                     },
                     {
-                        name: "Vaso cristallo oceano",
+                        name: "Vaso in cristallo 'Oceano'",
                         price: 150,
                         id_category: 9,
-                        description: "prova3",
+                        description: "Raffinato vaso in cristallo trasparente con sfumature ispirate ai toni dell’oceano. Un oggetto decorativo di grande pregio, perfetto per ambienti moderni ed eleganti.",
                         seller_id: artisanId,
                         image_url: userImagesPath + "/vaso_oceano.jpg"
                     },
                     {
-                        name: "Set 6 bicchieri vetro",
+                        name: "Set di 6 bicchieri in vetro",
                         price: 200,
                         id_category: 8,
-                        description: "prova4",
+                        description: "Set composto da sei bicchieri in vetro soffiato a mano, dallo stile minimal ed elegante. Ideali per la tavola di tutti i giorni o per occasioni speciali.",
                         seller_id: artisanId,
                         image_url: userImagesPath + "/bicchieri.jpg"
                     }
-                ]
+                ];
 
                 for (const product of products) {
                     await Product.newProduct(product)
