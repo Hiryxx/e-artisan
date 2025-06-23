@@ -188,5 +188,4 @@ window.loadCartPage = loadCartPage;
 window.modifyQuantity = modifyQuantity;
 window.removeProdFromCart = removeProdFromCart;
 window.goToShoppingCartWithProduct = goToShoppingCartWithProduct;
-window.updateCartTotal = updateCartTotal;
 window.addProductToCart = addProductToCart;

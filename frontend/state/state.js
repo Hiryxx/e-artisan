@@ -114,7 +114,7 @@ class ProductState {
     static addProduct(param, token) {
         const formData = new FormData();
         let headers = {
-            'Content-Type': 'multipart/form-data',
+
         }
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
@@ -123,7 +123,7 @@ class ProductState {
         formData.append('name', param.name);
         formData.append('price', param.price);
         formData.append('description', param.description);
-        formData.append('category_id', param.category);
+        formData.append('id_category', param.category);
         formData.append('photo', param.picture);
 
 
@@ -131,7 +131,7 @@ class ProductState {
 
         console.log("FormData content:", formData.get('name'), formData.get('price'), formData.get('description'), formData.get('category_id'), formData.get('photo'));
 
-        return fetch("http://localhost:900/product", {
+        return fetch("http://localhost:900/product/with-img", {
             method: "POST",
             headers: headers,
             body: formData

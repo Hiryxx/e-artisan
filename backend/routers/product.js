@@ -4,7 +4,7 @@ import Product from "../lib/models/product.js";
 
 const router = express.Router();
 
-/*
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public/user-images/');
@@ -16,10 +16,10 @@ const storage = multer.diskStorage({
 
 
 const upload = multer({storage: storage});
+/*
 
- */
 const upload = multer({ dest: './public/user-images/' })
-
+ */
 /**
  * @swagger
  * /product/categories:
@@ -46,13 +46,14 @@ router.get("/categories", async (req, res) => {
     }
 })
 
-router.post("/", upload.single('photo'), async (req, res) => {
-    const {name, description, price, category_id} = req.body;
+router.post("/with-img",express.urlencoded({ extended: true }), upload.single('photo'), async (req, res) => {
+    const {name, description, price, id_category} = req.body;
     console.log("Body received:", req.body);
     console.log("File received:", req.file);
+    console.log("User UUID:", req.user_uuid);
     try {
         const product = {
-            name, description, price, category_id, image_url: req.file.path
+            name, description, price, id_category, image_url: req.file.path, seller_id: req.user_uuid
         }
         await Product.newProduct(product)
         res.status(201).json({message: "Product added successfully"});
