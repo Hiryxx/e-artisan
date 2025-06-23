@@ -25,6 +25,48 @@ const requireAdmin = (req, res, next) => {
     next();
 };
 
+/**
+ * @swagger
+ * /admin/reports:
+ *   get:
+ *     summary: Retrieve all reports
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of all reports
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   report_id:
+ *                     type: string
+ *                   product_id:
+ *                     type: string
+ *                   reporter_id:
+ *                     type: string
+ *                   reason:
+ *                     type: string
+ *                   status:
+ *                     type: string
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
 router.get("/reports", requireAdmin, async (req, res) => {
     try {
         const reports = await Report.getAllReports();
@@ -35,6 +77,53 @@ router.get("/reports", requireAdmin, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /admin/reports/history:
+ *   get:
+ *     summary: Retrieve history of all reports
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: History of all reports
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   report_id:
+ *                     type: string
+ *                   product_id:
+ *                     type: string
+ *                   reporter_id:
+ *                     type: string
+ *                   reason:
+ *                     type: string
+ *                   status:
+ *                     type: string
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *                   resolved_at:
+ *                     type: string
+ *                     format: date-time
+ *                   resolution_message:
+ *                     type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
 router.get("/reports/history", requireAdmin, async (req, res) => {
     try {
         const history = await Report.getAllReportsHistory();
@@ -45,7 +134,66 @@ router.get("/reports/history", requireAdmin, async (req, res) => {
     }
 });
 
-
+/**
+ * @swagger
+ * /admin/reports/{productId}/resolve:
+ *   put:
+ *     summary: Resolve reports for a specific product
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 description: Resolution message
+ *     responses:
+ *       200:
+ *         description: Reports resolved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Segnalazione risolta con successo
+ *                 resolved_count:
+ *                   type: integer
+ *                   example: 1
+ *       404:
+ *         description: No pending reports found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Nessun report pendente trovato per questo prodotto
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
 router.put("/reports/:productId/resolve", requireAdmin, async (req, res) => {
     const { productId } = req.params;
     const { message } = req.body;
@@ -76,6 +224,70 @@ router.put("/reports/:productId/resolve", requireAdmin, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /admin/product/{productId}:
+ *   delete:
+ *     summary: Delete a product and related data
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID to delete
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 description: Message about the deletion
+ *     responses:
+ *       200:
+ *         description: Product deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Prodotto rimosso con successo
+ *                 archived_product:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     price:
+ *                       type: number
+ *       404:
+ *         description: Product not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Prodotto non trovato
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
 router.delete("/product/:productId", requireAdmin, async (req, res) => {
     const { productId } = req.params;
     const { message } = req.body;
@@ -140,6 +352,62 @@ router.delete("/product/:productId", requireAdmin, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /admin/reports:
+ *   post:
+ *     summary: Create a new report
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               product_id:
+ *                 type: string
+ *               reason:
+ *                 type: string
+ *             required:
+ *               - product_id
+ *               - reason
+ *     responses:
+ *       201:
+ *         description: Report created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Segnalazione creata con successo
+ *                 report_id:
+ *                   type: string
+ *       400:
+ *         description: Missing data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Dati mancanti
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
 router.post("/reports", async (req, res) => {
     const { product_id, reason } = req.body;
     const reporter_id = req.user_uuid || null;
@@ -165,6 +433,44 @@ router.post("/reports", async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /admin/user-reports:
+ *   get:
+ *     summary: Get reports created by the authenticated user
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Array of product IDs reported by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *       401:
+ *         description: User not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Utente non autenticato
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
 router.get("/user-reports", async (req, res) => {
     try {
         const reporter_id = req.user_uuid;
@@ -186,7 +492,50 @@ router.get("/user-reports", async (req, res) => {
 });
 
 
-// GET /admin/orders - Ottieni tutti gli ordini (solo per admin)
+/**
+ * @swagger
+ * /admin/orders:
+ *   get:
+ *     summary: Get all orders with basic information
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   order_id:
+ *                     type: string
+ *                   user_id:
+ *                     type: string
+ *                   total_amount:
+ *                     type: number
+ *                   status:
+ *                     type: string
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *                   user_name:
+ *                     type: string
+ *                   user_lastname:
+ *                     type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
 router.get("/orders", async (req, res) => {
     try {
         const orders = await db.dbConnection.execute(
@@ -204,7 +553,63 @@ router.get("/orders", async (req, res) => {
     }
 });
 
-// GET /admin/orders/pending - Ottieni solo gli ordini pendenti con dettagli completi
+/**
+ * @swagger
+ * /admin/orders/pending:
+ *   get:
+ *     summary: Get pending and shipped orders with detailed information
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of pending orders with items details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   order_id:
+ *                     type: string
+ *                   user_id:
+ *                     type: string
+ *                   total_amount:
+ *                     type: number
+ *                   status:
+ *                     type: string
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *                   user_name:
+ *                     type: string
+ *                   user_lastname:
+ *                     type: string
+ *                   items:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         product_id:
+ *                           type: string
+ *                         name:
+ *                           type: string
+ *                         quantity:
+ *                           type: integer
+ *                         price:
+ *                           type: number
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
 router.get("/orders/pending", requireAdmin, async (req, res) => {
     try {
         const orders = await db.dbConnection.execute(
@@ -234,7 +639,69 @@ router.get("/orders/pending", requireAdmin, async (req, res) => {
     }
 });
 
-// PUT /admin/orders/:orderId/status - Aggiorna lo stato di un ordine
+/**
+ * @swagger
+ * /admin/orders/{orderId}/status:
+ *   put:
+ *     summary: Update the status of an order
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Order ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, processing, shipped, delivered, cancelled]
+ *             required:
+ *               - status
+ *     responses:
+ *       200:
+ *         description: Order status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Stato dell'ordine aggiornato con successo
+ *                 order_id:
+ *                   type: string
+ *                 status:
+ *                   type: string
+ *       400:
+ *         description: Invalid or missing status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Stato non valido
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
 router.put("/orders/:orderId/status", async (req, res) => {
     try {
         const { orderId } = req.params;
