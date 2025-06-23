@@ -141,6 +141,20 @@ class ProductState {
     static removeAllProducts() {
         ProductState.allProducts = [];
     }
+
+    static addStockToProduct(productId, token) {
+        let headers = {
+            "Content-Type": "application/json",
+        }
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        return fetch(`http://localhost:900/product/${productId}/stock/1`, {
+            method: "POST",
+            headers: headers
+        });
+
+    }
 }
 
 class CartState {

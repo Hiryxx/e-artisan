@@ -170,6 +170,23 @@ const changePersonalInfo = () => {
 }
 
 
+const addStockToProduct = (productId) => {
+    const token = localStorage.getItem("token");
+    ProductState.addStockToProduct(productId, token).then(res => {
+        if (!res.ok) {
+            throw new Error(`Server responded with status: ${res.status}`);
+        }
+        return res.json();
+    }).then(data => {
+        spawnToast("Stock added successfully", "success");
+        loadContent("my-products"); // Reload the products page
+    }).catch(err => {
+        console.error("Error adding stock to product:", err);
+        spawnToast("Cannot add stock to product: " + err, "error");
+    });
+}
+
+
 const loadContent = (type) => {
     const content = document.getElementById("content");
     const token = localStorage.getItem("token")
@@ -194,7 +211,6 @@ const loadContent = (type) => {
     switch (type) {
         case "my-products":
             const user = UserState.getUserInfo()
-            // todo maybe improve
             const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
             products.then(res => {
                 if (!res.ok) {
@@ -215,6 +231,8 @@ const loadContent = (type) => {
                         <h3>${product.name}</h3>
                         <p>${product.description}</p>
                         <p>$${product.price}</p>
+                        <p>Stock: ${product.stock_count}</p>
+                        <button onclick="addStockToProduct(${product.product_id})" class="product-add-stock">Add stock</button>
                     </div>
                 `).join("");
                 }
@@ -387,3 +405,4 @@ window.loadAccountPage = loadAccountPage;
 window.loadContent = loadContent;
 window.addArtisanProduct = addArtisanProduct;
 window.changePersonalInfo = changePersonalInfo;
+window.addStockToProduct = addStockToProduct;

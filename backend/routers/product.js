@@ -46,19 +46,36 @@ router.get("/categories", async (req, res) => {
     }
 })
 
-router.post("/with-img",express.urlencoded({ extended: true }), upload.single('photo'), async (req, res) => {
+router.post("/with-img", express.urlencoded({extended: true}), upload.single('photo'), async (req, res) => {
     const {name, description, price, id_category, stock} = req.body;
 
     try {
         const product = {
             name, description, price, id_category, image_url: req.file.path, seller_id: req.user_uuid
         }
-        const product_id =  await Product.newProduct(product)
+        const product_id = await Product.newProduct(product)
         for (let i = 0; i < stock; i++) {
             await Product.addToStock(product_id);
         }
         res.status(201).json({message: "Product added successfully"});
     } catch (error) {
+        console.log(error);
+        res.status(500).json({message: "Server error"});
+    }
+
+})
+
+
+router.post("/:product_id/stock/:stock_number", async (req, res) => {
+    const {product_id, stock_number} = req.params;
+
+    try {
+        for (let i = 0; i < stock_number; i++) {
+            await Product.addToStock(product_id);
+        }
+        res.status(200).json({message: "Stock added successfully"});
+    } catch
+        (error) {
         console.log(error);
         res.status(500).json({message: "Server error"});
     }
