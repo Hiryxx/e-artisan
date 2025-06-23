@@ -23,15 +23,24 @@ docker-compose up -d
 
 | Funzionalità                                                                 | Stato       | Grafica     | Responsabile                    | Note                                                                 |
 |------------------------------------------------------------------------------|-------------|-------------|----------------------------------|----------------------------------------------------------------------|
-| Pagina utente                                                               | ☐ Da fare   | ☐ Da fare   | Tommaso, Mauro                   |                                                                      |
-| Pagina prodotto                                                             | ✅ Fatto   | ☐ Da fare   | Francesco                        |                                                                      |
-| Carrello                                                                    | ✅ Fatto     | ☐ Fatto     | Paolo                            |                                                                      |
-| Ricerca con filtri                                                          | ☐ Da fare   | ☐ Da fare   | Paolo                            |                                                                      |
-| Acquisto, pagamento e gestione ordini                                       | ✅ Fatto  | ☐ Da fare   | Paolo, Francesco                 |                                                                      |
-| Dashboard artigiano (vendite, prodotti, stock)                              | ☐ Da fare   | ☐ Da fare   | Davide                           |                                                                      |
-| Amministratore (monitoraggio, segnalazioni, funzionamento)                 | ✅ Fatto   | ☐ Da fare   | Francesco                        |                                                                      |
-| Test unitari e integration test                                             | ☐ Da fare   | —           | Paolo                            |                                                                      |
-| Schema ER                                                                   | ☐ Da fare   | —           | Tommaso                          |                                                                      |
-| Documentazione operazioni CRUD                                              | ☐ Da fare   | —           | Tutti                            |                                                                      |
-| README esaustivo                                                            | ☐ Da fare   | —           | Davide                           | Include istruzioni di build, test, deploy                           |
+| Pagina utente                                                               | ✅   | ✅    | Tommaso, Mauro                   |                                                                      |
+| Pagina prodotto                                                             | ✅  | ✅    | Francesco                        |                                                                      |
+| Carrello                                                                    | ✅      | ✅      | Paolo                            |                                                                      |
+| Ricerca con filtri                                                          | ✅    | ✅   | Paolo                            |                                                                      |
+| Acquisto, pagamento e gestione ordini                                       | ✅   | ✅    | Paolo, Francesco                 |                                                                      |
+| Dashboard artigiano (vendite, prodotti, stock)                              | ✅    | ✅    | Davide                           |                                                                      |
+| Amministratore (monitoraggio, segnalazioni, funzionamento)                 | ✅    | ✅    | Francesco                        |                                                                      |
+| Test unitari e integration test                                             | ✅    | —           | Paolo                            |                                                                      |
+| Schema ER                                                                   | ✅    | —           | Tommaso                          |                                                                      |
+| Documentazione operazioni CRUD                                              | ✅    | —           | Tutti                            |                                                                      |
+| README esaustivo                                                            | ✅    | —           | Davide                           | Include istruzioni di build, test, deploy                           |
+---
+Francesco Del Rosso – Backend, dashboard admin
+
+Davide Cartolano – Documentazione, interfaccia artigiano
+
+Tommaso Ferloni – Autenticazione, gestione utente
+
+Andrea Riva – UI, flusso d’acquisto, carrello
+
 
