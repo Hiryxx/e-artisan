@@ -34,4 +34,13 @@ docker-compose up -d
 | Schema ER                                                                   | ✅    | —           | Tommaso                          |                                                                      |
 | Documentazione operazioni CRUD                                              | ✅    | —           | Tutti                            |                                                                      |
 | README esaustivo                                                            | ✅    | —           | Davide                           | Include istruzioni di build, test, deploy                           |
+---
+Francesco Del Rosso – Backend, dashboard admin
+
+Davide Cartolano – Documentazione, interfaccia artigiano
+
+Tommaso Ferloni – Autenticazione, gestione utente
+
+Andrea Riva – UI, flusso d’acquisto, carrello
+
 
