@@ -6,7 +6,34 @@ import jwt from "jsonwebtoken";
 import cors from "cors";
 import * as path from "node:path";
 import adminRouter from "../../routers/admin.js";
+import bodyParser from "body-parser";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 
+const options = {
+    definition: {
+        openapi: "3.1.0",
+        info: {
+            title: "E-Artisan API Swagger",
+            version: "0.1.0",
+            description:
+                "This is a simple CRUD API application made with Express and documented with Swagger",
+            license: {
+                name: "MIT",
+                url: "https://spdx.org/licenses/MIT.html",
+            },
+        },
+        servers: [
+            {
+                url: "http://localhost:900",
+            },
+        ],
+    },
+    // Use absolute path to router files
+    apis: [path.join(process.cwd(), "routers/*.js")],
+};
+
+const specs = swaggerJsdoc(options);
 
 dotenv.config();
 export const db = new Database()
@@ -38,6 +65,12 @@ export class Server {
     loadServer() {
         this.app.use(cors())
 
+        this.app.use(
+            "/docs",
+            swaggerUi.serve,
+            swaggerUi.setup(specs)
+        );
+
         // configures dotenv to work in your application
         this.app.use(unless(["/", "/images", "/auth/login", "/auth/register", "/product", "/admin/reports:", "/product/categories", "/orders"], this.middleware))
         this.app.use(express.json())
@@ -65,6 +98,7 @@ export class Server {
             const imgPath = path.join(".", product.image_url)
             res.sendFile(path.resolve(imgPath));
         });
+
     }
 
     async startServer() {
@@ -75,6 +109,7 @@ export class Server {
 
         this.app.listen(PORT, () => {
             console.log("Server running at PORT: ", PORT);
+            console.log("Swagger docs available at: http://localhost:" + PORT + "/docs");
         }).on("error", (error) => {
             // gracefully handle error
             throw new Error(error.message);

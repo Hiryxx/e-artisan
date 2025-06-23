@@ -20,7 +20,21 @@ const upload = multer({storage: storage});
  */
 const upload = multer({ dest: './public/user-images/' })
 
-
+/**
+ * @swagger
+ * /product/categories:
+ *   get:
+ *     summary: Retrieve a list of product categories
+ *     responses:
+ *       200:
+ *         description: A list of categories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ */
 router.get("/categories", async (req, res) => {
     try {
         const categories = await Product.getCategories();
