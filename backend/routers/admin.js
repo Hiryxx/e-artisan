@@ -2,6 +2,7 @@ import express from "express";
 import Report from "../lib/models/report.js";
 import Product from "../lib/models/product.js";
 import {db} from "../lib/server/server.js";
+import Order from "../lib/models/order.js";
 const router = express.Router();
 
 const requireAdmin = (req, res, next) => {
@@ -28,6 +29,7 @@ router.get("/reports/history", requireAdmin, async (req, res) => {
         res.status(500).json({ message: "Errore del server" });
     }
 });
+
 
 router.put("/reports/:productId/resolve", requireAdmin, async (req, res) => {
     const { productId } = req.params;
@@ -164,6 +166,84 @@ router.get("/user-reports", async (req, res) => {
         res.status(200).json(result.rows.map(row => row.product_id));
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: "Errore del server" });
+    }
+});
+
+
+// GET /admin/orders - Ottieni tutti gli ordini (solo per admin)
+router.get("/orders", async (req, res) => {
+    try {
+        const orders = await db.dbConnection.execute(
+            `SELECT o.order_id, o.user_id, o.total_amount, o.status, o.created_at,
+                    u.name as user_name, u.lastname as user_lastname
+             FROM orders o
+             JOIN users u ON o.user_id = u.user_uuid
+             ORDER BY o.created_at DESC`
+        );
+
+        res.status(200).json(orders.rows);
+    } catch (error) {
+        console.error("Errore nel recupero ordini:", error);
+        res.status(500).json({ message: "Errore del server" });
+    }
+});
+
+// GET /admin/orders/pending - Ottieni solo gli ordini pendenti con dettagli completi
+router.get("/orders/pending", requireAdmin, async (req, res) => {
+    try {
+        const orders = await db.dbConnection.execute(
+            `SELECT o.order_id, o.user_id, o.total_amount, o.status, o.created_at,
+                    u.name as user_name, u.lastname as user_lastname,
+                    json_agg(
+                        json_build_object(
+                            'product_id', oi.product_id,
+                            'name', p.name,
+                            'quantity', oi.quantity,
+                            'price', oi.price
+                        )
+                    ) as items
+             FROM orders o
+             JOIN users u ON o.user_id = u.user_uuid
+             LEFT JOIN order_items oi ON o.order_id = oi.order_id
+             LEFT JOIN products p ON oi.product_id = p.product_id
+             WHERE o.status = 'pending' OR o.status = 'shipped'
+             GROUP BY o.order_id, o.user_id, o.total_amount, o.status, o.created_at, u.name, u.lastname
+             ORDER BY o.created_at DESC`
+        );
+
+        res.status(200).json(orders.rows);
+    } catch (error) {
+        console.error("Errore nel recupero ordini pendenti:", error);
+        res.status(500).json({ message: "Errore del server" });
+    }
+});
+
+// PUT /admin/orders/:orderId/status - Aggiorna lo stato di un ordine
+router.put("/orders/:orderId/status", async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { status } = req.body;
+
+        if (!status) {
+            return res.status(400).json({ message: "Stato mancante" });
+        }
+
+        // Valida lo stato
+        const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({ message: "Stato non valido" });
+        }
+
+        await Order.updateOrderStatus(orderId, status);
+
+        res.status(200).json({
+            message: "Stato dell'ordine aggiornato con successo",
+            order_id: orderId,
+            status: status
+        });
+    } catch (error) {
+        console.error("Errore nell'aggiornamento dello stato:", error);
         res.status(500).json({ message: "Errore del server" });
     }
 });

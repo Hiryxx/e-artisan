@@ -1,5 +1,3 @@
-
-
 function viewReportedProduct(productId) {
     if (!productId) {
         spawnToast("Questo prodotto è stato rimosso", "info");
@@ -30,7 +28,7 @@ function resolveReport(productId) {
 
     const token = localStorage.getItem("token");
 
-    fetch(`http://localhost:900/admin/reports/${productId}/resolve`, {
+    fetch(`http://localhost:900/admin/reports/${productId}/resolve/`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -54,7 +52,7 @@ function resolveReport(productId) {
         });
 }
 
-function removeReportedProduct(productId, sellerId) {
+function removeReportedProduct(productId) {
     // Chiedi conferma
     const message = prompt("Vuoi inviare un messaggio all'artigiano? (opzionale)");
 
@@ -97,10 +95,12 @@ function removeReportedProduct(productId, sellerId) {
 
 const loadReports = () => {
     const reportedProductsDiv = document.getElementById("reported-products");
+    const ordersDiv = document.getElementById("orders-management");
 
-    // Aggiorna stato visuale dei bottoni
-    document.getElementById("view-pending").classList.add("active");
-    document.getElementById("view-history").classList.remove("active");
+
+    // Mostra/nascondi le sezioni appropriate
+    reportedProductsDiv.style.display = "block";
+    ordersDiv.style.display = "none";
 
     reportedProductsDiv.innerHTML = '<div class="loading">Caricamento segnalazioni pendenti...</div>';
 
@@ -203,10 +203,13 @@ const loadReports = () => {
 
 const loadReportsHistory = () => {
     const reportedProductsDiv = document.getElementById("reported-products");
+    const ordersDiv = document.getElementById("orders-management");
 
     // Aggiorna stato visuale dei bottoni
-    document.getElementById("view-pending").classList.remove("active");
-    document.getElementById("view-history").classList.add("active");
+
+    // Mostra/nascondi le sezioni appropriate
+    reportedProductsDiv.style.display = "block";
+    ordersDiv.style.display = "none";
 
     reportedProductsDiv.innerHTML = '<div class="loading">Caricamento storico segnalazioni...</div>';
 
@@ -265,17 +268,167 @@ const loadReportsHistory = () => {
         });
 };
 
+const loadPendingOrders = () => {
+    const ordersDiv = document.getElementById("orders-management");
+
+
+    // Nascondi altre sezioni
+    document.getElementById("reported-products").style.display = "none";
+    ordersDiv.style.display = "block";
+
+    ordersDiv.innerHTML = '<div class="loading">Caricamento ordini pendenti...</div>';
+
+    const token = localStorage.getItem("token");
+    fetch("http://localhost:900/admin/orders/pending", {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Il server ha risposto con stato: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(orders => {
+            if (orders.length === 0) {
+                ordersDiv.innerHTML = `
+                <div class="no-reports">
+                    <h3>✅ Nessun ordine pendente</h3>
+                    <p>Non ci sono ordini in attesa di elaborazione al momento.</p>
+                </div>
+            `;
+                return;
+            }
+
+            ordersDiv.innerHTML = '<h3>Ordini Pendenti</h3>';
+            orders.forEach(order => {
+                const orderDiv = document.createElement("div");
+                orderDiv.className = `order-item status-${order.status}`;
+                orderDiv.innerHTML = `
+                <div class="order-header">
+               
+                    <h4>Ordine #${order.order_id}</h4>
+                    <span class="order-status ${order.status === 'pending' ? 'pending' : order.status === 'shipped' ? 'shipped' : ''}">
+                        ${order.status.charAt(0).toUpperCase()  + order.status.slice(1)}  
+                </div>
+                <div class="order-details">
+                    <p><strong>Cliente:</strong> ${order.user_name} ${order.user_lastname}</p>
+                    <p><strong>Data ordine:</strong> ${new Date(order.created_at).toLocaleDateString('it-IT')}</p>
+                    <p><strong>Totale:</strong> €${order.total_amount}</p>
+                    <p><strong>Articoli:</strong></p>
+                    <ul>
+                        ${order.items ? order.items.map(item =>
+                    `<li>${item.name} x${item.quantity} - €${item.price}</li>`
+                ).join('') : '<li>Caricamento articoli...</li>'}
+                    </ul>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-primary" onclick="deliverOrder(${order.order_id})">
+                        <i class="fas fa-check"></i> Consegna
+               
+                    <button class="btn btn-success" onclick="shipOrder(${order.order_id})">
+                        <i class="fas fa-shipping-fast"></i> Spedisci
+                    </button>
+                    <button class="btn btn-danger" onclick="cancelOrder(${order.order_id})">
+                        <i class="fas fa-times"></i> Annulla
+                    </button>
+                </div>
+            `;
+                ordersDiv.appendChild(orderDiv);
+            });
+        })
+        .catch(err => {
+            console.error("Errore nel caricamento degli ordini:", err);
+            ordersDiv.innerHTML = `
+            <div class="error-message">
+                <strong>Errore:</strong> Impossibile caricare gli ordini pendenti.
+            </div>
+        `;
+        });
+};
+
+
+const deliverOrder = (orderId) => {
+    if (!confirm("Confermi la consegna di questo ordine?")) return;
+
+    const token = localStorage.getItem("token");
+    fetch(`http://localhost:900/admin/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 'delivered' })
+    })
+        .then(res => res.json())
+        .then(data => {
+            spawnToast("Ordine consegnato", "success");
+            loadPendingOrders();
+        })
+        .catch(err => {
+            console.error("Errore:", err);
+            spawnToast("Errore nella consegna dell'ordine", "error");
+        });
+}
+
+const shipOrder = (orderId) => {
+    if (!confirm("Confermi la spedizione di questo ordine?")) return;
+
+    const token = localStorage.getItem("token");
+    fetch(`http://localhost:900/admin/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 'shipped' })
+    })
+        .then(res => res.json())
+        .then(data => {
+            spawnToast("Ordine spedito", "success");
+            loadPendingOrders();
+        })
+        .catch(err => {
+            console.error("Errore:", err);
+            spawnToast("Errore nella spedizione dell'ordine", "error");
+        });
+};
+
+const cancelOrder = (orderId) => {
+    const reason = prompt("Motivo dell'annullamento:");
+    if (!reason) return;
+
+    const token = localStorage.getItem("token");
+    fetch(`http://localhost:900/admin/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 'cancelled', reason: reason })
+    })
+        .then(res => res.json())
+        .then(data => {
+            spawnToast("Ordine annullato", "success");
+            loadPendingOrders();
+        })
+        .catch(err => {
+            console.error("Errore:", err);
+            spawnToast("Errore nell'annullamento dell'ordine", "error");
+        });
+};
+
 const loadAdminPage = () => {
     const user = UserState.getUserInfo();
 
     if (!user || user.role_id !== 1) {
-        alert("Accesso negato: area riservata agli amministratori");
+        spawnToast("Accesso negato: area riservata agli amministratori");
         switchPage("home");
         return;
     }
 
     // Aggiunto container per switchare tra report pendenti e storico
-    const reportedProductsDiv = document.getElementById("reported-products");
     const adminHeader = document.getElementById("admin-header");
 
     // Aggiorniamo l'header per includere le opzioni di visualizzazione
@@ -284,19 +437,19 @@ const loadAdminPage = () => {
         <p>Gestione prodotti segnalati</p>
         <div class="view-options">
             <button id="view-pending" class="btn btn-primary active">Segnalazioni pendenti</button>
-            <button id="view-history" class="btn btn-secondary">Storico segnalazioni</button>
+            <button id="view-history" class="btn btn-primary active">Storico segnalazioni</button>
+            <button id="view-orders" class="btn btn-primary active ">Ordini pendenti</button>
         </div>
     `;
 
     // Aggiungiamo gli event listener per i nuovi bottoni
     document.getElementById("view-pending").addEventListener("click", () => loadReports());
     document.getElementById("view-history").addEventListener("click", () => loadReportsHistory());
+    document.getElementById("view-orders").addEventListener("click", () => loadPendingOrders());
 
     // Carichiamo le segnalazioni pendenti di default
     loadReports();
 };
-
-
 
 
 
@@ -306,3 +459,7 @@ window.loadAdminPage = loadAdminPage;
 window.resolveReport = resolveReport;
 window.loadReports = loadReports;
 window.loadReportsHistory = loadReportsHistory;
+window.loadPendingOrders = loadPendingOrders;
+window.shipOrder = shipOrder;
+window.cancelOrder = cancelOrder;
+window.deliverOrder = deliverOrder;

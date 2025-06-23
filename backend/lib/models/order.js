@@ -80,6 +80,38 @@ export default class Order {
         }
     }
 
+    //Update Order status
+    static async updateOrderStatus(orderId, status) {
+        const client = await db.dbConnection.client;
+
+        try {
+            await client.query('BEGIN');
+
+            const result = await client.query(
+                `UPDATE orders 
+                 SET status = $1 
+                 WHERE order_id = $2 
+                 RETURNING *`,
+                [status, orderId]
+            );
+
+            if (result.rows.length === 0) {
+                throw new Error('Order not found');
+            }
+
+            await client.query('COMMIT');
+            client.release();
+
+            return result.rows[0];
+
+        } catch (error) {
+            await client.query('ROLLBACK');
+            client.release();
+            throw error;
+        }
+    }
+
+
     static async getOrdersByUser(userId) {
         const result = await db.dbConnection.execute(
             `WITH order_items_info AS (

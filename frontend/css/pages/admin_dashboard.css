@@ -254,6 +254,128 @@ details li {
     color: #666;
 }
 
+/* Stili per la gestione ordini */
+#orders-management {
+    display: none;
+    padding: 20px;
+}
+
+#orders-management h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+.order-item {
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left: 5px solid #ccc;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.order-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.order-item.status-pending {
+    border-left-color: #ffc107;
+}
+
+.order-item.status-processing {
+    border-left-color: #17a2b8;
+}
+
+.order-item.status-shipped {
+    border-left-color: #28a745;
+}
+
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.order-header h4 {
+    margin: 0;
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.order-details {
+    margin-bottom: 15px;
+}
+
+.order-details p {
+    margin: 8px 0;
+    color: #555;
+}
+
+.order-details ul {
+    margin: 10px 0 10px 20px;
+    padding-left: 20px;
+}
+
+.order-details li {
+    margin: 5px 0;
+    color: #666;
+}
+
+.order-status {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.order-status.pending {
+    background-color: #ffc107;
+    margin-left: 8px;
+    color: #000;
+}
+
+
+.order-status.shipped {
+    background-color: #28a745;
+    margin-left: 8px;
+    color: white;
+}
+
+.order-status.delivered {
+    background-color: #28a745;
+    color: white;
+}
+
+.order-status.cancelled {
+    background-color: #dc3545;
+    color: white;
+}
+
+.order-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.order-actions .btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.order-actions .btn i {
+    font-size: 14px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     #admin-container {
