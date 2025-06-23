@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const res = checkUserAuth()
     if (res) {
         res.then(res => {
-            console.log("User auth response: ", res)
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem("token")
                 UserState.removeUserInfo()
@@ -78,7 +77,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return res.json();
         }).then(user => {
             if (user) {
-                console.log("User found ", user)
                 UserState.seUserInfo(user);
                 loadUserReportedProducts().then(() => user);
             }
@@ -122,6 +120,20 @@ const putProds = (productsDiv, products) => {
 
     for (let prod of products) {
         const productDiv = document.createElement('div');
+        const user = UserState.getUserInfo();
+        let addToCartBtnContent = "";
+        if (user) {
+            const role = user.role_id
+            addToCartBtnContent = role !== 3 ? `<div class="product-info-button" id="add-cart-${prod.product_id}">
+            Add to cart
+        </div>` : ""
+        } else {
+            addToCartBtnContent = `<div class="product-info-button" id="add-cart-${prod.product_id}">
+            Add to cart
+            </div>`
+        }
+
+
         productDiv.className = 'product';
         productDiv.innerHTML = `
                 <div class="product-img">
@@ -137,9 +149,7 @@ const putProds = (productsDiv, products) => {
                     <p class="product-info-text">
                         $${prod.price}
                     </p>
-                    <div class="product-info-button" id="add-cart-${prod.product_id}">
-                    Add to cart
-                    </div>
+                    ${addToCartBtnContent}
                 </div>
         `;
 
@@ -150,10 +160,13 @@ const putProds = (productsDiv, products) => {
 
         productsDiv.appendChild(productDiv);
 
-        document.getElementById(`add-cart-${prod.product_id}`).addEventListener('click', (e) => {
-            e.stopPropagation();
-            goToShoppingCartWithProduct(prod.product_id);
-        });
+        let goToCartBtn = document.getElementById(`add-cart-${prod.product_id}`)
+        if (goToCartBtn) {
+            goToCartBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                goToShoppingCartWithProduct(prod.product_id);
+            });
+        }
     }
 }
 
@@ -451,7 +464,6 @@ const loadProducts = (filters = {}) => {
 }
 
 
-
 const checkUserAuth = () => {
     let token = localStorage.getItem("token")
 
@@ -528,7 +540,6 @@ let switchPage = (page) => {
     localStorage.setItem("currentPage", page)
     extractHtml(router.getCurrentPagePath(), pageId, getPageFunction(page))
 }
-
 
 
 // needed since now index.js is a module

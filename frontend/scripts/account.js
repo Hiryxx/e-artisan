@@ -222,7 +222,6 @@ const loadContent = (type) => {
                 return res.json();
             }).then(products => {
                 ProductState.setAllProducts(products);
-                console.log("Products loaded:", products);
                 let productsContent;
                 if (products.length === 0) {
                     productsContent = `<p>No products found.</p>`;
