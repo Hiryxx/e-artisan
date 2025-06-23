@@ -507,7 +507,7 @@ const loadNavbarAuth = () => {
     const user = UserState.getUserInfo()
     let adminOption = "";
     if (user && user.role_id === 1) {
-        adminOption = `<p onclick="switchPage('admin_dashboard')" class="nav-link">>Admin</p>`;
+        adminOption = `<p onclick="switchPage('admin_dashboard')" class="nav-link">Admin</p>`;
     }
 
     if (token) {
