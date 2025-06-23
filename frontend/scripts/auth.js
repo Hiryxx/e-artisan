@@ -137,3 +137,4 @@ const logout = () => {
 window.loadAuthPages = loadAuthPages
 window.register = register;
 window.login = login;
+window.logout = logout;

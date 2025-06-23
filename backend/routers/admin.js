@@ -14,11 +14,11 @@ const router = express.Router();
  *   description: Admin management APIs
  */
 
-const requireAdmin = (req, res, next) => {
+const requireAdmin = async (req, res, next) => {
     if (!req.user_uuid) {
         return res.status(403).json({ message: "Only for admins" });
     }
-    const user = User.getUserById(req.user_uuid)
+    const user = await User.getUserById(req.user_uuid)
     if (!user || user.role_id !== 1) {
         return res.status(403).json({ message: "Accesso negato: solo per amministratori" });
     }
@@ -317,7 +317,7 @@ router.delete("/product/:productId", requireAdmin, async (req, res) => {
         );
 
         await client.query(
-            'DELETE FROM orders WHERE item_id IN (SELECT item_id FROM stock WHERE product_id = $1)',
+            'DELETE FROM order_items WHERE product_id = $1',
             [productId]
         );
 
@@ -334,8 +334,6 @@ router.delete("/product/:productId", requireAdmin, async (req, res) => {
 
         await client.query('COMMIT');
         client.release();
-
-        console.log(`Messaggio per l'artigiano ${productInfo.seller_id}: ${message}`);
 
         res.status(200).json({
             message: "Prodotto rimosso con successo",
