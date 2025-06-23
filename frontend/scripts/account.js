@@ -35,7 +35,7 @@ const loadAccountPage = () => {
     }
 
 
-    // todo should never happen
+    // should never happen
     if (!user) {
         console.error("No user found")
         switchPage("home")
@@ -49,7 +49,6 @@ const loadAccountPage = () => {
 
     // 2 user, 3 artisan
     if (user.role_id === 2) {
-
         accountNav.innerHTML = `
                     <button id="orders" onclick="loadContent('orders')" class="nav-btn" data-tab="orders">
                         <i class="fas fa-shopping-bag"></i>Orders
@@ -60,7 +59,6 @@ const loadAccountPage = () => {
                 `
         loadContent('orders')
     } else if (user.role_id === 3) { // or fa-plus-circle
-
         accountNav.innerHTML = `
                      <button id="my-products" onclick="loadContent('my-products')" class="nav-btn" data-tab="products">
                         <i class="fas fa-box"></i>My products
@@ -76,32 +74,6 @@ const loadAccountPage = () => {
 
     }
 
-
-    // todo depend on user role, show different options
-    /*
-    const accountProductsDiv = document.getElementById("account-products")
-
-    if (!accountProductsDiv) {
-        console.error("No orders div found")
-    }
-
-
-    if (products) {
-        products.then(res => {
-            if (!res.ok) {
-                throw new Error(`Server responded with status: ${res.status}`);
-            }
-            return res.json();
-        }).then(products => {
-            putProds(accountProductsDiv, products)
-        })
-    }
-
-     */
-
-
-    // understand how to show both orders and products
-
 }
 
 const addArtisanProduct = () => {
@@ -109,11 +81,22 @@ const addArtisanProduct = () => {
     const price = document.getElementById("prod-price").value;
     const description = document.getElementById("prod-description").value;
     const category = document.getElementById("category-filter").value;
+    const stock = document.getElementById("prod-stock").value;
     const picture = document.getElementById("prod-picture").files[0];
 
 
-    if (!name || !price || !description || !category || !picture) {
+    if (!name || !price || !description || !category || !stock || !picture) {
         spawnToast("Please fill all fields", "error");
+        return;
+    }
+
+    if (isNaN(price) || price <= 0) {
+        spawnToast("Price must be a valid number greater than 0", "error");
+        return;
+    }
+
+    if (isNaN(stock) || stock <= 0) {
+        spawnToast("Stock must be a valid number greater than 0", "error");
         return;
     }
 
@@ -121,7 +104,7 @@ const addArtisanProduct = () => {
 
     const token = localStorage.getItem("token");
 
-    ProductState.addProduct({name, price, description, category, picture}, token)
+    ProductState.addProduct({name, price, description, category, stock, picture}, token)
         .then(res => {
             if (!res.ok) {
                 throw new Error(`Server responded with status: ${res.status}`);
@@ -130,7 +113,7 @@ const addArtisanProduct = () => {
         })
         .then(product => {
             spawnToast("Product added successfully", "success");
-            console.log("Product added:", product);
+            loadContent("my-products"); // Reload the products page
             // Optionally, refresh the product list or redirect
         })
         .catch(err => {
@@ -282,7 +265,7 @@ const loadContent = (type) => {
                         </div>
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <input type="email" id="prod-description">
+                            <input type="text" id="prod-description">
                         </div>
                         <div class="form-group">
                             <label for="categories">Category</label>
@@ -290,6 +273,10 @@ const loadContent = (type) => {
                                 <option value="" disabled>Categories</option>
                                  <!-- Categories from db -->
                             </select>
+                        </div>
+                         <div class="form-group">
+                            <label for="description">Stock</label>
+                            <input type="number" id="prod-stock" min=1 value=1>
                         </div>
                         <div class="form-group">
                             <label for="picture">Picture</label>
@@ -332,23 +319,22 @@ const loadContent = (type) => {
             break
 
         case "orders":
-            const token = localStorage.getItem("token");
             if (!token) {
                 content.innerHTML = `
-        <div class="content-tab active" id="orders-tab">
-            <h2>Orders</h2>
-            <p>Autenticazione richiesta.</p>
-        </div>
-        `;
+                    <div class="content-tab active" id="orders-tab">
+                        <h2>Orders</h2>
+                        <p>Autenticazione richiesta.</p>
+                    </div>
+                `;
                 return;
             }
 
             content.innerHTML = `
-    <div class="content-tab active" id="orders-tab">
-        <h2>Orders</h2>
-        <p>Caricamento ordini...</p>
-    </div>
-    `;
+                <div class="content-tab active" id="orders-tab">
+                    <h2>Orders</h2>
+                    <p>Caricamento ordini...</p>
+                </div>
+             `;
 
             OrderState.fetchOrders(token).then(res => {
                 if (!res.ok) {
@@ -372,15 +358,15 @@ const loadContent = (type) => {
                     "<p>Nessun ordine trovato.</p>";
 
                 content.innerHTML = `
-        <div class="content-tab active" id="orders-tab">
-            <h2>Orders</h2>
-            <div class="orders-management">
-                <div class="orders-grid">
-                    ${ordersContent}
+                <div class="content-tab active" id="orders-tab">
+                    <h2>Orders</h2>
+                    <div class="orders-management">
+                        <div class="orders-grid">
+                            ${ordersContent}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        `;
+            `;
             }).catch(error => {
                 console.error("Error loading orders:", error);
                 spawnToast("Cannot load orders: " + error, "error");

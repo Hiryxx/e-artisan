@@ -47,15 +47,16 @@ router.get("/categories", async (req, res) => {
 })
 
 router.post("/with-img",express.urlencoded({ extended: true }), upload.single('photo'), async (req, res) => {
-    const {name, description, price, id_category} = req.body;
-    console.log("Body received:", req.body);
-    console.log("File received:", req.file);
-    console.log("User UUID:", req.user_uuid);
+    const {name, description, price, id_category, stock} = req.body;
+
     try {
         const product = {
             name, description, price, id_category, image_url: req.file.path, seller_id: req.user_uuid
         }
-        await Product.newProduct(product)
+        const product_id =  await Product.newProduct(product)
+        for (let i = 0; i < stock; i++) {
+            await Product.addToStock(product_id);
+        }
         res.status(201).json({message: "Product added successfully"});
     } catch (error) {
         console.log(error);

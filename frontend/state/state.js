@@ -43,6 +43,10 @@ class UserState {
         })
 
     }
+
+    static removeReportedProduct(productId) {
+        UserState.reportedProducts = UserState.reportedProducts.filter(product_id => product_id !== Number(productId));
+    }
 }
 
 class ProductState {
@@ -114,7 +118,6 @@ class ProductState {
     static addProduct(param, token) {
         const formData = new FormData();
         let headers = {
-
         }
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
@@ -124,18 +127,19 @@ class ProductState {
         formData.append('price', param.price);
         formData.append('description', param.description);
         formData.append('id_category', param.category);
+        formData.append('stock', param.stock);
         formData.append('photo', param.picture);
 
-
-        console.log("Adding product with data:", param);
-
-        console.log("FormData content:", formData.get('name'), formData.get('price'), formData.get('description'), formData.get('category_id'), formData.get('photo'));
 
         return fetch("http://localhost:900/product/with-img", {
             method: "POST",
             headers: headers,
             body: formData
         });
+    }
+
+    static removeAllProducts() {
+        ProductState.allProducts = [];
     }
 }
 
