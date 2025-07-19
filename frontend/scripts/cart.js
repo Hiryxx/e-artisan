@@ -61,39 +61,33 @@ let loadCartPage = () => {
             continue
         }
 
-        // Aggiungi al totale
         total += prod.price * prod.quantity;
 
         cartDiv.innerHTML += `
-           <div class="cart-item">
-                <div id="cart-image">
-                    <img src="http://localhost:900/images?product_id=${prod.product_id}" alt="">
-                </div>
-                <div class="cart-info">
-                    <div class="cart-title">
-                         ${prod.name}
-                    </div>
-                    <div class="cart-price">
-                        €${prod.price}
-                    </div>
-                    <div onclick="removeProdFromCart(${prod.product_id})" class="cart-remove">
-                        Remove
-                    </div>
-                </div>
-                <div class="cart-quantity">
-                    <div class="quantity-minus" onclick="modifyQuantity(${prod.product_id}, -1, ${prod.stock_count})">
-                     -
-                    </div>
-                    <p>
-                        ${prod.quantity}
-                    </p>
-                    <div class="quantity-plus" onclick="modifyQuantity(${prod.product_id}, 1, ${prod.stock_count})">
-                     +
-                    </div>
-                </div>
+   <div class="cart-item">
+        <div class="cart-item-image">
+            <img 
+                src="http://localhost:900/images?product_id=${prod.product_id}" 
+                alt="${prod.name}"
+            >
         </div>
-        `
-    }
+        <div class="cart-info">
+            <div class="cart-title">
+                 ${prod.name}
+            </div>
+            <div class="cart-price">
+                €${prod.price}
+            </div>
+            <div class="cart-quantity-control">
+                <button class="quantity-btn" onclick="modifyQuantity(${prod.product_id}, -1, ${prod.stock_count})">-</button>
+                <span class="quantity-value">${prod.quantity}</span>
+                <button class="quantity-btn" onclick="modifyQuantity(${prod.product_id}, 1, ${prod.stock_count})">+</button>
+            </div>
+            <button class="remove-btn" onclick="removeProdFromCart(${prod.product_id})">Rimuovi</button>
+        </div>
+    </div>
+`;
+}
 
     // Aggiorna il totale nel DOM
     updateCartTotal();
