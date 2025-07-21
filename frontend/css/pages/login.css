@@ -190,8 +190,8 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    margin: 0 auto 1.5rem auto; /* Centratura orizzontale */
-    display: block; /* Assicura che il pulsante sia un elemento block per la centratura */
+    margin: 0 auto 1.5rem auto;
+    display: block;
 }
 
 .login-btn:hover {

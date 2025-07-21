@@ -13,34 +13,36 @@
                 <h2>Bentornato!</h2>
                 <p>Accedi al tuo account per continuare</p>
 
-                <form id="loginForm">
+                <div class="login__inputs">
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
+                        <input type="email" id="email" name="email" placeholder="Inserisci la tua email" required>
                         <i class="fas fa-envelope"></i>
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword()"></i>
+                        <input type="password" id="password" name="password" placeholder="Inserisci la tua password" required>
+                        <i class="fas fa-eye password-toggle"></i>
                     </div>
+                </div>
 
-                    <div class="login-options">
-                        <label class="remember-me">
-                            <input type="checkbox" id="remember">
-                            Ricordami
-                        </label>
-                        <a href="#" class="forgot-password">Password dimenticata?</a>
+                <div class="login-options">
+                    <div class="login__check">
+                        <input id="show-pass" type="checkbox" class="login__check-input">
+                        <label id="show-pass-text-login" for="show-pass" class="login__check-label">Show Password</label>
                     </div>
+                    <a href="#" class="forgot-password">Password dimenticata?</a>
+                </div>
 
-                    <button type="submit" class="login-btn">
+                <div class="login__buttons">
+                    <button onclick="login()" class="login-btn">
                         Accedi
                     </button>
-                </form>
+                </div>
 
                 <div class="signup-link">
-                    Non hai un account? <a href="#">Registrati qui</a>
+                    Non hai un account? <a href="#" onclick="switchPage('register')">Registrati qui</a>
                 </div>
             </div>
         </div>
@@ -72,3 +74,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof loadAuthPages === 'function') {
+            loadAuthPages();
+        }
+    });
+</script>
+</body>
