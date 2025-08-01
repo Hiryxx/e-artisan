@@ -1,6 +1,7 @@
 import express from "express";
 import multer from 'multer'
 import Product from "../lib/models/product.js";
+import {db} from "../lib/server/server.js";
 
 const router = express.Router();
 
@@ -525,15 +526,49 @@ router.get("/", async (req, res) => {
  *                   example: Server error
  */
 router.delete("/", async (req, res) => {
-    const {product_id} = req.params;
+    const { product_id } = req.query;
+    const client = await db.dbConnection.client;
+
     try {
-        await Product.deleteProduct(product_id)
-        res.status(200).json({message: "Product deleted successfully"});
+        await client.query('BEGIN');
+
+        // Verifica che il prodotto esista
+        const product = await Product.getProduct({product_id});
+        if (!product || product.length === 0) {
+            await client.query('ROLLBACK');
+            client.release();
+            return res.status(404).json({ message: "Prodotto non trovato" });
+        }
+
+        // Elimina prima i riferimenti in stock
+        await client.query(
+            'DELETE FROM stock WHERE product_id = $1',
+            [product_id]
+        );
+
+        // Elimina i riferimenti in order_items se necessario
+        await client.query(
+            'DELETE FROM order_items WHERE product_id = $1',
+            [product_id]
+        );
+
+        // Infine elimina il prodotto
+        await client.query(
+            'DELETE FROM products WHERE product_id = $1',
+            [product_id]
+        );
+
+        await client.query('COMMIT');
+        client.release();
+
+        res.status(200).json({ message: "Prodotto eliminato con successo" });
     } catch (error) {
+        await client.query('ROLLBACK');
+        client.release();
         console.log(error);
-        res.status(500).json({message: "Server error"});
+        res.status(500).json({ message: "Errore del server: " + error.message });
     }
-})
+});
 
 
 export default router;

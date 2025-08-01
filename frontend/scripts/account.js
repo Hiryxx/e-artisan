@@ -374,60 +374,60 @@ const saveProductChanges = () => {
 }
 
 
-    const addStockToProduct = (productId, quantity) => {
-        const token = localStorage.getItem("token");
-        ProductState.addStockToProduct(productId, token, quantity).then(res => {
-            if (!res.ok) {
-                throw new Error(`Server responded with status: ${res.status}`);
-            }
-            return res.json();
-        }).then(data => {
-            spawnToast("Stock added successfully", "success");
-            loadContent("my-products"); // Reload the products page
-        }).catch(err => {
-            console.error("Error adding stock to product:", err);
-            spawnToast("Cannot add stock to product: " + err, "error");
-        });
+const addStockToProduct = (productId, quantity) => {
+    const token = localStorage.getItem("token");
+    ProductState.addStockToProduct(productId, token, quantity).then(res => {
+        if (!res.ok) {
+            throw new Error(`Server responded with status: ${res.status}`);
+        }
+        return res.json();
+    }).then(data => {
+        spawnToast("Stock added successfully", "success");
+        loadContent("my-products"); // Reload the products page
+    }).catch(err => {
+        console.error("Error adding stock to product:", err);
+        spawnToast("Cannot add stock to product: " + err, "error");
+    });
+}
+
+
+const loadContent = (type) => {
+    const content = document.getElementById("content");
+    const token = localStorage.getItem("token")
+
+    if (!content) {
+        console.error("No content div found");
+        return;
+    }
+
+    const buttonType = document.getElementById(type)
+
+    // is this good?
+    if (buttonType) {
+        const activeButton = document.querySelector(".nav-btn.active");
+        if (activeButton) {
+            activeButton.classList.remove("active");
+        }
+        buttonType.classList.add("active");
     }
 
 
-    const loadContent = (type) => {
-        const content = document.getElementById("content");
-        const token = localStorage.getItem("token")
-
-        if (!content) {
-            console.error("No content div found");
-            return;
-        }
-
-        const buttonType = document.getElementById(type)
-
-        // is this good?
-        if (buttonType) {
-            const activeButton = document.querySelector(".nav-btn.active");
-            if (activeButton) {
-                activeButton.classList.remove("active");
-            }
-            buttonType.classList.add("active");
-        }
-
-
-        switch (type) {
-            case "my-products":
-                const user = UserState.getUserInfo()
-                const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
-                products.then(res => {
-                    if (!res.ok) {
-                        throw new Error(`Server responded with status: ${res.status}`);
-                    }
-                    return res.json();
-                }).then(products => {
-                    ProductState.setAllProducts(products);
-                    let productsContent;
-                    if (products.length === 0) {
-                        productsContent = `<p>No products found.</p>`;
-                    } else {
-                        productsContent = products.map(product => `
+    switch (type) {
+        case "my-products":
+            const user = UserState.getUserInfo()
+            const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
+            products.then(res => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status: ${res.status}`);
+                }
+                return res.json();
+            }).then(products => {
+                ProductState.setAllProducts(products);
+                let productsContent;
+                if (products.length === 0) {
+                    productsContent = `<p>No products found.</p>`;
+                } else {
+                    productsContent = products.map(product => `
     <div class="product-card">
         <div class="product-img" onclick="editProduct('${product.product_id}')">
            <img src="http://localhost:900/images?product_id=${product.product_id}" alt="prod-img">
@@ -439,12 +439,13 @@ const saveProductChanges = () => {
         <div class="add-stock-container">
             <input type="number" id="stock-input-${product.product_id}" min="1" value="1" class="add-stock-input">
             <button onclick="addStockToProduct('${product.product_id}', document.getElementById('stock-input-${product.product_id}').value)" class="add-stock-btn">Aggiungi Stock</button>
+            <button onclick="deleteProduct('${product.product_id}')" class="delete-btn">Elimina Prodotto</button>
         </div>
     </div>
 `).join('');
-                    }
+                }
 
-                    content.innerHTML = `
+                content.innerHTML = `
                     <div class="content-tab active" id="products-tab">
                         <div class="products-management">
                             <h2>My Products</h2>
@@ -454,29 +455,29 @@ const saveProductChanges = () => {
                         </div>
                     </div>
                 `;
-                }).catch(error => {
-                    console.error("Error loading products:", error);
-                    spawnToast("Cannot load products: " + error, "error");
+            }).catch(error => {
+                console.error("Error loading products:", error);
+                spawnToast("Cannot load products: " + error, "error");
 
-                });
-                break
-            case "add-product":
-                loadCategories(token)
-                    .then(categories => {
-                        const categoriesDiv = document.getElementById("category-filter");
-                        for (let category of categories) {
-                            categoriesDiv.innerHTML += `
+            });
+            break
+        case "add-product":
+            loadCategories(token)
+                .then(categories => {
+                    const categoriesDiv = document.getElementById("category-filter");
+                    for (let category of categories) {
+                        categoriesDiv.innerHTML += `
                         <option value="${category.id_category}">${category.name}</option>
                      `
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error loading categories:", error);
-                        spawnToast("Cannot load categories: " + error, "error");
-                        document.dispatchEvent(createPageChangeEvent("home"));
-                    });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading categories:", error);
+                    spawnToast("Cannot load categories: " + error, "error");
+                    document.dispatchEvent(createPageChangeEvent("home"));
+                });
 
-                content.innerHTML = `
+            content.innerHTML = `
               <!-- Add product (only for Artisan) -->
                 <div class="content-tab active" id="products-tab">
                     <div class="products-management">
@@ -514,10 +515,10 @@ const saveProductChanges = () => {
                     </div>
                 </div>
         `;
-                break
+            break
 
-            case "settings":
-                content.innerHTML = `
+        case "settings":
+            content.innerHTML = `
              <div class="content-tab active" id="settings-tab">
                 <div class="settings-form">
                     <h3>Personal information (changes only the provided ones)</h3>
@@ -541,37 +542,37 @@ const saveProductChanges = () => {
                 </div>
             </div>
             `
-                break
+            break
 
-            case "orders":
-                if (!token) {
-                    content.innerHTML = `
+        case "orders":
+            if (!token) {
+                content.innerHTML = `
                     <div class="content-tab active" id="orders-tab">
                         <h2>Orders</h2>
                         <p>Autenticazione richiesta.</p>
                     </div>
                 `;
-                    return;
-                }
+                return;
+            }
 
-                content.innerHTML = `
+            content.innerHTML = `
                 <div class="content-tab active" id="orders-tab">
                     <h2>Orders</h2>
                     <p>Caricamento ordini...</p>
                 </div>
              `;
 
-                OrderState.fetchOrders(token).then(res => {
-                    if (!res.ok) {
-                        throw new Error(`Server responded with status: ${res.status}`);
-                    }
-                    return res.json();
-                }).then(orders => {
-                    OrderState.setOrders(orders);
-                    console.log("Orders loaded:", orders);
+            OrderState.fetchOrders(token).then(res => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status: ${res.status}`);
+                }
+                return res.json();
+            }).then(orders => {
+                OrderState.setOrders(orders);
+                console.log("Orders loaded:", orders);
 
-                    let ordersContent = orders.length > 0 ?
-                        orders.map(order => `
+                let ordersContent = orders.length > 0 ?
+                    orders.map(order => `
                 <div class="order-card ${order.status}">
                     <h3>Order #${order.order_id}</h3>
                     <p>Date: ${new Date(order.created_at).toLocaleDateString()}</p>
@@ -580,9 +581,9 @@ const saveProductChanges = () => {
                     <p>Status: ${order.status}</p>
                 </div>
             `).join("") :
-                        "<p>Nessun ordine trovato.</p>";
+                    "<p>Nessun ordine trovato.</p>";
 
-                    content.innerHTML = `
+                content.innerHTML = `
                 <div class="content-tab active" id="orders-tab">
                     <h2>Orders</h2>
                     <div class="orders-management">
@@ -592,26 +593,59 @@ const saveProductChanges = () => {
                     </div>
                 </div>
             `;
-                }).catch(error => {
-                    console.error("Error loading orders:", error);
-                    spawnToast("Cannot load orders: " + error, "error");
+            }).catch(error => {
+                console.error("Error loading orders:", error);
+                spawnToast("Cannot load orders: " + error, "error");
 
-                    content.innerHTML = `
+                content.innerHTML = `
         <div class="content-tab active" id="orders-tab">
             <h2>Orders</h2>
             <p>Errore nel caricamento degli ordini.</p>
         </div>
         `;
-                });
-                break;
-        }
+            });
+            break;
+    }
+}
+const deleteProduct = (productId) => {
+    if (!confirm("Sei sicuro di voler eliminare questo prodotto? Questa azione non può essere annullata.")) {
+        return;
     }
 
-    window.saveProductChanges = saveProductChanges;
-    window.editProduct = editProduct;
-    window.loadCategories = loadCategories;
-    window.loadAccountPage = loadAccountPage;
-    window.loadContent = loadContent;
-    window.addArtisanProduct = addArtisanProduct;
-    window.changePersonalInfo = changePersonalInfo;
-    window.addStockToProduct = addStockToProduct;
+    const token = localStorage.getItem("token");
+    if (!token) {
+        spawnToast("Devi essere autenticato per eliminare un prodotto", "error");
+        return;
+    }
+
+    fetch(`http://localhost:900/product?product_id=${productId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Il server ha risposto con status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            spawnToast("Prodotto eliminato con successo", "success");
+            loadContent('my-products'); // Ricarica la lista dei prodotti
+        })
+        .catch(err => {
+            console.error("Errore nell'eliminazione del prodotto:", err);
+            spawnToast("Impossibile eliminare il prodotto: " + err.message, "error");
+        });
+};
+
+window.saveProductChanges = saveProductChanges;
+window.editProduct = editProduct;
+window.loadCategories = loadCategories;
+window.loadAccountPage = loadAccountPage;
+window.loadContent = loadContent;
+window.addArtisanProduct = addArtisanProduct;
+window.changePersonalInfo = changePersonalInfo;
+window.addStockToProduct = addStockToProduct;
+window.deleteProduct = deleteProduct;
