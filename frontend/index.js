@@ -571,6 +571,11 @@ const loadNavbarAuth = () => {
  * @param page Page name without url (e.g. "home" for "/pages/home.html")
  */
 let switchPage = (page) => {
+    if(page === "account") {
+        document.body.classList.add('is-account');
+    }else if(localStorage.getItem("currentPage") === "account") {
+        document.body.classList.remove('is-account');
+    }
     router.changePage(page)
     localStorage.setItem("currentPage", page)
     extractHtml(router.getCurrentPagePath(), pageId, getPageFunction(page))

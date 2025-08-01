@@ -168,7 +168,79 @@ const changePersonalInfo = () => {
 
 }
 
+const editProduct = (productId) => {
+    // Debug: Mostra tutti i prodotti disponibili
+    productId = Number(productId);
 
+    // Trova il prodotto specifico
+    const product = ProductState.getAllProducts().find(p => {
+        //console.log(`Confronto: ${p.product_id} === ${productId}` + " (tipo p.product_id: " + typeof p.product_id + ")" + " (tipo productId: " + typeof productId + ")");
+        return p.product_id.toString() === productId.toString();
+    });
+
+    if (!product) {
+        // Log più dettagliato
+        spawnToast("Prodotto non trovato", "error");
+        return;
+
+    }
+    // Imposta il prodotto selezionato
+    ProductState.selectedProduct = product;
+
+    // Resto del codice di rendering del prodotto
+    const content = document.getElementById("content");
+    content.innerHTML = `
+        <div class="edit-product-container">
+            <h2>Modifica Prodotto</h2>
+            <div class="product-edit-grid">
+                <div class="product-image-section">
+                    <div class="current-image">
+                        <img src="http://localhost:900/images?product_id=${product.product_id}" alt="Immagine Prodotto">
+                    </div>
+                    <div class="image-upload">
+                        <label for="edit-prod-picture">Cambia Immagine</label>
+                        <input type="file" id="edit-prod-picture" accept="image/*">
+                    </div>
+                </div>
+                
+                <div class="product-details-section">
+                    <div class="form-group">
+                        <label for="edit-prod-name">Nome Prodotto</label>
+                        <input type="text" id="edit-prod-name" value="${product.name}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-prod-price">Prezzo</label>
+                        <input type="number" id="edit-prod-price" value="${product.price}" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-prod-description">Descrizione Prodotto</label>
+                        <textarea id="edit-prod-description" required>${product.description}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-prod-stock">Disponibilità</label>
+                        <input type="number" id="edit-prod-stock" value="${product.stock_count}" min="0" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button onclick="saveProductChanges()" class="save-btn">
+                            Salva Modifiche
+                        </button>
+                        <button onclick="loadContent('my-products')" class="cancel-btn">
+                            Annulla
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+    const saveProductChanges = () => {
+        // Recupera il prodotto selezionato dallo stato
+    }
 const addStockToProduct = (productId, quantity) => {
     const token = localStorage.getItem("token");
     ProductState.addStockToProduct(productId, token, quantity).then(res => {
@@ -224,7 +296,7 @@ const loadContent = (type) => {
                 } else {
                     productsContent = products.map(product => `
     <div class="product-card">
-        <div class="product-img">
+        <div class="product-img" onclick="editProduct('${product.product_id}')">
            <img src="http://localhost:900/images?product_id=${product.product_id}" alt="prod-img">
         </div>
         <h3>${product.name}</h3>
@@ -402,6 +474,8 @@ const loadContent = (type) => {
     }
 }
 
+window.saveProductChanges = saveProductChanges;
+window.editProduct = editProduct;
 window.loadCategories = loadCategories;
 window.loadAccountPage = loadAccountPage;
 window.loadContent = loadContent;
