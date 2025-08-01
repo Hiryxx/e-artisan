@@ -428,21 +428,22 @@ const loadContent = (type) => {
                     productsContent = `<p>No products found.</p>`;
                 } else {
                     productsContent = products.map(product => `
-    <div class="product-card">
-        <div class="product-img" onclick="editProduct('${product.product_id}')">
-           <img src="http://localhost:900/images?product_id=${product.product_id}" alt="prod-img">
-        </div>
-        <h3>${product.name}</h3>
-        <p>${product.description}</p>
-        <p>$${product.price}</p>
-        <p>Stock: ${product.stock_count}</p>
-        <div class="add-stock-container">
-            <input type="number" id="stock-input-${product.product_id}" min="1" value="1" class="add-stock-input">
-            <button onclick="addStockToProduct('${product.product_id}', document.getElementById('stock-input-${product.product_id}').value)" class="add-stock-btn">Aggiungi Stock</button>
-            <button onclick="deleteProduct('${product.product_id}')" class="delete-btn">Elimina Prodotto</button>
-        </div>
-    </div>
-`).join('');
+                <div class="product-card">
+                    <div class="product-img" onclick="editProduct('${product.product_id}')">
+                       <img src="http://localhost:900/images?product_id=${product.product_id}" alt="prod-img">
+                    </div>
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p>$${product.price}</p>
+                    <p>Stock: ${product.stock_count}</p>
+                    <div class="add-stock-container">
+                        <input type="number" id="stock-input-${product.product_id}" min="1" value="1" class="add-stock-input">
+                        <button onclick="addStockToProduct('${product.product_id}', document.getElementById('stock-input-${product.product_id}').value)" class="add-stock-btn">Aggiungi Stock</button>
+                        <button onclick="deleteProduct('${product.product_id}')" class="remove-all-stock-btn">Elimina Prodotto</button>
+                    </div>
+                </div>
+                `)
+                        .join('');
                 }
 
                 content.innerHTML = `
