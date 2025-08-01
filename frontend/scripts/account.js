@@ -40,7 +40,6 @@ const loadAccountPage = () => {
     }
 
 
-
     userDiv.innerHTML = `
              <h2 id="user-name">${user.name} ${user.lastname}</h2>
              <p id="user-email">${user.email}</p>
@@ -169,25 +168,16 @@ const changePersonalInfo = () => {
 }
 
 const editProduct = (productId) => {
-    // Debug: Mostra tutti i prodotti disponibili
     productId = Number(productId);
-
-    // Trova il prodotto specifico
-    const product = ProductState.getAllProducts().find(p => {
-        //console.log(`Confronto: ${p.product_id} === ${productId}` + " (tipo p.product_id: " + typeof p.product_id + ")" + " (tipo productId: " + typeof productId + ")");
-        return p.product_id.toString() === productId.toString();
-    });
+    const product = ProductState.getAllProducts().find(p => p.product_id.toString() === productId.toString());
 
     if (!product) {
-        // Log più dettagliato
         spawnToast("Prodotto non trovato", "error");
         return;
-
     }
-    // Imposta il prodotto selezionato
+
     ProductState.selectedProduct = product;
 
-    // Resto del codice di rendering del prodotto
     const content = document.getElementById("content");
     content.innerHTML = `
         <div class="edit-product-container">
@@ -202,28 +192,35 @@ const editProduct = (productId) => {
                         <input type="file" id="edit-prod-picture" accept="image/*">
                     </div>
                 </div>
-                
+
                 <div class="product-details-section">
                     <div class="form-group">
                         <label for="edit-prod-name">Nome Prodotto</label>
                         <input type="text" id="edit-prod-name" value="${product.name}" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="edit-prod-price">Prezzo</label>
                         <input type="number" id="edit-prod-price" value="${product.price}" step="0.01" min="0" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="edit-prod-description">Descrizione Prodotto</label>
                         <textarea id="edit-prod-description" required>${product.description}</textarea>
                     </div>
-                    
+
+                    <div class="form-group">
+                        <label for="edit-category-filter">Categoria</label>
+                        <select id="edit-category-filter" class="filter-select" required>
+                            <option value="" disabled>Caricamento categorie...</option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label for="edit-prod-stock">Disponibilità</label>
-                        <input type="number" id="edit-prod-stock" value="${product.stock_count}" min="0" required>
+                        <input type="number" id="edit-prod-stock" value="${product.stock_count}" min="0">
                     </div>
-                    
+
                     <div class="form-actions">
                         <button onclick="saveProductChanges()" class="save-btn">
                             Salva Modifiche
@@ -236,65 +233,201 @@ const editProduct = (productId) => {
             </div>
         </div>
     `;
+
+    // Carica le categorie
+    const token = localStorage.getItem("token");
+    loadCategories(token)
+        .then(categories => {
+            const categorySelect = document.getElementById("edit-category-filter");
+            categorySelect.innerHTML = "";
+
+            for (let category of categories) {
+                const option = document.createElement("option");
+                option.value = category.id_category;
+                option.textContent = category.name;
+                option.selected = (category.id_category === product.id_category);
+                categorySelect.appendChild(option);
+            }
+        })
+        .catch(error => {
+            console.error("Errore nel caricamento delle categorie:", error);
+            spawnToast("Impossibile caricare le categorie: " + error, "error");
+        });
 };
 
-    const saveProductChanges = () => {
-        // Recupera il prodotto selezionato dallo stato
-    }
-const addStockToProduct = (productId, quantity) => {
-    const token = localStorage.getItem("token");
-    ProductState.addStockToProduct(productId, token, quantity).then(res => {
-        if (!res.ok) {
-            throw new Error(`Server responded with status: ${res.status}`);
-        }
-        return res.json();
-    }).then(data => {
-        spawnToast("Stock added successfully", "success");
-        loadContent("my-products"); // Reload the products page
-    }).catch(err => {
-        console.error("Error adding stock to product:", err);
-        spawnToast("Cannot add stock to product: " + err, "error");
-    });
-}
 
-
-const loadContent = (type) => {
-    const content = document.getElementById("content");
-    const token = localStorage.getItem("token")
-
-    if (!content) {
-        console.error("No content div found");
+const saveProductChanges = () => {
+    // Recupera il prodotto selezionato
+    const product = ProductState.selectedProduct;
+    if (!product) {
+        spawnToast("Nessun prodotto selezionato", "error");
         return;
     }
 
-    const buttonType = document.getElementById(type)
+    // Recupera i dati dal form
+    const name = document.getElementById("edit-prod-name").value;
+    const price = document.getElementById("edit-prod-price").value;
+    const description = document.getElementById("edit-prod-description").value;
+    const id_category = document.getElementById("edit-category-filter").value;
+    const newStockCount = parseInt(document.getElementById("edit-prod-stock").value);
+    const photoInput = document.getElementById("edit-prod-picture");
 
-    // is this good?
-    if (buttonType) {
-        const activeButton = document.querySelector(".nav-btn.active");
-        if (activeButton) {
-            activeButton.classList.remove("active");
+    // Validazione dei dati
+    if (!name || !price || !description || !id_category || newStockCount < 0) {
+        spawnToast("Completa tutti i campi obbligatori correttamente", "error");
+        return;
+    }
+
+    if (isNaN(price) || price <= 0) {
+        spawnToast("Il prezzo deve essere un numero valido maggiore di zero", "error");
+        return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+        spawnToast("Devi essere autenticato per modificare un prodotto", "error");
+        return;
+    }
+
+    // Calcola la variazione di stock
+    const stockDifference = newStockCount - product.stock_count;
+
+    // Funzione per aggiornare le info del prodotto (senza lo stock)
+    const updateProductInfo = () => {
+        // Controllo se c'è una nuova immagine
+        if (photoInput.files && photoInput.files[0]) {
+            // Aggiornamento con nuova immagine
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('price', price);
+            formData.append('description', description);
+            formData.append('id_category', id_category);
+            formData.append('photo', photoInput.files[0]);
+
+            return fetch(`http://localhost:900/product/${product.product_id}/with-img`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+        } else {
+            // Aggiornamento senza immagine
+            const updates = {
+                name,
+                price,
+                description,
+                id_category
+            };
+
+            return fetch(`http://localhost:900/product/${product.product_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(updates)
+            });
         }
-        buttonType.classList.add("active");
+    };
+
+// Prima aggiorniamo le informazioni del prodotto
+    updateProductInfo()
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Il server ha risposto con status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            // Se c'è una variazione di stock, la gestiamo
+            if (stockDifference !== 0) {
+                if (stockDifference > 0) {
+                    // Aggiungiamo stock
+                    return fetch(`http://localhost:900/product/${product.product_id}/stock/${stockDifference}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                } else if (stockDifference < 0) {
+                    // Rimuoviamo stock (valore assoluto della differenza)
+                    const quantityToRemove = Math.abs(stockDifference);
+                    return fetch(`http://localhost:900/product/${product.product_id}/stock/remove/${quantityToRemove}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                }
+            }
+            return Promise.resolve();
+        })
+        .then(() => {
+            spawnToast("Prodotto aggiornato con successo", "success");
+            loadContent('my-products');
+        })
+        .catch(err => {
+            console.error("Errore nell'aggiornamento del prodotto:", err);
+            spawnToast("Impossibile aggiornare il prodotto: " + err.message, "error");
+        });
+}
+
+
+    const addStockToProduct = (productId, quantity) => {
+        const token = localStorage.getItem("token");
+        ProductState.addStockToProduct(productId, token, quantity).then(res => {
+            if (!res.ok) {
+                throw new Error(`Server responded with status: ${res.status}`);
+            }
+            return res.json();
+        }).then(data => {
+            spawnToast("Stock added successfully", "success");
+            loadContent("my-products"); // Reload the products page
+        }).catch(err => {
+            console.error("Error adding stock to product:", err);
+            spawnToast("Cannot add stock to product: " + err, "error");
+        });
     }
 
 
-    switch (type) {
-        case "my-products":
-            const user = UserState.getUserInfo()
-            const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
-            products.then(res => {
-                if (!res.ok) {
-                    throw new Error(`Server responded with status: ${res.status}`);
-                }
-                return res.json();
-            }).then(products => {
-                ProductState.setAllProducts(products);
-                let productsContent;
-                if (products.length === 0) {
-                    productsContent = `<p>No products found.</p>`;
-                } else {
-                    productsContent = products.map(product => `
+    const loadContent = (type) => {
+        const content = document.getElementById("content");
+        const token = localStorage.getItem("token")
+
+        if (!content) {
+            console.error("No content div found");
+            return;
+        }
+
+        const buttonType = document.getElementById(type)
+
+        // is this good?
+        if (buttonType) {
+            const activeButton = document.querySelector(".nav-btn.active");
+            if (activeButton) {
+                activeButton.classList.remove("active");
+            }
+            buttonType.classList.add("active");
+        }
+
+
+        switch (type) {
+            case "my-products":
+                const user = UserState.getUserInfo()
+                const products = ProductState.fetchProducts({seller_id: user.user_uuid}, token)
+                products.then(res => {
+                    if (!res.ok) {
+                        throw new Error(`Server responded with status: ${res.status}`);
+                    }
+                    return res.json();
+                }).then(products => {
+                    ProductState.setAllProducts(products);
+                    let productsContent;
+                    if (products.length === 0) {
+                        productsContent = `<p>No products found.</p>`;
+                    } else {
+                        productsContent = products.map(product => `
     <div class="product-card">
         <div class="product-img" onclick="editProduct('${product.product_id}')">
            <img src="http://localhost:900/images?product_id=${product.product_id}" alt="prod-img">
@@ -309,9 +442,9 @@ const loadContent = (type) => {
         </div>
     </div>
 `).join('');
-                }
+                    }
 
-                content.innerHTML = `
+                    content.innerHTML = `
                     <div class="content-tab active" id="products-tab">
                         <div class="products-management">
                             <h2>My Products</h2>
@@ -321,29 +454,29 @@ const loadContent = (type) => {
                         </div>
                     </div>
                 `;
-            }).catch(error => {
-                console.error("Error loading products:", error);
-                spawnToast("Cannot load products: " + error, "error");
+                }).catch(error => {
+                    console.error("Error loading products:", error);
+                    spawnToast("Cannot load products: " + error, "error");
 
-            });
-            break
-        case "add-product":
-            loadCategories(token)
-                .then(categories => {
-                    const categoriesDiv = document.getElementById("category-filter");
-                    for (let category of categories) {
-                        categoriesDiv.innerHTML += `
+                });
+                break
+            case "add-product":
+                loadCategories(token)
+                    .then(categories => {
+                        const categoriesDiv = document.getElementById("category-filter");
+                        for (let category of categories) {
+                            categoriesDiv.innerHTML += `
                         <option value="${category.id_category}">${category.name}</option>
                      `
-                    }
-                })
-                .catch(error => {
-                    console.error("Error loading categories:", error);
-                    spawnToast("Cannot load categories: " + error, "error");
-                    document.dispatchEvent(createPageChangeEvent("home"));
-                });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error loading categories:", error);
+                        spawnToast("Cannot load categories: " + error, "error");
+                        document.dispatchEvent(createPageChangeEvent("home"));
+                    });
 
-            content.innerHTML = `
+                content.innerHTML = `
               <!-- Add product (only for Artisan) -->
                 <div class="content-tab active" id="products-tab">
                     <div class="products-management">
@@ -381,10 +514,10 @@ const loadContent = (type) => {
                     </div>
                 </div>
         `;
-            break
+                break
 
-        case "settings":
-            content.innerHTML = `
+            case "settings":
+                content.innerHTML = `
              <div class="content-tab active" id="settings-tab">
                 <div class="settings-form">
                     <h3>Personal information (changes only the provided ones)</h3>
@@ -408,37 +541,37 @@ const loadContent = (type) => {
                 </div>
             </div>
             `
-            break
+                break
 
-        case "orders":
-            if (!token) {
-                content.innerHTML = `
+            case "orders":
+                if (!token) {
+                    content.innerHTML = `
                     <div class="content-tab active" id="orders-tab">
                         <h2>Orders</h2>
                         <p>Autenticazione richiesta.</p>
                     </div>
                 `;
-                return;
-            }
+                    return;
+                }
 
-            content.innerHTML = `
+                content.innerHTML = `
                 <div class="content-tab active" id="orders-tab">
                     <h2>Orders</h2>
                     <p>Caricamento ordini...</p>
                 </div>
              `;
 
-            OrderState.fetchOrders(token).then(res => {
-                if (!res.ok) {
-                    throw new Error(`Server responded with status: ${res.status}`);
-                }
-                return res.json();
-            }).then(orders => {
-                OrderState.setOrders(orders);
-                console.log("Orders loaded:", orders);
+                OrderState.fetchOrders(token).then(res => {
+                    if (!res.ok) {
+                        throw new Error(`Server responded with status: ${res.status}`);
+                    }
+                    return res.json();
+                }).then(orders => {
+                    OrderState.setOrders(orders);
+                    console.log("Orders loaded:", orders);
 
-                let ordersContent = orders.length > 0 ?
-                    orders.map(order => `
+                    let ordersContent = orders.length > 0 ?
+                        orders.map(order => `
                 <div class="order-card ${order.status}">
                     <h3>Order #${order.order_id}</h3>
                     <p>Date: ${new Date(order.created_at).toLocaleDateString()}</p>
@@ -447,9 +580,9 @@ const loadContent = (type) => {
                     <p>Status: ${order.status}</p>
                 </div>
             `).join("") :
-                    "<p>Nessun ordine trovato.</p>";
+                        "<p>Nessun ordine trovato.</p>";
 
-                content.innerHTML = `
+                    content.innerHTML = `
                 <div class="content-tab active" id="orders-tab">
                     <h2>Orders</h2>
                     <div class="orders-management">
@@ -459,26 +592,26 @@ const loadContent = (type) => {
                     </div>
                 </div>
             `;
-            }).catch(error => {
-                console.error("Error loading orders:", error);
-                spawnToast("Cannot load orders: " + error, "error");
+                }).catch(error => {
+                    console.error("Error loading orders:", error);
+                    spawnToast("Cannot load orders: " + error, "error");
 
-                content.innerHTML = `
+                    content.innerHTML = `
         <div class="content-tab active" id="orders-tab">
             <h2>Orders</h2>
             <p>Errore nel caricamento degli ordini.</p>
         </div>
         `;
-            });
-            break;
+                });
+                break;
+        }
     }
-}
 
-window.saveProductChanges = saveProductChanges;
-window.editProduct = editProduct;
-window.loadCategories = loadCategories;
-window.loadAccountPage = loadAccountPage;
-window.loadContent = loadContent;
-window.addArtisanProduct = addArtisanProduct;
-window.changePersonalInfo = changePersonalInfo;
-window.addStockToProduct = addStockToProduct;
+    window.saveProductChanges = saveProductChanges;
+    window.editProduct = editProduct;
+    window.loadCategories = loadCategories;
+    window.loadAccountPage = loadAccountPage;
+    window.loadContent = loadContent;
+    window.addArtisanProduct = addArtisanProduct;
+    window.changePersonalInfo = changePersonalInfo;
+    window.addStockToProduct = addStockToProduct;

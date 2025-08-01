@@ -99,6 +99,7 @@ class ProductState {
         })
     }
 
+
     static setCategories(categories) {
         ProductState.categories = categories;
     }

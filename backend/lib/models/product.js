@@ -38,7 +38,6 @@ export default class Product {
         }
 
 
-
         const query = `SELECT p.*, COUNT(s.item_id) as stock_count, u.name as seller_name, u.lastname as seller_lastname
                        FROM products p
                                 LEFT JOIN stock s ON p.product_id = s.product_id
@@ -58,6 +57,54 @@ export default class Product {
             'DELETE FROM products WHERE product_id = $1',
             [productId]
         );
+    }
+
+    static async updateProduct(productId, updates) {
+        // Costruisce dinamicamente la query di aggiornamento
+        const setClauses = [];
+        const values = [];
+        let paramIndex = 1;
+
+        for (const [key, value] of Object.entries(updates)) {
+            if (value !== undefined && value !== null) {
+                setClauses.push(`${key} = $${paramIndex}`);
+                values.push(value);
+                paramIndex++;
+            }
+        }
+
+        if (setClauses.length === 0) {
+            return null; // Nessun campo da aggiornare
+        }
+
+        values.push(productId);
+
+        const query = `
+            UPDATE products
+            SET ${setClauses.join(', ')}
+            WHERE product_id = $${paramIndex} RETURNING product_id
+        `;
+
+        const result = await db.dbConnection.execute(query, values);
+        return result.rows[0].product_id;
+    }
+
+    static async removeStockByQuantity(productId, quantity) {
+        // Ottieni i più recenti item di stock per questo prodotto
+        const result = await db.dbConnection.execute(
+            'SELECT item_id FROM stock WHERE product_id = $1 ORDER BY item_id DESC LIMIT $2',
+            [productId, quantity]
+        );
+
+        // Rimuovi ogni item di stock
+        for (const row of result.rows) {
+            await db.dbConnection.execute(
+                'DELETE FROM stock WHERE item_id = $1',
+                [row.item_id]
+            );
+        }
+
+        return result.rows.length; // Restituisci il numero di item effettivamente rimossi
     }
 
     static async addToStock(productId) {

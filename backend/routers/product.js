@@ -142,6 +142,7 @@ router.post("/with-img", express.urlencoded({extended: true}), upload.single('ph
 })
 
 
+
 /**
  * @swagger
  * /product/{product_id}/stock/{stock_number}:
@@ -200,6 +201,210 @@ router.post("/:product_id/stock/:stock_number", async (req, res) => {
     }
 
 })
+
+/**
+ * @swagger
+ * /product/{product_id}:
+ *   put:
+ *     summary: Aggiorna un prodotto senza immagine
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: product_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del prodotto da modificare
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               id_category:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Prodotto aggiornato con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Prodotto aggiornato con successo
+ *       500:
+ *         description: Errore del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
+router.put("/:product_id", async (req, res) => {
+    const { product_id } = req.params;
+    const updates = req.body;
+
+    try {
+        await Product.updateProduct(product_id, updates);
+        res.status(200).json({ message: "Prodotto aggiornato con successo" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Errore del server" });
+    }
+});
+
+/**
+ * @swagger
+ * /product/{product_id}/with-img:
+ *   put:
+ *     summary: Aggiorna un prodotto con immagine
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: path
+ *         name: product_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del prodotto da modificare
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               id_category:
+ *                 type: integer
+ *               photo:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Prodotto aggiornato con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Prodotto aggiornato con successo
+ *       500:
+ *         description: Errore del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
+router.put("/:product_id/with-img", express.urlencoded({extended: true}), upload.single('photo'), async (req, res) => {
+    const { product_id } = req.params;
+    const { name, description, price, id_category } = req.body;
+
+    try {
+        const updates = {
+            name,
+            description,
+            price,
+            id_category
+        };
+
+        if (req.file) {
+            updates.image_url = req.file.path;
+        }
+
+        await Product.updateProduct(product_id, updates);
+        res.status(200).json({ message: "Prodotto aggiornato con successo" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Errore del server" });
+    }
+});
+
+
+/**
+ * @swagger
+ * /product/{product_id}/stock/remove/{stock_number}:
+ *   post:
+ *     summary: Rimuove stock da un prodotto esistente
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: product_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del prodotto
+ *       - in: path
+ *         name: stock_number
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Quantità di stock da rimuovere
+ *     responses:
+ *       200:
+ *         description: Stock rimosso con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Stock rimosso con successo
+ *       500:
+ *         description: Errore del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Errore del server
+ */
+router.post("/:product_id/stock/remove/:stock_number", async (req, res) => {
+    const {product_id, stock_number} = req.params;
+
+    try {
+        await Product.removeStockByQuantity(product_id, stock_number);
+        res.status(200).json({message: "Stock rimosso con successo"});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message: "Errore del server"});
+    }
+});
+
+
 /**
  * @swagger
  * /product:
