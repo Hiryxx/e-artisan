@@ -38,12 +38,13 @@ export default class Product {
         }
 
 
-        const query = `SELECT p.*, COUNT(s.item_id) as stock_count, u.name as seller_name, u.lastname as seller_lastname
+        const query = `SELECT p.*, COUNT(s.item_id) as stock_count, u.name as seller_name, u.lastname as seller_lastname, c.name as category_name
                        FROM products p
                                 LEFT JOIN stock s ON p.product_id = s.product_id
                                 LEFT JOIN users u ON p.seller_id = u.user_uuid
+                                LEFT JOIN categories c ON p.id_category = c.id_category
                        WHERE ${whereClause}
-                       GROUP BY p.product_id, u.name, u.lastname
+                       GROUP BY p.product_id, u.name, u.lastname, c.name
                        ORDER BY p.product_id DESC`;
 
         const values = Object.values(filter);

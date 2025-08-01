@@ -284,7 +284,6 @@ const loadProductDetails = () => {
     }
 
 
-
     productDetailsDiv.innerHTML = `
         <div class="product-details-image">
             <img src="http://localhost:900/images?product_id=${selectedProduct.product_id}" alt="${selectedProduct.name}">
@@ -294,7 +293,7 @@ const loadProductDetails = () => {
             <p class="product-price">Price: $${selectedProduct.price}</p>
             <p class="product-stock">Stock: ${selectedProduct.stock_count}</p>
             <p class="product-description">Description: ${selectedProduct.description || 'Nessuna descrizione disponibile'}</p>
-            <p class="product-category">Category: ${selectedProduct.category_id || selectedProduct.id_category || 'N/A'}</p>
+            <p class="product-category">Category: ${selectedProduct.category_name || 'N/A'}</p>
             <p class="product-seller">Seller: ${selectedProduct.seller_name || ''} ${selectedProduct.seller_lastname || ''}</p>
             <div class="actions">
                 ${addToCartBtnContent}
@@ -318,10 +317,12 @@ const loadProductDetails = () => {
             });
         }
     }
-
-    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
-        goToShoppingCartWithProduct(selectedProduct.product_id);
-    });
+    const addToCartBtn = document.getElementById('add-to-cart-btn')
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', () => {
+            goToShoppingCartWithProduct(selectedProduct.product_id);
+        });
+    }
 }
 
 
