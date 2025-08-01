@@ -142,14 +142,14 @@ class ProductState {
         ProductState.allProducts = [];
     }
 
-    static addStockToProduct(productId, token) {
+    static addStockToProduct(productId, token, quantity) {
         let headers = {
             "Content-Type": "application/json",
         }
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
         }
-        return fetch(`http://localhost:900/product/${productId}/stock/1`, {
+        return fetch(`http://localhost:900/product/${productId}/stock/${quantity}`, {
             method: "POST",
             headers: headers
         });

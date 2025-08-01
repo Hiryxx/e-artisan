@@ -169,9 +169,9 @@ const changePersonalInfo = () => {
 }
 
 
-const addStockToProduct = (productId) => {
+const addStockToProduct = (productId, quantity) => {
     const token = localStorage.getItem("token");
-    ProductState.addStockToProduct(productId, token).then(res => {
+    ProductState.addStockToProduct(productId, token, quantity).then(res => {
         if (!res.ok) {
             throw new Error(`Server responded with status: ${res.status}`);
         }
@@ -223,17 +223,20 @@ const loadContent = (type) => {
                     productsContent = `<p>No products found.</p>`;
                 } else {
                     productsContent = products.map(product => `
-                    <div class="product-card">
-                        <div class="product-img">
-                           <img src="http://localhost:900/images?product_id=${product.product_id}" alt="prod-img">
-                        </div>
-                        <h3>${product.name}</h3>
-                        <p>${product.description}</p>
-                        <p>$${product.price}</p>
-                        <p>Stock: ${product.stock_count}</p>
-                        <button onclick="addStockToProduct(${product.product_id})" class="product-add-stock">Add stock</button>
-                    </div>
-                `).join("");
+    <div class="product-card">
+        <div class="product-img">
+           <img src="http://localhost:900/images?product_id=${product.product_id}" alt="prod-img">
+        </div>
+        <h3>${product.name}</h3>
+        <p>${product.description}</p>
+        <p>$${product.price}</p>
+        <p>Stock: ${product.stock_count}</p>
+        <div class="add-stock-container">
+            <input type="number" id="stock-input-${product.product_id}" min="1" value="1" class="add-stock-input">
+            <button onclick="addStockToProduct('${product.product_id}', document.getElementById('stock-input-${product.product_id}').value)" class="add-stock-btn">Aggiungi Stock</button>
+        </div>
+    </div>
+`).join('');
                 }
 
                 content.innerHTML = `
