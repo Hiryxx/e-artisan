@@ -433,7 +433,9 @@ const loadContent = (type) => {
                        <img src="http://localhost:900/images?product_id=${product.product_id}" alt="prod-img">
                     </div>
                     <h3>${product.name}</h3>
-                    <p>${product.description}</p>
+                    
+                    <p>${product.description.length > 30 ? product.description.substring(0, 30) + '...' : product.description}</p>
+
                     <p>$${product.price}</p>
                     <p>Stock: ${product.stock_count}</p>
                     <div class="add-stock-container">
