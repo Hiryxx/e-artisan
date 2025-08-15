@@ -63,10 +63,18 @@ const loadPaymentPage = () => {
     document.getElementById("expiry-date").addEventListener("input", (e) => {
         let value = e.target.value.replace(/\D/g, '');
         if (value.length > 2) {
+            const month = parseInt(value.substring(0, 2));
+            // Controlla che il mese sia valido (1-12)
+            if (month < 1 || month > 12) {
+                e.target.value = '';
+                spawnToast("Il mese deve essere compreso tra 1 e 12", "error");
+                return;
+            }
             value = value.substring(0, 2) + '/' + value.substring(2, 4);
         }
         e.target.value = value;
     });
+
 };
 
 // Funzione per tornare alla pagina di checkout
@@ -76,6 +84,28 @@ const goBackToCheckout = () => {
 
 const handlePaymentSubmit = async (e) => {
     e.preventDefault();
+
+    // Validazione della data di scadenza
+    const expiryDate = document.getElementById("expiry-date").value;
+    const [month, year] = expiryDate.split('/').map(num => parseInt(num));
+
+    // Ottieni la data corrente
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100; // Prende le ultime due cifre dell'anno
+    const currentMonth = currentDate.getMonth() + 1; // getMonth() restituisce 0-11
+
+    // Validazione del mese e dell'anno
+    if (month < 1 || month > 12) {
+        spawnToast("Il mese di scadenza non è valido", "error");
+        return;
+    }
+
+    // Controlla se la carta è scaduta
+    if (year < currentYear || (year === currentYear && month < currentMonth)) {
+        spawnToast("La carta di credito è scaduta", "error");
+        return;
+    }
+
     spawnToast("Elaborazione dell'ordine in corso...", "info");
 
     try {
@@ -146,6 +176,7 @@ const handlePaymentSubmit = async (e) => {
 
         // 9. Ordine completato con successo
         localStorage.removeItem("cartItems");
+        CartState.setCartItems([]);
         localStorage.removeItem("shippingInfo");
 
         spawnToast("Ordine completato con successo!", "success");
