@@ -19,22 +19,45 @@ docker-compose up -d
 
 ### You can now access the backend at http://localhost:3000/index.html
 ---
-## 📋 ToDo List
 
-| Funzionalità                                                                 | Stato       | Grafica     | Responsabile                    | Note                                                                 |
-|------------------------------------------------------------------------------|-------------|-------------|----------------------------------|----------------------------------------------------------------------|
-| Pagina utente                                                               | ✅   | ✅    | Tommaso, Mauro                   |                                                                      |
-| Pagina prodotto                                                             | ✅  | ✅    | Francesco                        |                                                                      |
-| Carrello                                                                    | ✅      | ✅      | Paolo                            |                                                                      |
-| Ricerca con filtri                                                          | ✅    | ✅   | Paolo                            |                                                                      |
-| Acquisto, pagamento e gestione ordini                                       | ✅   | ✅    | Paolo, Francesco                 |                                                                      |
-| Dashboard artigiano (vendite, prodotti, stock)                              | ✅    | ✅    | Davide                           |                                                                      |
-| Amministratore (monitoraggio, segnalazioni, funzionamento)                 | ✅    | ✅    | Francesco                        |                                                                      |
-| Test unitari e integration test                                             | ✅    | —           | Paolo                            |                                                                      |
-| Schema ER                                                                   | ✅    | —           | Tommaso                          |                                                                      |
-| Documentazione operazioni CRUD                                              | ✅    | —           | Tutti                            |                                                                      |
-| README esaustivo                                                            | ✅    | —           | Davide                           | Include istruzioni di build, test, deploy                           |
----
+# E-Artisan API Testing
+
+## Setup
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Create test database:
+   ```bash
+   npm run test:setup
+   ```
+
+3. Configure `.env.test` with your database credentials
+
+## Running Tests
+
+- Run all tests: `npm test`
+- Run with coverage: `npm run test:coverage`
+- Run in watch mode: `npm run test:watch`
+- Run only unit tests: `npm run test:unit`
+- Run only integration tests: `npm run test:integration`
+
+## Cleanup
+
+To remove test database:
+```bash
+npm run test:cleanup
+```
+
+## Test Structure
+
+- `test/api.test.js` - Complete API endpoint tests
+- `test/integration.test.js` - Integration flow tests
+- `test/helpers.js` - Utility functions
+- `test/setup.js` - Database configuration
+
 
 
 

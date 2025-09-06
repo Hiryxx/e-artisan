@@ -145,7 +145,6 @@ class Database {
     }
 }
 
-// for now a pool is fine but i need to acquire a client in the future
 class DbConnection {
     _pool
 

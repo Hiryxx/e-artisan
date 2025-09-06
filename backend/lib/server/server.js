@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import cors from "cors";
 import * as path from "node:path";
 import adminRouter from "../../routers/admin.js";
-import bodyParser from "body-parser";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 
@@ -71,6 +70,10 @@ export class Server {
             swaggerUi.setup(specs)
         );
 
+        this.app.get('/swagger.json', (req, res) => {
+            res.json(specs);
+        });
+
         // configures dotenv to work in your application
         this.app.use(unless(["/", "/images", "/auth/login", "/auth/register", "/product", "/admin/reports:", "/product/categories"], this.middleware))
         this.app.use(express.json())
@@ -130,6 +133,7 @@ export class Server {
             next();
         });
     }
-
 }
+
+export default Server;
 
