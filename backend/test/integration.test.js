@@ -18,6 +18,7 @@ describe('Integration Tests', function() {
         db = new TestDatabase();
         await db.bootstrap();
 
+        // Setup server
         server = new Server();
         server.loadServer();
         app = server.app;

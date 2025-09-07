@@ -27,6 +27,10 @@ export default class Product {
                 // For name, we want to use a LIKE clause for partial matches
                 whereClause += `LOWER(p.${key}) LIKE LOWER($${index})`;
                 filter[key] = `%${filter[key]}%`; // Add wildcards for LIKE
+            } else if (key === 'min_price') {
+                whereClause += `p.price >= ${"$" + index}`;
+            } else if (key === 'max_price') {
+                whereClause += `p.price <= ${"$" + index}`;
             } else {
                 whereClause += `p.${key} = ${"$" + index}`;
             }
@@ -38,7 +42,11 @@ export default class Product {
         }
 
 
-        const query = `SELECT p.*, COUNT(s.item_id) as stock_count, u.name as seller_name, u.lastname as seller_lastname, c.name as category_name
+        const query = `SELECT p.*,
+                              COUNT(s.item_id) as stock_count,
+                              u.name           as seller_name,
+                              u.lastname       as seller_lastname,
+                              c.name           as category_name
                        FROM products p
                                 LEFT JOIN stock s ON p.product_id = s.product_id
                                 LEFT JOIN users u ON p.seller_id = u.user_uuid

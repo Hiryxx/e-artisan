@@ -100,6 +100,10 @@ export class Server {
             res.sendFile(path.resolve(imgPath));
         });
 
+        this.app.use((req, res) => {
+            res.status(404).send("Not Found");
+        });
+
     }
 
     async startServer() {

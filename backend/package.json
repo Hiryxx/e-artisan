@@ -26,6 +26,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
+    "nyc": "^17.1.0",
     "pg": "^8.15.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
@@ -34,8 +35,8 @@
   "devDependencies": {
     "@testcontainers/postgresql": "^11.5.1",
     "autocannon": "^8.0.0",
-    "mocha": "^10.2.0",
     "chai": "^4.3.10",
+    "mocha": "^10.2.0",
     "supertest": "^7.1.4"
   }
 }
