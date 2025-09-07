@@ -73,7 +73,9 @@ describe('Integration Tests', function() {
                 .get('/product')
                 .expect(200);
 
-            productId = productsRes.body.find(p => p.name === 'Integration Test Product').id;
+            //console.log("RESSS, ", productsRes.body);
+
+            productId = productsRes.body.find(p => p.name === 'Integration Test Product').product_id;
 
             // 4. User creates order
             const orderRes = await request(app)
@@ -85,7 +87,8 @@ describe('Integration Tests', function() {
                             product_id: productId,
                             quantity: 1,
                             price: 150
-                        }]
+                        }],
+                        totalAmount: 150
                     },
                     shippingInfo: {
                         street: 'Test St',
@@ -95,8 +98,7 @@ describe('Integration Tests', function() {
                         state: 'TS'
                     },
                     paymentInfo: {
-                        method: 'card',
-                        transaction_id: 'tx_123'
+                        paymentMethod: 'credit_card',
                     }
                 })
                 .expect(201);

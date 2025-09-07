@@ -66,7 +66,7 @@ describe('E-Artisan API Tests', function() {
 
     // Cleanup after all tests
     after(async function() {
-        this.timeout(15000);
+        this.timeout(10000);
 
         // Clean up test data
         if (db && db.dbConnection) {
@@ -586,14 +586,6 @@ describe('E-Artisan API Tests', function() {
                 .get('/orders')
                 .set('Authorization', 'InvalidTokenFormat')
                 .expect(401);
-        });
-
-        it.skip('should handle non-existent endpoints', async function() {
-            // Skip this test as middleware ordering makes it return 401 instead of 404
-            // This is a known limitation of the current middleware setup
-            const res = await request(app)
-                .get('/non-existent-endpoint')
-                .expect(404);
         });
     });
 
