@@ -60,13 +60,13 @@ const loadAccountPage = () => {
     } else if (user.role_id === 3) { // or fa-plus-circle
         accountNav.innerHTML = `
                      <button id="my-products" onclick="loadContent('my-products')" class="nav-btn" data-tab="products">
-                        <i class="fas fa-box"></i>My products
+                        <i class="fas fa-box"></i>I miei prodotti
                     </button>
                      <button id="add-product" onclick="loadContent('add-product')" class="nav-btn" data-tab="products">
-                        <i class="fas fa-cart-plus"></i>Add product
+                        <i class="fas fa-cart-plus"></i>Aggiungi prodotto
                     </button>
                     <button id="settings" onclick="loadContent('settings')" class="nav-btn" data-tab="settings">
-                        <i class="fas fa-cog"></i>Settings
+                        <i class="fas fa-cog"></i>Impostazioni
                     </button>
                    `
         loadContent('my-products')
@@ -157,7 +157,7 @@ const changePersonalInfo = () => {
         })
         .then(updatedUser => {
             UserState.seUserInfo(updatedUser);
-            spawnToast("Personal information updated successfully", "success");
+            spawnToast("Informazioni personali aggiornate con successo", "success");
             loadAccountPage(); // Reload the account page to reflect changes
         })
         .catch(err => {
@@ -451,7 +451,7 @@ const loadContent = (type) => {
                 content.innerHTML = `
                     <div class="content-tab active" id="products-tab">
                         <div class="products-management">
-                            <h2>My Products</h2>
+                            <h2>I miei prodotti</h2>
                             <div class="products-grid">
                                 ${productsContent}
                             </div>
@@ -485,19 +485,19 @@ const loadContent = (type) => {
                 <div class="content-tab active" id="products-tab">
                     <div class="products-management">
                         <div class="form-group">
-                            <label for="name">Name</label>
+                            <label for="name">Nome</label>
                             <input type="text" id="prod-name">
                         </div>
                         <div class="form-group">
-                            <label for="price">Price ($)</label>
+                            <label for="price">Prezzo ($)</label>
                             <input type="number" id="prod-price">
                         </div>
                         <div class="form-group">
-                            <label for="description">Description</label>
+                            <label for="description">Descrizione</label>
                             <input type="text" id="prod-description">
                         </div>
                         <div class="form-group">
-                            <label for="categories">Category</label>
+                            <label for="categories">Categoria</label>
                             <select id="category-filter" class="filter-select">
                                 <option value="" disabled>Categories</option>
                                  <!-- Categories from db -->
@@ -508,12 +508,12 @@ const loadContent = (type) => {
                             <input type="number" id="prod-stock" min=1 value=1>
                         </div>
                         <div class="form-group">
-                            <label for="picture">Picture</label>
+                            <label for="picture">Immagine</label>
                             <input type="file" id="prod-picture">
                         </div>
         
                         <button onclick="addArtisanProduct()" class="add-product-btn">
-                            <i class="fas fa-plus"></i>Add Product
+                            <i class="fas fa-plus"></i>Aggiungi prodotto
                         </button>
                     </div>
                 </div>
@@ -524,13 +524,13 @@ const loadContent = (type) => {
             content.innerHTML = `
              <div class="content-tab active" id="settings-tab">
                 <div class="settings-form">
-                    <h3>Personal information (changes only the provided ones)</h3>
+                    <h3 id="settings-title">Infomazioni personali (cambia solo quelle inserite)</h3>
                         <div class="form-group">
-                            <label for="edit-name">Name</label>
+                            <label for="edit-name">Nome</label>
                             <input type="text" id="edit-name">
                         </div>
                          <div class="form-group">
-                            <label for="edit-name">Last Name</label>
+                            <label for="edit-name">Cognome</label>
                             <input type="text" id="edit-last-name">
                         </div>
                         <div class="form-group">
@@ -538,7 +538,7 @@ const loadContent = (type) => {
                             <input type="email" id="edit-email">
                         </div>
                         <div class="form-group">
-                            <label for="edit-password">New Password</label>
+                            <label for="edit-password">Nuova Password</label>
                             <input type="password" id="edit-password">
                         </div>
                         <button onclick="changePersonalInfo()" type="submit" class="save-btn">Save</button>
