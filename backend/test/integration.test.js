@@ -2,28 +2,23 @@ import { describe, it, before, after } from 'mocha';
 import { expect } from 'chai';
 import request from 'supertest';
 import Server from '../lib/server/server.js';
-import { TestDatabase } from './setup.js';
 import { TestHelpers } from './helpers.js';
 
 describe('Integration Tests', function() {
     let server;
     let app;
-    let db;
     let tokens = {};
 
     before(async function() {
         this.timeout(10000);
 
-        // Setup test database
-        db = new TestDatabase();
-        await db.bootstrap();
-
-        // Setup server
         server = new Server();
+        await server.bootstrap();
         server.loadServer();
         app = server.app;
 
-        // Setup test users and get tokens
+        const { db } = await import('../lib/server/server.js');
+
         const users = await TestHelpers.setupTestUsers(db);
         for (const [role, user] of Object.entries(users)) {
             tokens[role] = TestHelpers.generateToken(user);
@@ -31,8 +26,17 @@ describe('Integration Tests', function() {
     });
 
     after(async function() {
-        await TestHelpers.cleanupTestData(db);
-        await db.dbConnection.pool.end();
+        this.timeout(15000);
+
+        const { db } = await import('../lib/server/server.js');
+
+        if (db) {
+            try {
+                await TestHelpers.cleanupTestData(db);
+            } catch (error) {
+                console.error('Error in integration test cleanup:', error);
+            }
+        }
     });
 
     describe('Complete User Flow', function() {
@@ -40,7 +44,6 @@ describe('Integration Tests', function() {
         let orderId;
 
         it('should complete full purchase flow', async function() {
-            // 1. Register new user
             const registerRes = await request(app)
                 .post('/auth/register')
                 .send({
@@ -54,7 +57,6 @@ describe('Integration Tests', function() {
 
             const buyerToken = registerRes.body.token;
 
-            // 2. Artisan creates product
             const imagePath = TestHelpers.createTestImage();
             const productRes = await request(app)
                 .post('/product/with-img')
@@ -68,16 +70,12 @@ describe('Integration Tests', function() {
 
             TestHelpers.deleteTestImage(imagePath);
 
-            // 3. Get product list
             const productsRes = await request(app)
                 .get('/product')
                 .expect(200);
 
-            //console.log("RESSS, ", productsRes.body);
-
             productId = productsRes.body.find(p => p.name === 'Integration Test Product').product_id;
 
-            // 4. User creates order
             const orderRes = await request(app)
                 .post('/orders')
                 .set('Authorization', `Bearer ${buyerToken}`)
@@ -105,7 +103,6 @@ describe('Integration Tests', function() {
 
             orderId = orderRes.body.order_id;
 
-            // 5. Admin updates order status
             const statusRes = await request(app)
                 .put(`/admin/orders/${orderId}/status`)
                 .set('Authorization', `Bearer ${tokens.admin}`)

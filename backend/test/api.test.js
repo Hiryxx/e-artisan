@@ -2,13 +2,11 @@ import { describe, it, before, after, beforeEach } from 'mocha';
 import { expect } from 'chai';
 import request from 'supertest';
 import Server from '../lib/server/server.js';
-import Database from '../lib/db/database.js';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Load test environment variables
@@ -17,7 +15,6 @@ dotenv.config({ path: '.env.test' });
 describe('E-Artisan API Tests', function() {
     let server;
     let app;
-    let db;
     let adminToken;
     let artisanToken;
     let userToken;
@@ -25,7 +22,6 @@ describe('E-Artisan API Tests', function() {
     let testOrderId;
     let testReportId;
 
-    // Test users
     const testAdmin = {
         email: 'test_admin@test.com',
         password: 'TestAdmin123!',
@@ -50,58 +46,61 @@ describe('E-Artisan API Tests', function() {
         role_id: 2
     };
 
-    // Setup before all tests
     before(async function() {
         this.timeout(10000);
 
-        // Initialize server with test database
         server = new Server();
-        db = new Database();
-        await db.bootstrap();
+        await server.bootstrap();
         server.loadServer();
         app = server.app;
 
         await new Promise(resolve => setTimeout(resolve, 1000));
     });
 
-    // Cleanup after all tests
+    // Cleanup
     after(async function() {
-        this.timeout(10000);
+        this.timeout(15000);
 
-        // Clean up test data
-        if (db && db.dbConnection) {
+        const { db } = await import('../lib/server/server.js');
+
+        if (db && db.dbConnection && db.dbConnection.pool) {
+            let client;
             try {
-                const client = await db.dbConnection.pool.connect();
-                try {
-                    await client.query('BEGIN');
-                    await client.query("DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM orders WHERE user_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%'))");
-                    await client.query("DELETE FROM reports WHERE reporter_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%')");
-                    await client.query("DELETE FROM stock WHERE product_id IN (SELECT product_id FROM products WHERE seller_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%'))");
-                    await client.query("DELETE FROM orders WHERE user_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%')");
-                    await client.query("DELETE FROM products WHERE seller_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%')");
-                    await client.query("DELETE FROM products WHERE name LIKE 'Test%'");
-                    await client.query("DELETE FROM users WHERE email LIKE 'test_%'");
-                    await client.query("DELETE FROM payment_infos WHERE payment_id NOT IN (SELECT payment_id FROM orders WHERE payment_id IS NOT NULL)");
-                    await client.query("DELETE FROM shipment_infos WHERE shipment_id NOT IN (SELECT shipment_id FROM orders WHERE shipment_id IS NOT NULL)");
-                    await client.query('COMMIT');
-                } catch (error) {
-                    await client.query('ROLLBACK');
-                    console.error('Error during cleanup transaction:', error);
-                }
-                finally {
-                    client.release();
-                    await db.dbConnection.pool.end()
+                client = await db.dbConnection.pool.connect();
+
+                await client.query('BEGIN');
+
+                const cleanupQueries = [
+                    "DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM orders WHERE user_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%'))",
+                    "DELETE FROM reports WHERE reporter_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%')",
+                    "DELETE FROM stock WHERE product_id IN (SELECT product_id FROM products WHERE seller_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%'))",
+                    "DELETE FROM orders WHERE user_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%')",
+                    "DELETE FROM products WHERE seller_id IN (SELECT user_uuid FROM users WHERE email LIKE 'test_%')",
+                    "DELETE FROM products WHERE name LIKE 'Test%'",
+                    "DELETE FROM users WHERE email LIKE 'test_%'",
+                    "DELETE FROM payment_infos WHERE payment_id NOT IN (SELECT payment_id FROM orders WHERE payment_id IS NOT NULL)",
+                    "DELETE FROM shipment_infos WHERE shipment_id NOT IN (SELECT shipment_id FROM orders WHERE shipment_id IS NOT NULL)"
+                ];
+
+                for (const query of cleanupQueries) {
+                    await client.query(query);
                 }
 
-                // Close database connection
+                await client.query('COMMIT');
             } catch (error) {
-                console.error('Cleanup error:', error);
+                if (client) {
+                    await client.query('ROLLBACK');
+                }
+                console.error('Error during cleanup transaction:', error);
+            } finally {
+                if (client) {
+                    client.release();
+                }
             }
         }
     });
 
     describe('Authentication Endpoints', function() {
-
         describe('POST /auth/register', function() {
             it('should register a new user', async function() {
                 const res = await request(app)
@@ -218,7 +217,6 @@ describe('E-Artisan API Tests', function() {
     });
 
     describe('Product Endpoints', function() {
-
         describe('GET /product/categories', function() {
             it('should retrieve all categories', async function() {
                 const res = await request(app)
@@ -234,7 +232,7 @@ describe('E-Artisan API Tests', function() {
 
         describe('POST /product/with-img', function() {
             it('should create product with image (artisan only)', async function() {
-                // Create a test image file
+                // Creates a test image file
                 const testImagePath = path.join(__dirname, 'test-image.jpg');
                 fs.writeFileSync(testImagePath, Buffer.from('fake-image-data'));
 
@@ -327,7 +325,6 @@ describe('E-Artisan API Tests', function() {
     });
 
     describe('Order Endpoints', function() {
-
         describe('POST /orders', function() {
             it('should create a new order', async function() {
                 if (!testProductId) this.skip();
@@ -400,7 +397,6 @@ describe('E-Artisan API Tests', function() {
                     .set('Authorization', `Bearer ${userToken}`)
                     .expect(200);
 
-
                 expect(res.body).to.have.property('order_id');
                 expect(res.body).to.have.property('items');
                 expect(res.body).to.have.property('payment_method');
@@ -420,7 +416,6 @@ describe('E-Artisan API Tests', function() {
     });
 
     describe('Admin Endpoints', function() {
-
         describe('POST /admin/reports', function() {
             it('should create a report', async function() {
                 if (!testProductId) this.skip();
@@ -564,7 +559,6 @@ describe('E-Artisan API Tests', function() {
     });
 
     describe('Edge Cases and Error Handling', function() {
-
         it('should handle unauthorized access', async function() {
             const res = await request(app)
                 .get('/orders')
@@ -590,7 +584,6 @@ describe('E-Artisan API Tests', function() {
     });
 
     describe('Performance Tests', function() {
-
         it('should handle concurrent requests', async function() {
             this.timeout(5000);
 
